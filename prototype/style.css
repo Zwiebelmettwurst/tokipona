@@ -447,6 +447,65 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 .tile:active, .choice:active, .lesson:not([data-state="locked"]):active { transform: scale(0.985); }
 .primary:active, .ghost:active { transform: scale(0.99); }
 
+/* ---------------- Wortnachschlag ---------------- */
+
+/* Ein gepunkteter Strich verrät, dass hier etwas nachzuschlagen ist —
+   auf dem Telefon gibt es kein Hover, das darauf hinweisen könnte. */
+.gloss-word {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  text-decoration: underline dotted;
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 1px;
+  text-decoration-color: currentColor;
+  opacity: 0.999;   /* eigener Malkontext, sonst flackert der Strich beim Antippen */
+}
+
+.gloss-word:active { background: var(--accent-soft); border-radius: 0.2rem; }
+
+@media (hover: hover) and (pointer: fine) {
+  .gloss-word { cursor: help; }
+  .gloss-word:hover { background: var(--accent-soft); border-radius: 0.2rem; }
+}
+
+.glossline { display: inline; }
+
+.bubble {
+  position: absolute;
+  z-index: 20;
+  max-width: min(20rem, calc(100% - 1rem));
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+  animation: bubble-in 0.12s ease;
+}
+
+@keyframes bubble-in { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .bubble { animation: none; } }
+
+.bubble-glyph { font-size: 2rem; line-height: 1; color: var(--accent); flex: none; }
+.bubble-body { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+.bubble-body b { font-family: var(--mono); font-weight: 500; font-size: 0.9375rem; color: var(--accent); }
+.bubble-body span { font-size: 0.8125rem; color: var(--ink-dim); }
+.bubble em {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+  align-self: flex-start;
+  flex: none;
+}
+
 /* ---------------- Rückmeldung ---------------- */
 
 .sheet {
