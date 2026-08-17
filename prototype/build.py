@@ -7,6 +7,7 @@ Die Artefakt-Umgebung erlaubt keine externen Dateien, deshalb landen Stil,
 Daten, Parser und Anwendung inline in docs/prototype.html.
 """
 import base64
+import hashlib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -22,6 +23,7 @@ TEMPLATE = """<title>o toki!</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="o toki!">
+<script>window.OTOKI_VERSION = '__VERSION__';</script>
 
 <style>
 /*__FONT__*/
@@ -45,9 +47,43 @@ TEMPLATE = """<title>o toki!</title>
 // offline verfügbar. In einer eingebetteten Vorschau bleibt er aus.
 if ('serviceWorker' in navigator && window.self === window.top
     && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  });
+  (() => {
+    // Wurde die Seite schon von einem Service Worker bedient, dann bedeutet
+    // ein Wechsel: eine neue Fassung hat übernommen.
+    const wasControlled = Boolean(navigator.serviceWorker.controller);
+    let told = false;
+    const announce = () => {
+      if (!wasControlled || told) return;
+      told = true;
+      // Die App entscheidet: mitten in einer Übung stört ein Neuladen.
+      if (typeof window.otokiUpdateReady === 'function') window.otokiUpdateReady();
+      else location.reload();
+    };
+
+    navigator.serviceWorker.addEventListener('controllerchange', announce);
+
+    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+      .then((registration) => {
+        // Beim Start und bei jeder Rückkehr zur App nachsehen, ob es etwas
+        // Neues gibt. iOS hält installierte Apps sonst tagelang eingefroren.
+        const look = () => { registration.update().catch(() => {}); };
+        look();
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') look();
+        });
+        window.addEventListener('online', look);
+
+        if (registration.waiting) announce();
+        registration.addEventListener('updatefound', () => {
+          const fresh = registration.installing;
+          if (!fresh) return;
+          fresh.addEventListener('statechange', () => {
+            if (fresh.state === 'installed' || fresh.state === 'activated') announce();
+          });
+        });
+      })
+      .catch(() => {});
+  })();
 }
 </script>
 """
@@ -67,6 +103,7 @@ def main():
     parser = (HERE / "tokipona.js").read_text()
     app = (HERE / "app.js").read_text()
     style = (HERE / "style.css").read_text()
+    worker = (HERE / "sw.js").read_text()
 
     # Der Prototyp lädt nichts nach; die Node-Zeilen fliegen raus.
     for needle in ["if (typeof module !== 'undefined') { module.exports = TOKIPONA_DATA; }\n",
@@ -80,14 +117,26 @@ def main():
     font = FONT.replace("__BASE64__",
                         base64.b64encode((HERE / "linja-pimeja-1.9.woff2").read_bytes()).decode())
 
-    page = TEMPLATE
+    # Die Fassungsnummer kommt aus dem Inhalt, nicht aus der Uhr: derselbe
+    # Quelltext ergibt immer dieselbe Nummer, sonst schlüge die Drift-Prüfung
+    # in der Werkbank bei jedem Lauf an.
+    fingerprint = hashlib.sha256()
+    for part in (TEMPLATE, FONT, style, data, parser, app, worker):
+        fingerprint.update(part.encode())
+    version = fingerprint.hexdigest()[:10]
+
+    page = TEMPLATE.replace("__VERSION__", version)
     for marker, payload in (("/*__FONT__*/", font), ("/*__STYLE__*/", style), ("/*__DATA__*/", data),
                             ("/*__PARSER__*/", parser), ("/*__APP__*/", app)):
         page = page.replace(marker, payload)
 
     out = ROOT / "docs/prototype.html"
     out.write_text(page)
-    print(f"{out.relative_to(ROOT)}: {out.stat().st_size // 1024} KB")
+
+    sw = ROOT / "docs/sw.js"
+    sw.write_text(worker.replace("__VERSION__", version))
+
+    print(f"{out.relative_to(ROOT)}: {out.stat().st_size // 1024} KB, Fassung {version}")
 
 
 if __name__ == "__main__":

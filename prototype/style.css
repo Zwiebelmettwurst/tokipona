@@ -717,3 +717,34 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   padding: 0.5rem 0 0;
 }
 .foot a { color: var(--ink-faint); }
+
+/* Neue Fassung: schmaler Streifen unten, der die laufende Übung stehen lässt. */
+.updatebar {
+  position: fixed;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: calc(0.75rem + var(--safe-bottom));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem 0.6rem 0.9rem;
+  border-radius: 0.9rem;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 0.8125rem;
+  box-shadow: 0 0.6rem 1.6rem rgba(0, 0, 0, 0.25);
+}
+.updatebar button {
+  flex: none;
+  padding: 0.35rem 0.7rem;
+  border-radius: 0.6rem;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+}
+
+.version { opacity: 0.75; }

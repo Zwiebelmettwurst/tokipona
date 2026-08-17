@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="o toki!">
+<script>window.OTOKI_VERSION = '431fc1e34b';</script>
 
 <style>
 /* linja pimeja 1.9 — jan Inkepa, CC0. Siehe prototype/SCHRIFT.md.
@@ -736,6 +737,37 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   padding: 0.5rem 0 0;
 }
 .foot a { color: var(--ink-faint); }
+
+/* Neue Fassung: schmaler Streifen unten, der die laufende Übung stehen lässt. */
+.updatebar {
+  position: fixed;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: calc(0.75rem + var(--safe-bottom));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem 0.6rem 0.9rem;
+  border-radius: 0.9rem;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 0.8125rem;
+  box-shadow: 0 0.6rem 1.6rem rgba(0, 0, 0, 0.25);
+}
+.updatebar button {
+  flex: none;
+  padding: 0.35rem 0.7rem;
+  border-radius: 0.6rem;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+}
+
+.version { opacity: 0.75; }
 
 </style>
 
@@ -1529,6 +1561,8 @@ const TokiPona = (function (data) {
       backupApply: 'Diesen Stand übernehmen',
       summary: (lvl, lessons, cards, xp) => `Stufe ${lvl}, ${lessons} Lektionen, ${cards} Karten, ${xp} XP`,
       langLabel: 'sprache', langOther: 'English',
+      updateReady: 'Neue Fassung ist da.', updateLoad: 'Jetzt laden',
+      versionLabel: (v) => `Fassung ${v}`,
       credit: (link) => `Prototyp. Übungssätze aus ${link} (MIT, © 2020 /dev/urandom `
         + 'und Mitwirkende), geprüft von TokiPonaKit.',
     },
@@ -1585,6 +1619,8 @@ const TokiPona = (function (data) {
       backupApply: 'Use this progress',
       summary: (lvl, lessons, cards, xp) => `level ${lvl}, ${lessons} lessons, ${cards} cards, ${xp} XP`,
       langLabel: 'language', langOther: 'Deutsch',
+      updateReady: 'A new version is here.', updateLoad: 'Load it now',
+      versionLabel: (v) => `Version ${v}`,
       credit: (link) => `Prototype. Exercise sentences from ${link} (MIT, © 2020 /dev/urandom `
         + 'and contributors), checked by TokiPonaKit.',
     },
@@ -2055,7 +2091,8 @@ const TokiPona = (function (data) {
 
     screen.append(el(`
       <p class="foot">${t('credit',
-        `<a href="https://lipu-sona.pona.la/${state.lang}/">lipu sona pona</a>`)}</p>`));
+        `<a href="https://lipu-sona.pona.la/${state.lang}/">lipu sona pona</a>`)}
+        ${window.OTOKI_VERSION ? `<br><span class="version">${escape(t('versionLabel', window.OTOKI_VERSION))}</span>` : ''}</p>`));
     return screen;
   }
 
@@ -2955,6 +2992,22 @@ const TokiPona = (function (data) {
     return screen;
   }
 
+  // ------------------------------------------------------- neue Fassung
+  // Der Service Worker meldet sich, sobald eine neue Fassung bereitliegt.
+  // Wer gerade nichts löst, bekommt sie sofort; mitten in einer Übung fragt
+  // ein schmaler Streifen, statt die halbe Antwort wegzuwerfen.
+  window.otokiUpdateReady = () => {
+    if (!session) { location.reload(); return; }
+    if (document.querySelector('.updatebar')) return;
+    const bar = el(`
+      <div class="updatebar">
+        <span>${escape(t('updateReady'))}</span>
+        <button class="ghost">${escape(t('updateLoad'))}</button>
+      </div>`);
+    bar.querySelector('button').onclick = () => location.reload();
+    document.body.append(bar);
+  };
+
   render();
   probeGlyphs();
 })(TOKIPONA_DATA, TokiPona);
@@ -2966,8 +3019,42 @@ const TokiPona = (function (data) {
 // offline verfügbar. In einer eingebetteten Vorschau bleibt er aus.
 if ('serviceWorker' in navigator && window.self === window.top
     && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  });
+  (() => {
+    // Wurde die Seite schon von einem Service Worker bedient, dann bedeutet
+    // ein Wechsel: eine neue Fassung hat übernommen.
+    const wasControlled = Boolean(navigator.serviceWorker.controller);
+    let told = false;
+    const announce = () => {
+      if (!wasControlled || told) return;
+      told = true;
+      // Die App entscheidet: mitten in einer Übung stört ein Neuladen.
+      if (typeof window.otokiUpdateReady === 'function') window.otokiUpdateReady();
+      else location.reload();
+    };
+
+    navigator.serviceWorker.addEventListener('controllerchange', announce);
+
+    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+      .then((registration) => {
+        // Beim Start und bei jeder Rückkehr zur App nachsehen, ob es etwas
+        // Neues gibt. iOS hält installierte Apps sonst tagelang eingefroren.
+        const look = () => { registration.update().catch(() => {}); };
+        look();
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') look();
+        });
+        window.addEventListener('online', look);
+
+        if (registration.waiting) announce();
+        registration.addEventListener('updatefound', () => {
+          const fresh = registration.installing;
+          if (!fresh) return;
+          fresh.addEventListener('statechange', () => {
+            if (fresh.state === 'installed' || fresh.state === 'activated') announce();
+          });
+        });
+      })
+      .catch(() => {});
+  })();
 }
 </script>

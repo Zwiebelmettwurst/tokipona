@@ -62,6 +62,8 @@
       backupApply: 'Diesen Stand übernehmen',
       summary: (lvl, lessons, cards, xp) => `Stufe ${lvl}, ${lessons} Lektionen, ${cards} Karten, ${xp} XP`,
       langLabel: 'sprache', langOther: 'English',
+      updateReady: 'Neue Fassung ist da.', updateLoad: 'Jetzt laden',
+      versionLabel: (v) => `Fassung ${v}`,
       credit: (link) => `Prototyp. Übungssätze aus ${link} (MIT, © 2020 /dev/urandom `
         + 'und Mitwirkende), geprüft von TokiPonaKit.',
     },
@@ -118,6 +120,8 @@
       backupApply: 'Use this progress',
       summary: (lvl, lessons, cards, xp) => `level ${lvl}, ${lessons} lessons, ${cards} cards, ${xp} XP`,
       langLabel: 'language', langOther: 'Deutsch',
+      updateReady: 'A new version is here.', updateLoad: 'Load it now',
+      versionLabel: (v) => `Version ${v}`,
       credit: (link) => `Prototype. Exercise sentences from ${link} (MIT, © 2020 /dev/urandom `
         + 'and contributors), checked by TokiPonaKit.',
     },
@@ -588,7 +592,8 @@
 
     screen.append(el(`
       <p class="foot">${t('credit',
-        `<a href="https://lipu-sona.pona.la/${state.lang}/">lipu sona pona</a>`)}</p>`));
+        `<a href="https://lipu-sona.pona.la/${state.lang}/">lipu sona pona</a>`)}
+        ${window.OTOKI_VERSION ? `<br><span class="version">${escape(t('versionLabel', window.OTOKI_VERSION))}</span>` : ''}</p>`));
     return screen;
   }
 
@@ -1487,6 +1492,22 @@
       </p>`));
     return screen;
   }
+
+  // ------------------------------------------------------- neue Fassung
+  // Der Service Worker meldet sich, sobald eine neue Fassung bereitliegt.
+  // Wer gerade nichts löst, bekommt sie sofort; mitten in einer Übung fragt
+  // ein schmaler Streifen, statt die halbe Antwort wegzuwerfen.
+  window.otokiUpdateReady = () => {
+    if (!session) { location.reload(); return; }
+    if (document.querySelector('.updatebar')) return;
+    const bar = el(`
+      <div class="updatebar">
+        <span>${escape(t('updateReady'))}</span>
+        <button class="ghost">${escape(t('updateLoad'))}</button>
+      </div>`);
+    bar.querySelector('button').onclick = () => location.reload();
+    document.body.append(bar);
+  };
 
   render();
   probeGlyphs();
