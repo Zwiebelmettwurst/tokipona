@@ -503,10 +503,10 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   color: var(--ink-faint);
   text-transform: uppercase;
 }
-.xray .span[data-role="Prädikat"] b,
-.xray .span[data-role="Objekt"] b,
-.xray .span[data-role="Präposition"] b,
-.xray .span[data-role="Befehl"] b {
+.xray .span[data-role="predicateMarker"] b,
+.xray .span[data-role="object"] b,
+.xray .span[data-role="preposition"] b,
+.xray .span[data-role="directive"] b {
   color: var(--accent);
   background: var(--accent-soft);
   border-color: var(--accent);
