@@ -356,6 +356,16 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   font-size: 0.9375rem;
 }
 
+.pickline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.9rem 0 0.2rem;
+}
+
+.lesson.review .badge { background: var(--gold-soft); color: var(--gold); font-size: 1rem; }
+.lesson.review { border-color: var(--gold); }
+
 /* ---------------- Rückmeldung ---------------- */
 
 .sheet {

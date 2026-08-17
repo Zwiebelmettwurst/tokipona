@@ -360,6 +360,16 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   font-size: 0.9375rem;
 }
 
+.pickline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.9rem 0 0.2rem;
+}
+
+.lesson.review .badge { background: var(--gold-soft); color: var(--gold); font-size: 1rem; }
+.lesson.review { border-color: var(--gold); }
+
 /* ---------------- Rückmeldung ---------------- */
 
 .sheet {
@@ -1202,12 +1212,42 @@ const TokiPona = (function (data) {
     c_zahlen: 'Zahlen',
   };
 
+  // Die Kernfertigkeit von toki pona: ausdrücken, wofür es kein Wort gibt.
+  // Jede Umschreibung ist beim Bauen durch den Parser gelaufen.
+  const COMPOUNDS = [
+    { de: 'Auto', tp: 'tomo tawa', literal: 'sich bewegendes Haus' },
+    { de: 'Kaffee', tp: 'telo pimeja wawa', literal: 'dunkles starkes Wasser' },
+    { de: 'Computer', tp: 'ilo sona', literal: 'Wissens-Gerät' },
+    { de: 'Telefon', tp: 'ilo toki', literal: 'Sprech-Gerät' },
+    { de: 'Uhr', tp: 'ilo tenpo', literal: 'Zeit-Gerät' },
+    { de: 'Fahrrad', tp: 'ilo tawa', literal: 'Bewegungs-Gerät' },
+    { de: 'Brille', tp: 'len lukin', literal: 'Seh-Kleidung' },
+    { de: 'Bibliothek', tp: 'tomo lipu', literal: 'Dokumenten-Haus' },
+    { de: 'Restaurant', tp: 'tomo moku', literal: 'Essens-Haus' },
+    { de: 'Schule', tp: 'tomo sona', literal: 'Wissens-Haus' },
+    { de: 'Kino', tp: 'tomo pi sitelen tawa', literal: 'Haus der bewegten Bilder' },
+    { de: 'Musik', tp: 'kalama musi', literal: 'unterhaltsamer Klang' },
+    { de: 'Regen', tp: 'telo tan sewi', literal: 'Wasser von oben' },
+    { de: 'Bier', tp: 'telo nasa', literal: 'seltsames Wasser' },
+    { de: 'Suppe', tp: 'telo moku', literal: 'Ess-Wasser' },
+    { de: 'Arzt', tp: 'jan pi pona sijelo', literal: 'Mensch der Körper-Güte' },
+    { de: 'Lehrerin', tp: 'jan pi pana sona', literal: 'Mensch, der Wissen gibt' },
+    { de: 'Freund', tp: 'jan pona', literal: 'guter Mensch' },
+  ];
+
   const app = document.getElementById('app');
   const today = () => new Date().toISOString().slice(0, 10);
 
   const blank = {
-    xp: 0, streak: 0, lastDay: null, dayXp: 0, done: {}, mastery: {}, seenWords: {},
+    xp: 0, streak: 0, lastDay: null, dayXp: 0, done: {}, mastery: {}, seenWords: {}, srs: {},
   };
+
+  // Lernschritte wie in bewährten Karteikartensystemen: erst zehn Minuten,
+  // dann Tage. Der kurze erste Schritt macht die Wiederholung schon in der
+  // ersten Sitzung sichtbar, statt sie auf morgen zu vertagen.
+  const MINUTE = 60000;
+  const DAY = 86400000;
+  const STEPS = [10 * MINUTE, DAY, 3 * DAY, 7 * DAY];
 
   let state = load();
   let session = null;
@@ -1243,6 +1283,55 @@ const TokiPona = (function (data) {
     save();
   }
 
+  function schedule(key, correct) {
+    const now = Date.now();
+    const card = state.srs[key] || { reps: 0, interval: 0, ease: 2.5, due: now };
+    if (correct) {
+      card.reps += 1;
+      if (card.reps <= STEPS.length) card.interval = STEPS[card.reps - 1];
+      else card.interval = Math.round(card.interval * card.ease);
+      card.ease = Math.min(2.8, card.ease + 0.05);
+    } else {
+      card.reps = 0;
+      card.interval = STEPS[0];
+      card.ease = Math.max(1.4, card.ease - 0.2);
+    }
+    card.due = now + card.interval;
+    state.srs[key] = card;
+  }
+
+  const dueKeys = () => {
+    const now = Date.now();
+    return Object.keys(state.srs).filter((key) => state.srs[key].due <= now);
+  };
+
+  function taskFromKey(key) {
+    const [kind, rest] = [key.slice(0, 1), key.slice(2)];
+    if (kind === 'w') {
+      const lesson = DATA.lessons.find((l) => l.words.includes(rest)) || DATA.lessons[0];
+      return TP.lexicon[rest] ? { type: 'word', word: rest, lesson, concepts: [] } : null;
+    }
+    if (kind === 'c') {
+      const compound = COMPOUNDS[Number(rest)];
+      return compound ? { type: 'compound', compound, lesson: DATA.lessons[0], concepts: [] } : null;
+    }
+    for (const lesson of DATA.lessons) {
+      const item = lesson.items.find((i) => i.id === rest);
+      if (item) {
+        return { type: item.direction === 'de_tp' ? 'build' : 'choose', item, lesson,
+                 concepts: lessonConcepts(lesson) };
+      }
+    }
+    return null;
+  }
+
+  function keyOf(task) {
+    if (task.type === 'word') return 'w:' + task.word;
+    if (task.type === 'compound') return 'c:' + COMPOUNDS.indexOf(task.compound);
+    if (task.item) return 's:' + task.item.id;
+    return null;
+  }
+
   function bumpMastery(concepts, correct) {
     for (const concept of concepts || []) {
       const value = state.mastery[concept] || 0;
@@ -1271,20 +1360,72 @@ const TokiPona = (function (data) {
     const words = shuffle(lesson.words.filter((w) => TP.lexicon[w]));
     const tasks = [];
 
-    words.slice(0, 2).forEach((word) => tasks.push({ type: 'word', word, concepts: [] }));
-    builds.slice(0, 3).forEach((item) => tasks.push({ type: 'build', item, concepts: lessonConcepts(lesson) }));
-    reads.slice(0, 2).forEach((item) => tasks.push({ type: 'choose', item, concepts: lessonConcepts(lesson) }));
-    if (builds[3]) tasks.push({ type: 'free', item: builds[3], concepts: lessonConcepts(lesson) });
+    words.slice(0, 2).forEach((word) => tasks.push({ type: 'word', word, lesson, concepts: [] }));
+    builds.slice(0, 3).forEach((item) =>
+      tasks.push({ type: 'build', item, lesson, concepts: lessonConcepts(lesson) }));
+    reads.slice(0, 2).forEach((item) =>
+      tasks.push({ type: 'choose', item, lesson, concepts: lessonConcepts(lesson) }));
+
+    const flawed = brokenSentence(lesson);
+    if (flawed) tasks.push({ type: 'fix', flawed, lesson, concepts: [flawed.violation.concept].filter(Boolean) });
+
+    const compound = availableCompounds(lesson)[0];
+    if (compound) tasks.push({ type: 'compound', compound, lesson, concepts: [] });
+
+    if (builds[3]) tasks.push({ type: 'free', item: builds[3], lesson, concepts: lessonConcepts(lesson) });
 
     return {
       lesson,
-      queue: tasks.length ? tasks : builds.slice(0, 4).map((item) => ({ type: 'build', item, concepts: [] })),
+      queue: tasks.length ? tasks : builds.slice(0, 4).map((item) => ({ type: 'build', item, lesson, concepts: [] })),
       index: 0,
       correct: 0,
       total: 0,
       xp: 0,
       retried: new Set(),
     };
+  }
+
+  function buildReviewSession() {
+    const tasks = shuffle(dueKeys()).map(taskFromKey).filter(Boolean).slice(0, 12);
+    return {
+      lesson: null, review: true, queue: tasks, index: 0, correct: 0, total: 0, xp: 0,
+      retried: new Set(),
+    };
+  }
+
+  // Umschreibungen, deren Wörter die Lernende schon kennt.
+  function availableCompounds(lesson) {
+    const known = new Set(DATA.lessons.filter((l) => l.number <= lesson.number).flatMap((l) => l.words));
+    return shuffle(COMPOUNDS.filter((compound) =>
+      TP.tokenize(compound.tp).every((token) => token.text === 'pi' || known.has(token.text))));
+  }
+
+  // Fehlersätze entstehen aus richtigen: eine Regel gezielt verletzen und vom
+  // Parser bestätigen lassen, dass genau sie anschlägt. Kein Handbetrieb.
+  const MUTATIONS = [
+    { rule: 'liAfterMiSina', apply: (words) =>
+        (['mi', 'sina'].includes(words[0]) && words[1] !== 'li' ? [words[0], 'li', ...words.slice(1)] : null) },
+    { rule: 'missingLi', apply: (words) =>
+        (words.includes('li') && words.includes('e') && !['mi', 'sina'].includes(words[0])
+          ? words.filter((w, i) => i !== words.indexOf('li')) : null) },
+    { rule: 'piWithSingleWord', apply: (words) =>
+        (words.length > 2 && !words.includes('pi') && !TP.lexicon[words[1]]?.roles.includes('particle')
+          ? [words[0], 'pi', ...words.slice(1)] : null) },
+  ];
+
+  function brokenSentence(lesson) {
+    for (const item of shuffle(lesson.items)) {
+      const words = TP.tokenize(item.tp).map((t) => t.text);
+      for (const mutation of shuffle(MUTATIONS)) {
+        const broken = mutation.apply(words);
+        if (!broken) continue;
+        const result = TP.parse(broken.join(' ') + '.');
+        if (result.violations.length !== 1) continue;
+        if (result.violations[0].rule !== mutation.rule) continue;
+        return { words: broken, correct: item.tp, violation: result.violations[0] };
+      }
+    }
+    return null;
   }
 
   function lessonConcepts(lesson) {
@@ -1363,6 +1504,20 @@ const TokiPona = (function (data) {
         <div class="path"></div>
       </div>`);
 
+    const due = dueKeys().length;
+    if (due) {
+      const card = el(`
+        <button class="lesson review" data-state="current">
+          <span class="badge">↻</span>
+          <span class="body">
+            <b>${due} ${due === 1 ? 'Karte' : 'Karten'} fällig</b>
+            <span>wörter, sätze und umschreibungen von vorher</span>
+          </span>
+        </button>`);
+      card.onclick = () => { session = buildReviewSession(); render(); };
+      screen.querySelector('.hello').after(card);
+    }
+
     const path = screen.querySelector('.path');
     DATA.lessons.forEach((lesson) => {
       const open = unlocked(lesson.number);
@@ -1413,7 +1568,7 @@ const TokiPona = (function (data) {
 
     const head = el(`
       <div class="exbar">
-        <button aria-label="Zurück">✕</button>
+        <button aria-label="Abbrechen">✕</button>
         <span class="track"><i style="width:${(session.index / session.queue.length) * 100}%"></i></span>
         <span class="metric">✓ <b>${session.correct}</b></span>
       </div>`);
@@ -1423,6 +1578,8 @@ const TokiPona = (function (data) {
     if (task.type === 'word') app.append(wordTask(task));
     else if (task.type === 'build') app.append(buildTask(task));
     else if (task.type === 'choose') app.append(chooseTask(task));
+    else if (task.type === 'fix') app.append(fixTask(task));
+    else if (task.type === 'compound') app.append(compoundTask(task));
     else app.append(freeTask(task));
   }
 
@@ -1433,7 +1590,7 @@ const TokiPona = (function (data) {
   function wordTask(task) {
     const entry = TP.lexicon[task.word];
     const right = entry.glosses.slice(0, 3).join(', ');
-    const options = shuffle([right, ...distractorWords(session.lesson, [task.word], 3)
+    const options = shuffle([right, ...distractorWords(task.lesson, [task.word], 3)
       .map((w) => TP.lexicon[w].glosses.slice(0, 3).join(', '))]);
 
     const screen = screenWith(`
@@ -1470,7 +1627,7 @@ const TokiPona = (function (data) {
 
   function chooseTask(task) {
     const right = task.item.de[0];
-    const pool = session.lesson.items
+    const pool = task.lesson.items
       .filter((i) => i.id !== task.item.id)
       .flatMap((i) => i.de)
       .filter((text) => text !== right);
@@ -1503,9 +1660,79 @@ const TokiPona = (function (data) {
     return screen;
   }
 
+  // Fehlersuche: das falsche Wort antippen. Die Stelle kommt aus dem Parser,
+  // nicht aus einer Handliste — deshalb stimmt sie immer.
+  function fixTask(task) {
+    const screen = screenWith(`
+      <p class="prompt">hier stimmt ein wort nicht — tipp es an</p>
+      <div class="pickline"></div>
+      <p class="hint">Ein Wort steht zu viel oder fehlt an dieser Stelle.</p>
+      <div class="actions"><button class="primary" disabled>Prüfen</button></div>`);
+
+    const line = screen.querySelector('.pickline');
+    const button = screen.querySelector('.primary');
+    let picked = null;
+
+    task.flawed.words.forEach((word, index) => {
+      const chip = el(`<button class="tile">${escape(word)}</button>`);
+      chip.onclick = () => {
+        picked = index;
+        line.querySelectorAll('.tile').forEach((t) => t.classList.remove('placed'));
+        chip.classList.add('placed');
+        button.disabled = false;
+      };
+      line.append(chip);
+    });
+
+    button.onclick = () => {
+      const wanted = task.flawed.violation.tokenIndices;
+      const correct = wanted.includes(picked);
+      finish(task, correct, {
+        solution: task.flawed.correct,
+        xray: task.flawed.correct,
+        reason: escape(task.flawed.violation.message),
+      });
+    };
+    return screen;
+  }
+
+  // Umschreiben: der Kern der Sprache. Nicht „wie heißt Kaffee“, sondern
+  // „wie drückst du Kaffee mit 120 Wörtern aus“.
+  function compoundTask(task) {
+    const right = task.compound;
+    const options = shuffle([right, ...shuffle(COMPOUNDS.filter((c) => c !== right)).slice(0, 2)]);
+
+    const screen = screenWith(`
+      <p class="prompt">dafür gibt es kein wort — wie sagst du es?</p>
+      <h2 class="question">${escape(right.de)}</h2>
+      <div class="choices"></div>
+      <div class="actions"><button class="primary" disabled>Prüfen</button></div>`);
+
+    let picked = null;
+    const list = screen.querySelector('.choices');
+    const button = screen.querySelector('.primary');
+    options.forEach((option) => {
+      const choice = el(`<button class="choice tp">${escape(option.tp)}</button>`);
+      choice.onclick = () => {
+        picked = option;
+        list.querySelectorAll('.choice').forEach((c) => { c.dataset.picked = 'false'; });
+        choice.dataset.picked = 'true';
+        button.disabled = false;
+      };
+      list.append(choice);
+    });
+
+    button.onclick = () => finish(task, picked === right, {
+      solution: right.tp,
+      xray: right.tp,
+      reason: `<b>${escape(right.tp)}</b> — wörtlich: ${escape(right.literal)}.`,
+    });
+    return screen;
+  }
+
   function buildTask(task) {
     const solution = TP.tokenize(task.item.tp).map((t) => t.text);
-    const extras = distractorWords(session.lesson, solution, Math.min(3, Math.max(2, 6 - solution.length)));
+    const extras = distractorWords(task.lesson, solution, Math.min(3, Math.max(2, 6 - solution.length)));
     const bank = shuffle(solution.concat(extras));
 
     const screen = screenWith(`
@@ -1641,13 +1868,20 @@ const TokiPona = (function (data) {
       const points = session.retried.has(session.index) ? 5 : 10;
       session.xp += points;
       award(points);
-    } else {
+    } else if ((task.attempts || 0) < 1) {
+      // Ein zweiter Anlauf in derselben Sitzung, mehr nicht. Danach ist es
+      // Sache des Wiederholungssystems — niemand soll festhängen.
+      task.attempts = 1;
       session.retried.add(session.queue.length);
-      session.queue.push(task);      // falsch beantwortet: kommt noch einmal
+      session.queue.push(task);
+    } else {
+      task.attempts = 2;
     }
+    const key = keyOf(task);
+    if (key) schedule(key, correct);
     bumpMastery(task.concepts, correct);
     save();
-    showSheet(correct, detail);
+    showSheet(correct, Object.assign({ parked: task.attempts === 2 }, detail));
   }
 
   function showSheet(correct, detail) {
@@ -1678,6 +1912,9 @@ const TokiPona = (function (data) {
     if (!correct || (detail.grade && detail.grade.variant)) {
       sheet.append(el(`<p class="reason">Musterlösung: <span class="solution">${escape(detail.solution)}</span></p>`));
     }
+    if (!correct && detail.parked) {
+      sheet.append(el('<p class="hint">Kommt in einer der nächsten Wiederholungen zurück.</p>'));
+    }
 
     if (detail.xray) {
       const spans = TP.xray(TP.parse(detail.xray).utterance);
@@ -1698,28 +1935,35 @@ const TokiPona = (function (data) {
 
   function renderDone() {
     const lesson = session.lesson;
-    state.done[lesson.number] = true;
-    lesson.words.forEach((word) => { state.seenWords[word] = true; });
+    const review = Boolean(session.review);
+    if (lesson) {
+      state.done[lesson.number] = true;
+      lesson.words.forEach((word) => { state.seenWords[word] = true; });
+    }
     save();
 
     const screen = el(`
       <div class="screen done">
         <div class="burst">pona!</div>
-        <h2>${escape(lesson.title)}</h2>
-        <p>${escape(lesson.note.replace(/<[^>]+>/g, ''))}</p>
+        <h2>${escape(review ? 'Wiederholung geschafft' : lesson.title)}</h2>
+        <p>${escape(review
+          ? 'Die Karten kommen wieder, wenn es Zeit dafür ist.'
+          : lesson.note.replace(/<[^>]+>/g, ''))}</p>
         <div class="tally">
           <div><b>+${session.xp}</b><span>xp</span></div>
           <div><b>${session.correct}</b><span>richtig</span></div>
-          <div><b>${lesson.words.length}</b><span>wörter</span></div>
+          <div><b>${review ? session.queue.length : lesson.words.length}</b><span>${review ? 'karten' : 'wörter'}</span></div>
         </div>
         <div class="actions">
           <button class="primary">Weiter</button>
-          <button class="ghost">Nochmal üben</button>
+          ${review ? '' : '<button class="ghost">Nochmal üben</button>'}
         </div>
       </div>`);
 
     screen.querySelector('.primary').onclick = () => { session = null; tab = 'pfad'; render(); };
-    screen.querySelector('.ghost').onclick = () => { session = buildSession(lesson); render(); };
+    if (!review) {
+      screen.querySelector('.ghost').onclick = () => { session = buildSession(lesson); render(); };
+    }
     app.append(topbar());
     app.append(screen);
   }
