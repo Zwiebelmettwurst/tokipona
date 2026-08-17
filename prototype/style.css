@@ -283,6 +283,12 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 
 .bank { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 
+/* Nach dem Antworten bleibt die Aufgabe sichtbar, aber unantastbar. */
+.screen.answered { pointer-events: none; }
+.screen.answered .tile,
+.screen.answered .choice,
+.screen.answered .typed { opacity: 0.75; }
+
 .tile {
   font-family: var(--mono);
   font-size: 0.9375rem;
