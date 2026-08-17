@@ -70,7 +70,8 @@ beide sind zulässig, und Rückmeldung darf nur beanstanden, was sicher falsch i
 
 `Tests/TokiPonaKitTests/GoldenCorpus.swift` enthält 71 Sätze über alle zwölf
 Stufen, die fehlerfrei analysierbar sein müssen, und 16 Fehlersätze, die je genau
-eine Regel auslösen sollen.
+eine Regel auslösen sollen. Für v1.0 wächst dieser Bestand laut Plan auf rund 600
+Sätze; jeder Redaktionssatz kommt hier zuerst an.
 
 Zusätzlich wurde der Parser gegen fremdes Material gemessen: die 238 toki-pona-Sätze
 des Kurses [lipu sona pona](https://lipu-sona.pona.la/de/) (MIT-Lizenz,
@@ -78,8 +79,7 @@ des Kurses [lipu sona pona](https://lipu-sona.pona.la/de/) (MIT-Lizenz,
 Lektionen. Die erste Messung ergab 90 %; die vier Lücken (Präposition als Beifügung
 im Subjekt, Präposition ohne Ergänzung, `anu` zwischen Prädikaten, `X ala X` an
 einem präverbfähigen Hauptverb) sind behoben, seither **238 von 238**. Das Lexikon
-stimmt mit dem Kurs exakt überein: 120 + 17. Für v1.0 wächst dieser Bestand laut Plan auf rund 600
-Sätze; jeder Redaktionssatz kommt hier zuerst an.
+stimmt mit dem Kurs exakt überein: 120 + 17.
 
 ```
 swift test
