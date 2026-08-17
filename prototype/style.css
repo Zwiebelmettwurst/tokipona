@@ -313,7 +313,9 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 
 /* Nach dem Antworten bleibt die Aufgabe sichtbar, aber unantastbar. */
 .screen.answered { pointer-events: none; }
-.screen.answered .tile,
+/* Kacheln nicht mit abblenden: sie tragen ihren eigenen Zustand (gelegt,
+   belegt), und ein pauschales opacity würde „belegt“ überstimmen — dann sähen
+   verbrauchte Vorratskacheln nach dem Auflösen wieder verfügbar aus. */
 .screen.answered .choice,
 .screen.answered .typed { opacity: 0.75; }
 

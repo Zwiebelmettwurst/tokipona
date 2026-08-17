@@ -992,9 +992,10 @@
 
     const refreshBank = () => {
       bankRow.querySelectorAll('.tile').forEach((tile) => {
+        // Kommt ein Wort mehrfach im Vorrat vor, sind genau so viele Kacheln
+        // belegt, wie oben liegen — von vorn abgezählt.
         const used = chosen.filter((w) => w === tile.dataset.word).length;
-        const available = bank.filter((w) => w === tile.dataset.word).length;
-        tile.classList.toggle('used', Number(tile.dataset.slot) < used || used >= available);
+        tile.classList.toggle('used', Number(tile.dataset.rank) < used);
       });
       button.disabled = chosen.length === 0;
     };
@@ -1106,8 +1107,11 @@
       refreshBank();
     };
 
-    bank.forEach((word, position) => {
-      const tile = el(`<button class="tile" data-word="${escape(word)}" data-slot="${position}">${escape(word)}</button>`);
+    const seen = {};
+    bank.forEach((word) => {
+      const rank = seen[word] || 0;
+      seen[word] = rank + 1;
+      const tile = el(`<button class="tile" data-word="${escape(word)}" data-rank="${rank}">${escape(word)}</button>`);
       tile.onclick = () => { chosen.push(word); sync(); };
       bankRow.append(tile);
     });
