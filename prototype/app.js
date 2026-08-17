@@ -699,6 +699,7 @@
       <p class="prompt">bau den satz</p>
       <h2 class="question">${escape(task.item.de[0])}</h2>
       <div class="slot"></div>
+      <p class="hint">Antippen nimmt ein Wort zurück, Ziehen sortiert um.</p>
       <div class="bank"></div>
       <div class="actions"><button class="primary" disabled>Prüfen</button></div>`);
 
@@ -707,22 +708,124 @@
     const button = screen.querySelector('.primary');
     const chosen = [];
 
-    const sync = () => {
-      slot.innerHTML = '';
-      chosen.forEach((word, position) => {
-        const tile = el(`<button class="tile placed">${escape(word)}</button>`);
-        tile.onclick = () => {
-          chosen.splice(position, 1);
-          sync();
-        };
-        slot.append(tile);
-      });
+    // Die gelegten Kacheln sind die Wahrheit: nach jedem Ziehen wird die
+    // Wortfolge aus der Reihenfolge im Baum neu gelesen.
+    const readOrder = () => Array.from(slot.children).map((node) => node.dataset.word);
+
+    const refreshBank = () => {
       bankRow.querySelectorAll('.tile').forEach((tile) => {
         const used = chosen.filter((w) => w === tile.dataset.word).length;
         const available = bank.filter((w) => w === tile.dataset.word).length;
         tile.classList.toggle('used', Number(tile.dataset.slot) < used || used >= available);
       });
       button.disabled = chosen.length === 0;
+    };
+
+    const commit = () => {
+      chosen.length = 0;
+      chosen.push(...readOrder());
+      refreshBank();
+    };
+
+    const remove = (node) => {
+      node.remove();
+      commit();
+    };
+
+    // Ziehen über Pointer-Events; HTML5-Drag gibt es auf iOS nicht.
+    // Unter der Schwelle bleibt es ein Tipp und entfernt die Kachel.
+    const THRESHOLD = 8;
+
+    function grab(node, event) {
+      if (event.button !== undefined && event.button !== 0) return;
+      // Am Fenster lauschen, nicht an der Kachel: Das Umhängen im Baum löst
+      // eine Pointer-Erfassung wieder, und danach käme kein pointerup mehr an.
+      const pointerId = event.pointerId;
+      const startX = event.clientX;
+      const startY = event.clientY;
+      const box = node.getBoundingClientRect();
+      const holdX = startX - box.left;
+      const holdY = startY - box.top;
+      let dragging = false;
+
+      const follow = (move) => {
+        if (move.pointerId !== pointerId) return;
+        if (!dragging) {
+          if (Math.hypot(move.clientX - startX, move.clientY - startY) < THRESHOLD) return;
+          dragging = true;
+          node.classList.add('dragging');
+        }
+
+        node.style.transform = '';
+        const base = node.getBoundingClientRect();
+        node.style.transform = `translate(${move.clientX - holdX - base.left}px, `
+          + `${move.clientY - holdY - base.top}px)`;
+
+        // Nächste Nachbarkachel suchen; Zeilen zählen stärker als Spalten,
+        // damit der Umbruch nicht gegen die Absicht arbeitet.
+        let closest = null;
+        let best = Infinity;
+        let after = false;
+        for (const other of slot.children) {
+          if (other === node) continue;
+          const rect = other.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          const distance = Math.hypot(move.clientX - cx, (move.clientY - cy) * 2.5);
+          if (distance < best) {
+            best = distance;
+            closest = other;
+            after = move.clientX > cx;
+          }
+        }
+        if (closest) slot.insertBefore(node, after ? closest.nextSibling : closest);
+      };
+
+      const release = (up) => {
+        if (up && up.pointerId !== pointerId) return;
+        window.removeEventListener('pointermove', follow);
+        window.removeEventListener('pointerup', release);
+        window.removeEventListener('pointercancel', release);
+        node.style.transform = '';
+        node.classList.remove('dragging');
+        if (dragging) commit();
+        else remove(node);
+      };
+
+      window.addEventListener('pointermove', follow);
+      window.addEventListener('pointerup', release);
+      window.addEventListener('pointercancel', release);
+    }
+
+    // Ohne Zeigegerät bedienbar: mit den Pfeiltasten verschieben.
+    function shift(node, direction) {
+      const sibling = direction < 0 ? node.previousElementSibling : node.nextElementSibling;
+      if (!sibling) return;
+      slot.insertBefore(direction < 0 ? node : sibling, direction < 0 ? sibling : node);
+      commit();
+      node.focus();
+    }
+
+    const place = (word) => {
+      const tile = el(`<button class="tile placed" data-word="${escape(word)}"
+        aria-label="${escape(word)} — antippen entfernt, ziehen oder Pfeiltasten sortieren um"
+        >${escape(word)}</button>`);
+      tile.addEventListener('pointerdown', (event) => grab(tile, event));
+      tile.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowLeft') { event.preventDefault(); shift(tile, -1); }
+        else if (event.key === 'ArrowRight') { event.preventDefault(); shift(tile, 1); }
+        else if (event.key === 'Backspace' || event.key === 'Delete') {
+          event.preventDefault();
+          remove(tile);
+        }
+      });
+      slot.append(tile);
+    };
+
+    const sync = () => {
+      slot.innerHTML = '';
+      chosen.forEach(place);
+      refreshBank();
     };
 
     bank.forEach((word, position) => {

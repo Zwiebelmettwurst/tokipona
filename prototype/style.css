@@ -327,7 +327,34 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   box-shadow: var(--shadow);
 }
 .tile.used { opacity: 0.25; pointer-events: none; }
-.tile.placed { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+.tile.placed {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  /* Ziehen statt Scrollen, sobald der Finger auf einer gelegten Kachel liegt. */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.12s ease;
+}
+
+.tile.placed.dragging {
+  z-index: 3;
+  position: relative;
+  transition: none;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+  border-color: var(--accent);
+  cursor: grabbing;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tile.placed { cursor: grab; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile.placed { transition: none; }
+}
 
 .choices { display: flex; flex-direction: column; gap: 0.5rem; }
 
