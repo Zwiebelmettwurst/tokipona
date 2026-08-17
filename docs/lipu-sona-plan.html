@@ -1,0 +1,1256 @@
+<title>lipu sona pi toki pona</title>
+
+<style>
+  :root {
+    --ground: #EFF1EE;
+    --surface: #F8F9F7;
+    --sunk: #E6EAE6;
+    --ink: #14181A;
+    --ink-dim: #5A6461;
+    --ink-faint: #8A938F;
+    --accent: #1C6F6A;
+    --accent-soft: rgba(28, 111, 106, 0.10);
+    --accent-2: #A2711A;
+    --warn: #AE3D28;
+    --rule: rgba(20, 24, 26, 0.13);
+    --rule-strong: rgba(20, 24, 26, 0.28);
+
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace;
+    --serif: ui-serif, Charter, "Bitstream Charter", "Iowan Old Style", Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+
+    --step-0: 1.0625rem;
+    --step-1: 1.1875rem;
+    --step-2: 1.4375rem;
+    --step-3: 1.875rem;
+    --step-4: 2.625rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #101314;
+      --surface: #171B1C;
+      --sunk: #1D2223;
+      --ink: #E6EAE7;
+      --ink-dim: #98A49F;
+      --ink-faint: #6E7A76;
+      --accent: #5CC7BA;
+      --accent-soft: rgba(92, 199, 186, 0.13);
+      --accent-2: #DDAF57;
+      --warn: #E9846C;
+      --rule: rgba(230, 234, 231, 0.14);
+      --rule-strong: rgba(230, 234, 231, 0.32);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #101314;
+    --surface: #171B1C;
+    --sunk: #1D2223;
+    --ink: #E6EAE7;
+    --ink-dim: #98A49F;
+    --ink-faint: #6E7A76;
+    --accent: #5CC7BA;
+    --accent-soft: rgba(92, 199, 186, 0.13);
+    --accent-2: #DDAF57;
+    --warn: #E9846C;
+    --rule: rgba(230, 234, 231, 0.14);
+    --rule-strong: rgba(230, 234, 231, 0.32);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: var(--step-0);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 54rem;
+    margin: 0 auto;
+    padding: 0 1.5rem 6rem;
+  }
+
+  p, li { max-width: 66ch; }
+
+  /* ---------- masthead ---------- */
+
+  header.mast {
+    padding: 4.5rem 0 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .kicker {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    margin: 0;
+  }
+
+  h1 {
+    font-family: var(--mono);
+    font-size: var(--step-4);
+    font-weight: 500;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    font-size: var(--step-1);
+    line-height: 1.55;
+    color: var(--ink-dim);
+    margin: 0;
+    max-width: 58ch;
+  }
+
+  .alphabet {
+    display: grid;
+    grid-template-columns: repeat(14, minmax(0, 1fr));
+    border: 1px solid var(--rule-strong);
+    background: var(--surface);
+  }
+
+  .alphabet span {
+    font-family: var(--mono);
+    font-size: 0.9375rem;
+    text-align: center;
+    padding: 0.6rem 0;
+    border-right: 1px solid var(--rule);
+    color: var(--ink);
+  }
+
+  .alphabet span:last-child { border-right: 0; }
+
+  .alphabet .vow { color: var(--accent); }
+
+  .caption {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+    margin: 0.5rem 0 0;
+    max-width: 66ch;
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 2.5rem;
+    border-top: 1px solid var(--rule);
+    padding-top: 1.25rem;
+  }
+
+  .fact { display: flex; flex-direction: column; gap: 0.1rem; }
+
+  .fact b {
+    font-family: var(--mono);
+    font-size: var(--step-2);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  .fact span {
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    color: var(--ink-faint);
+  }
+
+  /* ---------- sections ---------- */
+
+  section {
+    padding-top: 3.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    border-top: 1px solid var(--rule-strong);
+    padding-top: 0.9rem;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    display: flex;
+    gap: 0.7rem;
+  }
+
+  .eyebrow i {
+    font-style: normal;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  h2 {
+    font-family: var(--mono);
+    font-size: var(--step-3);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-family: var(--sans);
+    font-size: var(--step-1);
+    font-weight: 650;
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+    margin: 1.25rem 0 -0.25rem;
+    text-wrap: balance;
+  }
+
+  h4 {
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--ink-dim);
+    margin: 0.75rem 0 -0.4rem;
+  }
+
+  p { margin: 0; }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+  a:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  ul, ol { margin: 0; padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.4rem; }
+
+  li::marker { color: var(--ink-faint); }
+
+  strong { font-weight: 650; }
+
+  .tp {
+    font-family: var(--mono);
+    font-size: 0.9375em;
+    color: var(--accent);
+  }
+
+  .de-gloss { color: var(--ink-dim); font-style: italic; }
+
+  /* ---------- toc ---------- */
+
+  nav.toc {
+    margin-top: 2.5rem;
+    border: 1px solid var(--rule-strong);
+    background: var(--surface);
+    padding: 1.25rem 1.4rem;
+  }
+
+  nav.toc ol {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 0.35rem 2rem;
+    counter-reset: toc;
+  }
+
+  nav.toc li {
+    max-width: none;
+    counter-increment: toc;
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    display: flex;
+    gap: 0.7rem;
+  }
+
+  nav.toc li::before {
+    content: counter(toc, decimal-leading-zero);
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  nav.toc a { color: var(--ink); text-decoration: none; }
+  nav.toc a:hover { color: var(--accent); text-decoration: underline; }
+
+  /* ---------- tables ---------- */
+
+  .scroll { overflow-x: auto; border: 1px solid var(--rule-strong); background: var(--surface); }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 34rem;
+    font-family: var(--sans);
+    font-size: 0.875rem;
+  }
+
+  th, td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.6rem 0.85rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  thead th {
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    background: var(--sunk);
+    border-bottom: 1px solid var(--rule-strong);
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td { border-bottom: 0; }
+
+  td.num {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-dim);
+    white-space: nowrap;
+  }
+
+  td .tp { font-size: 0.875rem; }
+
+  /* ---------- sentence x-ray ---------- */
+
+  .xray {
+    border: 1px solid var(--rule-strong);
+    background: var(--surface);
+    padding: 1.5rem 1.4rem 1.2rem;
+    overflow-x: auto;
+  }
+
+  .xray-row {
+    display: flex;
+    gap: 0.5rem;
+    min-width: 30rem;
+  }
+
+  .slot { display: flex; flex-direction: column; gap: 0.4rem; }
+
+  .slot .tok {
+    font-family: var(--mono);
+    font-size: 1.0625rem;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid var(--rule-strong);
+    background: var(--ground);
+    text-align: center;
+  }
+
+  .slot .role {
+    font-family: var(--mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    text-align: center;
+    color: var(--ink-faint);
+  }
+
+  .slot.particle .tok { color: var(--accent); background: var(--accent-soft); border-color: var(--accent); }
+  .slot.particle .role { color: var(--accent); }
+
+  /* ---------- notes ---------- */
+
+  .note {
+    border-left: 2px solid var(--accent);
+    padding: 0.15rem 0 0.15rem 1rem;
+    color: var(--ink-dim);
+  }
+
+  .note.risk { border-left-color: var(--warn); }
+
+  .note p { max-width: 62ch; }
+
+  pre {
+    margin: 0;
+    overflow-x: auto;
+    border: 1px solid var(--rule-strong);
+    background: var(--surface);
+    padding: 1rem 1.1rem;
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    color: var(--ink);
+    tab-size: 2;
+  }
+
+  code { font-family: var(--mono); font-size: 0.9em; }
+  p code, li code, td code { background: var(--sunk); padding: 0.1em 0.3em; }
+
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1.25rem 2rem;
+  }
+
+  .card {
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    padding: 1rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .card h4 { margin: 0; }
+  .card p { max-width: none; font-size: 0.9375rem; }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    border: 1px solid var(--rule-strong);
+    padding: 0.1rem 0.4rem;
+    color: var(--ink-dim);
+    white-space: nowrap;
+  }
+
+  .tag.mvp { color: var(--accent); border-color: var(--accent); }
+  .tag.later { color: var(--ink-faint); }
+
+  footer {
+    margin-top: 4rem;
+    border-top: 1px solid var(--rule-strong);
+    padding-top: 1.25rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+  }
+
+  @media (max-width: 34rem) {
+    :root { --step-4: 2rem; --step-3: 1.5rem; }
+    header.mast { padding-top: 3rem; }
+    .alphabet { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+    .alphabet span:nth-child(7) { border-right: 0; }
+    .alphabet span:nth-child(-n+7) { border-bottom: 1px solid var(--rule); }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <p class="kicker">app-plan · ios · deutschsprachig</p>
+    <h1>lipu sona pi toki pona</h1>
+    <p class="standfirst">
+      Eine iOS-App, die nicht Vokabeln abfragt, sondern Sätze bauen lehrt: das
+      komplette Wortinventar, die zwölf Grammatikkonzepte dahinter und rund 600
+      geprüfte Beispielsätze — offline, ohne Konto, ohne Abo.
+    </p>
+
+    <div>
+      <div class="alphabet">
+        <span class="vow">a</span><span class="vow">e</span><span class="vow">i</span><span>j</span><span>k</span><span>l</span><span>m</span><span>n</span><span class="vow">o</span><span>p</span><span>s</span><span>t</span><span class="vow">u</span><span>w</span>
+      </div>
+      <p class="caption">
+        Das gesamte Lautinventar: 14 Buchstaben, Silben nach dem Muster (K)V(n).
+        Genau diese Kleinheit ist das Produktversprechen — und der Grund, warum
+        die App eine echte Grammatikprüfung leisten kann.
+      </p>
+    </div>
+
+    <div class="facts">
+      <div class="fact"><b>120</b><span>nimi pu</span></div>
+      <div class="fact"><b>+17</b><span>nimi ku suli</span></div>
+      <div class="fact"><b>12</b><span>grammatikstufen</span></div>
+      <div class="fact"><b>13</b><span>übungstypen</span></div>
+      <div class="fact"><b>10</b><span>wochen bis mvp</span></div>
+    </div>
+
+    <div class="note">
+      <p>
+        Zur Zahl vorweg: Das Buch <em>pu</em> (Sonja Lang, 2014) definiert
+        <strong>120</strong> Wörter, nicht 130. Die verbreitete höhere Zahl kommt
+        aus <em>ku</em> (2021), das 17 weitere Wörter als <em>nimi ku suli</em>
+        —&nbsp;gut etabliert — einordnet: zusammen <strong>137</strong>. Der Plan
+        behandelt die 120 als Pflichtkanon und die 17 als freischaltbare
+        Erweiterung, weil genau an dieser Grenze auch die Community diskutiert.
+      </p>
+    </div>
+
+    <nav class="toc" aria-label="Inhalt">
+      <ol>
+        <li><a href="#s1">Produktidee</a></li>
+        <li><a href="#s2">Zielgruppe &amp; Umfeld</a></li>
+        <li><a href="#s3">Didaktisches Modell</a></li>
+        <li><a href="#s4">Curriculum, 12 Stufen</a></li>
+        <li><a href="#s5">Übungstypen</a></li>
+        <li><a href="#s6">Bewertung freier Antworten</a></li>
+        <li><a href="#s7">Feature-Umfang</a></li>
+        <li><a href="#s8">Screens &amp; Navigation</a></li>
+        <li><a href="#s9">Technische Architektur</a></li>
+        <li><a href="#s10">Datenmodell</a></li>
+        <li><a href="#s11">Wiederholungsplanung</a></li>
+        <li><a href="#s12">Inhalte produzieren</a></li>
+        <li><a href="#s13">sitelen pona &amp; Audio</a></li>
+        <li><a href="#s14">Zugänglichkeit</a></li>
+        <li><a href="#s15">Preismodell</a></li>
+        <li><a href="#s16">Roadmap</a></li>
+        <li><a href="#s17">Risiken &amp; offene Entscheidungen</a></li>
+        <li><a href="#s18">Woran wir Erfolg messen</a></li>
+      </ol>
+    </nav>
+  </header>
+
+  <main>
+
+    <section id="s1">
+      <div class="head">
+        <p class="eyebrow"><i>01</i> pona</p>
+        <h2>Produktidee</h2>
+      </div>
+      <p>
+        Die meisten toki-pona-Lernenden scheitern nicht am Wortschatz — 120 Wörter
+        sitzen nach zwei Wochen Karteikarten. Sie scheitern daran, aus wenigen
+        Wörtern <em>Bedeutung</em> zu bauen: <span class="tp">li</span> und
+        <span class="tp">e</span> richtig zu setzen, Modifikatoren zu stapeln, und
+        Begriffe zu umschreiben, für die es kein Wort gibt.
+      </p>
+      <p>
+        Die App setzt deshalb drei Säulen gleichberechtigt nebeneinander:
+        <strong>Wörter</strong> (Bedeutungsräume statt 1:1-Übersetzungen),
+        <strong>Konzepte</strong> (jede Grammatikregel als eigenes, einzeln
+        messbares Lernziel) und <strong>Sätze</strong> (produktiv bauen, nicht nur
+        erkennen). Der technische Hebel dafür: die Grammatik ist so klein, dass ein
+        vollständiger Parser in den Client passt. Damit kann die App Lernenden-Sätze
+        <em>strukturell</em> prüfen und präzise Rückmeldung geben, statt
+        Zeichenketten zu vergleichen.
+      </p>
+
+      <div class="xray" role="figure" aria-label="Satzstruktur mit markierten Partikeln">
+        <div class="xray-row">
+          <div class="slot"><div class="tok">jan suli</div><div class="role">subjekt</div></div>
+          <div class="slot particle"><div class="tok">li</div><div class="role">prädikat</div></div>
+          <div class="slot"><div class="tok">pana</div><div class="role">verb</div></div>
+          <div class="slot particle"><div class="tok">e</div><div class="role">objekt</div></div>
+          <div class="slot"><div class="tok">lipu</div><div class="role">nomen</div></div>
+          <div class="slot particle"><div class="tok">tawa</div><div class="role">präposition</div></div>
+          <div class="slot"><div class="tok">mi</div><div class="role">nomen</div></div>
+        </div>
+        <p class="caption">
+          <span class="tp">jan suli li pana e lipu tawa mi.</span>
+          <span class="de-gloss">Die wichtige Person gibt mir ein Dokument.</span>
+          Dieses „Satzröntgen“ ist gleichzeitig Erklärformat, Übungstyp und
+          Fehlermeldung — dieselbe Komponente an drei Stellen.
+        </p>
+      </div>
+    </section>
+
+    <section id="s2">
+      <div class="head">
+        <p class="eyebrow"><i>02</i> jan</p>
+        <h2>Zielgruppe &amp; Umfeld</h2>
+      </div>
+      <p>
+        Primär: deutschsprachige Erwachsene, sprachinteressiert, die von toki pona
+        über Reddit, YouTube oder Freunde gehört haben und einen geführten Einstieg
+        wollen. Sekundär: Rückkehrende, die die Wörter kennen, aber nie flüssig
+        Sätze gebaut haben. Nicht Zielgruppe: Kinder (Wortschatzarbeit setzt
+        abstraktes Sprachdenken voraus).
+      </p>
+      <p>
+        Was es schon gibt und wie sich die App dazu verhält:
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>Bestehend</th><th>Stärke</th><th>Lücke, die wir füllen</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><em>lipu sona pona</em>, <em>o kama sona</em> (Web-Kurse)</td><td>Didaktisch sehr gut, community-geprüft</td><td>Kein Üben, keine Wiederholung, kein Mobil-Flow</td></tr>
+            <tr><td>Anki-Decks</td><td>Starke Wiederholungslogik</td><td>Nur Wörter, keine Grammatik, keine Produktion</td></tr>
+            <tr><td>Memrise-/Quizlet-Kurse</td><td>Niedrige Einstiegshürde</td><td>1:1-Übersetzungen, verstärken falsche Bedeutungsgrenzen</td></tr>
+            <tr><td><em>nimi.li</em> / Linku (Wörterbücher)</td><td>Aktuelle, belegte Wortdaten</td><td>Nachschlagen, kein Lernpfad</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Positionierung in einem Satz: <em>der geführte Kurs plus das Übungsgerät
+        — offline, auf dem Telefon, auf Deutsch.</em> Die bestehenden Kurse sind
+        keine Konkurrenz, sondern Referenz: Wir verlinken sie und richten die
+        Konzeptreihenfolge bewusst an ihnen aus, damit Lernende parallel lesen können.
+      </p>
+    </section>
+
+    <section id="s3">
+      <div class="head">
+        <p class="eyebrow"><i>03</i> nasin</p>
+        <h2>Didaktisches Modell</h2>
+      </div>
+      <p>
+        Vier Prinzipien, die jede Design-Entscheidung weiter unten begründen:
+      </p>
+      <div class="cols">
+        <div class="card">
+          <h4>bedeutungsraum statt gleichung</h4>
+          <p>
+            <span class="tp">suli</span> ist nicht „groß“, sondern groß / lang /
+            wichtig / erwachsen. Jedes Wort wird von Anfang an mit mehreren
+            deutschen Lesarten und mindestens einer <em>Nicht</em>-Lesart gelernt.
+          </p>
+        </div>
+        <div class="card">
+          <h4>produzieren vor erkennen</h4>
+          <p>
+            Multiple Choice erzeugt Scheinkompetenz. Der Standardmodus ist Bauen
+            aus Wortkacheln; Erkennungsaufgaben dienen nur der Einführung.
+          </p>
+        </div>
+        <div class="card">
+          <h4>konzepte sind lernziele</h4>
+          <p>
+            Jede Regel (<span class="tp">li</span>-Tilgung, <span class="tp">pi</span>,
+            <span class="tp">la</span> …) hat eigenen Fortschritt, eigene Fehlerquote,
+            eigene Wiederholung. Fehler sind diagnostisch, nicht nur falsch.
+          </p>
+        </div>
+        <div class="card">
+          <h4>umschreiben ist die kernfertigkeit</h4>
+          <p>
+            Wer „Zug“ als <span class="tp">tomo tawa linja</span> ausdrücken kann,
+            hat toki pona verstanden. Diese Fertigkeit wird ab Stufe 4 explizit
+            geübt, nicht dem Zufall überlassen.
+          </p>
+        </div>
+      </div>
+      <h3>Aufbau einer Lerneinheit (7–10 Minuten)</h3>
+      <ol>
+        <li><strong>Fällige Wiederholungen</strong> (4–8 Karten, gemischte Richtungen)</li>
+        <li><strong>Konzeptkarte</strong>: eine Regel, ein Satzröntgen, drei Beispiele</li>
+        <li><strong>Geführte Produktion</strong>: 5–8 Sätze aus Kacheln bauen, Schwierigkeit steigend</li>
+        <li><strong>Fehlerarbeit</strong>: zwei typische Falschsätze zu genau dieser Regel finden und reparieren</li>
+        <li><strong>Lesen</strong>: kurzer Text, der nur bekannte Wörter und Konzepte nutzt, mit Tap-Glossar</li>
+      </ol>
+      <p class="caption">
+        Immer dieselbe Abfolge: Wiederholung → Regel → Produktion → Fehler → Input.
+        Keine Herzen, keine Verlustmechanik; die Einheit endet, wenn das Konzept
+        zweimal fehlerfrei angewendet wurde.
+      </p>
+    </section>
+
+    <section id="s4">
+      <div class="head">
+        <p class="eyebrow"><i>04</i> kama sona</p>
+        <h2>Curriculum, 12 Stufen</h2>
+      </div>
+      <p>
+        Reihenfolge nach syntaktischer Notwendigkeit, nicht nach Themenfeldern.
+        Jede Stufe umfasst 2–3 Lektionen und schaltet erst weiter, wenn ihre
+        Konzepte je zweimal fehlerfrei produziert wurden.
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>Stufe</th><th>Konzept</th><th>Beispiel</th><th>neue Wörter</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="num">1</td><td><span class="tp">mi</span>/<span class="tp">sina</span> + Prädikat, kein <span class="tp">li</span>; Nomen als Prädikat</td><td><span class="tp">mi pona.</span> <span class="de-gloss">Mir geht’s gut.</span></td><td class="num">12</td></tr>
+            <tr><td class="num">2</td><td>Modifikator folgt dem Kopf</td><td><span class="tp">jan pona</span> <span class="de-gloss">Freund</span> · <span class="tp">jan lili</span> <span class="de-gloss">Kind</span></td><td class="num">14</td></tr>
+            <tr><td class="num">3</td><td>3. Person mit <span class="tp">li</span>; mehrere Prädikate</td><td><span class="tp">ona li suli li pona.</span></td><td class="num">12</td></tr>
+            <tr><td class="num">4</td><td><span class="tp">e</span> + direktes Objekt</td><td><span class="tp">jan lili li moku e kili.</span></td><td class="num">14</td></tr>
+            <tr><td class="num">5</td><td>Modifikatorketten, <span class="tp">pi</span>-Umgruppierung</td><td><span class="tp">jan pi toki pona</span> <span class="de-gloss">toki-pona-Sprecher</span></td><td class="num">12</td></tr>
+            <tr><td class="num">6</td><td>Präverben: <span class="tp">wile ken kama awen sona lukin</span></td><td><span class="tp">mi wile moku.</span></td><td class="num">10</td></tr>
+            <tr><td class="num">7</td><td>Präpositionen <span class="tp">lon tan tawa kepeken sama</span>, auch als Prädikat</td><td><span class="tp">mi tawa tomo mi.</span></td><td class="num">10</td></tr>
+            <tr><td class="num">8</td><td>Negation <span class="tp">ala</span>; Fragen: <span class="tp">seme</span>, <span class="tp">X ala X</span>, <span class="tp">anu seme</span></td><td><span class="tp">sina wile ala wile moku?</span></td><td class="num">8</td></tr>
+            <tr><td class="num">9</td><td><span class="tp">o</span> für Befehl und Anrede; Partikeln <span class="tp">a</span>, <span class="tp">kin</span></td><td><span class="tp">o kama pona!</span> <span class="de-gloss">Willkommen!</span></td><td class="num">8</td></tr>
+            <tr><td class="num">10</td><td><span class="tp">la</span>: Kontext, Zeit, Bedingung — daher auch Tempus</td><td><span class="tp">tenpo pini la mi lon ma Tosi.</span></td><td class="num">10</td></tr>
+            <tr><td class="num">11</td><td><span class="tp">ni:</span> als Satzeinbettung; <span class="tp">en</span>, <span class="tp">anu</span>, <span class="tp">taso</span></td><td><span class="tp">mi wile e ni: sina kama.</span></td><td class="num">6</td></tr>
+            <tr><td class="num">12</td><td>Zahlen, Mengen, Eigennamen als Modifikator</td><td><span class="tp">soweli tu</span> · <span class="tp">jan Sonja</span> · <span class="tp">ma Tosi</span></td><td class="num">4</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Nach Stufe 12 sind die 120 <em>pu</em>-Wörter und die gesamte Kerngrammatik
+        abgedeckt. Danach kein neuer Stoff, sondern drei offene Trakte:
+        <strong>Lesestrecke</strong> (graduierte Texte), <strong>nimi ku suli</strong>
+        (17 Wörter mit Einordnung, wo sie akzeptiert sind) und
+        <strong>sitelen pona</strong>.
+      </p>
+      <div class="note">
+        <p>
+          Bewusste didaktische Entscheidung: Zahlen kommen zuletzt, obwohl
+          Sprachkurse traditionell mit ihnen anfangen. In toki pona sind sie ein
+          Randthema mit umstrittenen Systemen (<span class="tp">wan tu mute ale</span>
+          gegen <em>nasin nanpa pona</em> mit <span class="tp">luka</span> = 5).
+          Beides wird gezeigt, gewertet wird nur das <em>pu</em>-System.
+        </p>
+      </div>
+    </section>
+
+    <section id="s5">
+      <div class="head">
+        <p class="eyebrow"><i>05</i> musi</p>
+        <h2>Übungstypen</h2>
+      </div>
+      <p>
+        13 Typen, jeder an ein konkretes Lernziel gebunden. Alle laufen offline und
+        sind deterministisch bewertbar — außer den beiden am Ende markierten.
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Typ</th><th>Aufgabe</th><th>trainiert</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Wort → Bedeutung</td><td><span class="tp">kepeken</span> → benutzen / mit</td><td>Rezeption</td></tr>
+            <tr><td class="num">2</td><td>Bedeutung → Wort</td><td>„Wasser, Flüssigkeit“ → <span class="tp">telo</span></td><td>Abruf</td></tr>
+            <tr><td class="num">3</td><td>Bedeutungsgrenze</td><td>Welche Lesarten deckt <span class="tp">suli</span> ab, welche nicht?</td><td>Bedeutungsraum</td></tr>
+            <tr><td class="num">4</td><td>Satz bauen (Kacheln)</td><td>„Ich sehe dich.“ → <span class="tp">mi lukin e sina.</span></td><td>Produktion</td></tr>
+            <tr><td class="num">5</td><td>Partikel-Lücke</td><td><span class="tp">soweli ___ moku e kili.</span> → <span class="tp">li</span></td><td>Syntax</td></tr>
+            <tr><td class="num">6</td><td>Fehler finden</td><td><span class="tp">mi li moku.</span> → <span class="tp">li</span> entfällt nach <span class="tp">mi</span></td><td>Regelbewusstsein</td></tr>
+            <tr><td class="num">7</td><td>Satzröntgen</td><td>Konstituenten den Rollen zuordnen</td><td>Struktur</td></tr>
+            <tr><td class="num">8</td><td>Mehrdeutigkeit</td><td>Welche deutschen Lesarten erlaubt <span class="tp">mi moku.</span>?</td><td>Kontextlesen</td></tr>
+            <tr><td class="num">9</td><td>Umschreiben</td><td>„Kaffee“ → <span class="tp">telo pimeja wawa</span></td><td>Kernfertigkeit</td></tr>
+            <tr><td class="num">10</td><td>Hören</td><td>Audio → Satz aus Kacheln legen</td><td>Rezeption</td></tr>
+            <tr><td class="num">11</td><td>sitelen pona</td><td>Glyphe ↔ Wort</td><td>Schrift</td></tr>
+            <tr><td class="num">12</td><td>Freies Tippen <span class="tag">selbstprüfung</span></td><td>Deutscher Satz → frei eingeben, Parser + Musterlösungen</td><td>Produktion</td></tr>
+            <tr><td class="num">13</td><td>Bildbeschreibung <span class="tag">selbstprüfung</span></td><td>Szene in 3 Sätzen beschreiben, Vergleich mit Referenz</td><td>freie Anwendung</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Typ 6 verdient Hervorhebung: Die häufigsten Anfängerfehler sind bekannt und
+        endlich viele (<span class="tp">*mi li moku</span>,
+        <span class="tp">*jan pi pona</span> bei einwortigem Modifikator, fehlendes
+        <span class="tp">e</span>, <span class="tp">la</span> am Satzende). Jeder
+        dieser Fehler wird als eigener Datensatz gepflegt: falscher Satz, korrigierte
+        Form, Ein-Satz-Begründung. Das ist gleichzeitig Übungsmaterial und der
+        Fehlermeldungs-Katalog des Parsers.
+      </p>
+    </section>
+
+    <section id="s6">
+      <div class="head">
+        <p class="eyebrow"><i>06</i> lukin pona</p>
+        <h2>Bewertung freier Antworten</h2>
+      </div>
+      <p>
+        Der schwierigste Punkt der ganzen App: Für „Ich mag Hunde“ gibt es Dutzende
+        richtige toki-pona-Sätze. Falsch-negative Bewertungen zerstören Vertrauen
+        schneller als jeder andere Fehler. Der Plan löst das in drei Schichten:
+      </p>
+      <ol>
+        <li>
+          <strong>Normalisieren.</strong> Kleinschreibung außer Eigennamen,
+          Interpunktion und Mehrfachleerzeichen weg, tolerante Wortgrenzen.
+          Tippfehler werden per Levenshtein-Distanz 1 gegen das 137-Wort-Lexikon
+          korrigiert und als Hinweis, nicht als Fehler, gemeldet.
+        </li>
+        <li>
+          <strong>Strukturell parsen.</strong> Recursive-Descent-Parser über die
+          Phrasengrammatik (Subjekt-Kette → <span class="tp">li</span> → Prädikat →
+          <span class="tp">e</span>-Objekte → Präpositionalphrasen). Ergebnis ist ein
+          Syntaxbaum plus konkrete Verstoßliste. Damit fällt Rückmeldung wie
+          „<span class="tp">e</span> ohne folgendes Nomen“ an, nicht nur „falsch“.
+        </li>
+        <li>
+          <strong>Semantisch abgleichen.</strong> Jeder Satzdatensatz trägt eine
+          Menge akzeptierter Lösungen plus <em>Pflichtbausteine</em>
+          (z.&nbsp;B. „muss <span class="tp">soweli</span> und ein Zuneigungswort
+          enthalten“). Baum + Pflichtbausteine erfüllt und Parser ohne Verstoß
+          ⇒ akzeptiert, auch wenn die Wortwahl nicht in der Liste steht.
+        </li>
+      </ol>
+      <p>
+        Bleibt es unklar, gewinnt der Lernende: Die Antwort wird als
+        „<em>grammatisch korrekt, andere Wortwahl als erwartet</em>“ gewertet, mit
+        Musterlösung daneben und einem „Das ist auch richtig“-Knopf, der den Fall in
+        die Redaktionsqueue schickt. Diese Meldungen sind das wertvollste
+        Content-Signal der App.
+      </p>
+      <div class="note risk">
+        <p>
+          Nicht geplant: ein Sprachmodell auf dem Gerät als Bewerter für den MVP.
+          Es macht die App groß, langsam und unvorhersagbar, und toki pona ist genau
+          die Sprache, in der ein Parser reicht. Frühestens als optionale
+          Server-Funktion, nachdem die Redaktionsqueue zeigt, wo der Parser
+          wirklich nicht ausreicht.
+        </p>
+      </div>
+    </section>
+
+    <section id="s7">
+      <div class="head">
+        <p class="eyebrow"><i>07</i> ilo</p>
+        <h2>Feature-Umfang</h2>
+      </div>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>Bereich</th><th>MVP (v1.0)</th><th>Später</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Kurs</td><td>Stufen 1–12, ~30 Lektionen</td><td>Lesestrecke mit 20 graduierten Texten</td></tr>
+            <tr><td>Wortschatz</td><td>120 <em>pu</em>-Wörter, Wiederholung in beiden Richtungen</td><td>17 <em>nimi ku suli</em> mit Akzeptanz-Hinweis</td></tr>
+            <tr><td>Übungen</td><td>Typen 1–9</td><td>Typen 10–13</td></tr>
+            <tr><td>Nachschlagen</td><td>Wörterbuch mit Suche, Beispielsätzen, Grammatikreferenz</td><td>Volltextsuche über alle Beispielsätze</td></tr>
+            <tr><td>Motivation</td><td>Tagesziel, Streak, Konzept-Fortschritt</td><td>Wochenrückblick, Abzeichen</td></tr>
+            <tr><td>System</td><td>Offline, Erinnerungs-Benachrichtigung, Dark Mode, Dynamic Type</td><td>iCloud-Sync, Widget „nimi pi tenpo suno“, Shortcuts, watchOS</td></tr>
+            <tr><td>Audio</td><td>137 Einzelwörter gesprochen</td><td>~300 gesprochene Sätze, Hörübungen</td></tr>
+            <tr><td>Schrift</td><td>—</td><td>sitelen pona lesen, dann schreiben</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Bewusst nicht geplant: Bestenlisten, Herzen/Leben, Freundeslisten,
+        Push-Serien-Druck. toki pona hat eine ausgesprochen anti-kompetitive
+        Community; eine Duolingo-Mechanik würde die Zielgruppe abstoßen, die die
+        App weiterempfehlen soll.
+      </p>
+    </section>
+
+    <section id="s8">
+      <div class="head">
+        <p class="eyebrow"><i>08</i> lukin</p>
+        <h2>Screens &amp; Navigation</h2>
+      </div>
+      <p>
+        Drei Tabs. Mehr braucht es nicht, und jeder zusätzliche Tab verwässert die
+        Frage „Was soll ich jetzt tun?“.
+      </p>
+      <div class="cols">
+        <div class="card">
+          <h4>tab 1 — nasin (weg)</h4>
+          <p>
+            Die Stufenliste als vertikaler Pfad. Oben immer eine einzige
+            Primäraktion: <em>Weiterlernen</em> oder <em>N Wiederholungen fällig</em>.
+            Stufen zeigen Konzeptbeherrschung als Ring, nicht als Prozentzahl.
+          </p>
+        </div>
+        <div class="card">
+          <h4>tab 2 — nimi (wörter)</h4>
+          <p>
+            Wörterbuch, filterbar nach <em>pu</em>/<em>ku suli</em>, Wortart, Status
+            (neu, im Lernen, gefestigt). Detailseite: Bedeutungsraum, Beispielsätze
+            aus echtem Kursmaterial, Audio, Glyphe, eigene Notiz.
+          </p>
+        </div>
+        <div class="card">
+          <h4>tab 3 — sona (wissen)</h4>
+          <p>
+            Grammatikreferenz mit denselben Satzröntgen-Karten wie im Kurs, plus
+            Fehlerkatalog zum Durchblättern. Diese Seite ist der Grund, warum die
+            App auch nach dem Kurs geöffnet wird.
+          </p>
+        </div>
+      </div>
+      <h3>Der Übungsbildschirm</h3>
+      <p>
+        Eine Komponente, 13 Aufgabendarstellungen, immer gleiche Anatomie: Anweisung
+        oben, Aufgabenfeld mittig, Kachelvorrat unten, ganz unten der Prüfknopf.
+        Rückmeldung erscheint als Blatt von unten mit drei Teilen — Urteil,
+        Satzröntgen der eigenen Antwort, Ein-Satz-Regel. Kein Vollbild-Konfetti,
+        keine Blockade: Weiter ist immer möglich, falsche Aufgaben kommen in derselben
+        Sitzung wieder.
+      </p>
+    </section>
+
+    <section id="s9">
+      <div class="head">
+        <p class="eyebrow"><i>09</i> insa</p>
+        <h2>Technische Architektur</h2>
+      </div>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>Baustein</th><th>Wahl</th><th>Begründung</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Zielplattform</td><td>iOS 17+, SwiftUI</td><td>Deckt praktisch die ganze Zielgruppe; SwiftData und Observation ohne Rückfallpfade nutzbar</td></tr>
+            <tr><td>Fortschrittsdaten</td><td>SwiftData, lokal</td><td>Kein Konto, keine Server-Kosten, kein Datenschutz-Aufwand im MVP</td></tr>
+            <tr><td>Sync</td><td>Später: SwiftData + CloudKit</td><td>Ein Schalter statt eines Backends; Schema von Beginn an sync-tauglich halten</td></tr>
+            <tr><td>Inhalte</td><td>Versionierte JSON-Dateien im Bundle</td><td>Redaktion in Git, Diff-fähig, keine Migration bei Textänderungen</td></tr>
+            <tr><td>Sprachlogik</td><td>Swift Package <code>TokiPonaKit</code>, UI-frei</td><td>Tokenizer, Parser, Bewerter und Planer sind reine Funktionen — vollständig unittestbar</td></tr>
+            <tr><td>Netz</td><td>Keins im MVP</td><td>„Funktioniert im Flugzeug“ ist ein Verkaufsargument, kein Kompromiss</td></tr>
+            <tr><td>Analytik</td><td>Lokale Ereigniszählung, opt-in-Export</td><td>Community-Erwartung; Metriken aus Abschnitt 18 lassen sich anonym aggregieren</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        <code>TokiPonaKit</code> ist der Kern des Vorhabens und sollte zuerst
+        entstehen, vor jedem Screen. Es enthält keine Abhängigkeiten, kein SwiftUI
+        und lässt sich gegen die gesamte Satzdatenbank in Sekunden prüfen — das ist
+        die Redaktionskontrolle aus Abschnitt 12.
+      </p>
+      <pre><code>TokiPonaKit/
+  Lexicon.swift        // 137 Einträge, Wortarten, Partikel-Klassifikation
+  Tokenizer.swift      // Text → [Token], Tippfehler-Vorschläge
+  Parser.swift         // [Token] → Result&lt;Sentence, [Violation]&gt;
+  Violation.swift      // Regel-ID + Spanne + deutsche Begründung
+  Grader.swift         // Antwort + Aufgabe → Verdict
+  Scheduler.swift      // FSRS-Zustand pro Item, Konzept-Mastery
+TokiPonaKitTests/
+  ParserGoldenTests    // ~600 Sätze müssen fehlerfrei parsen
+  ViolationTests       // jeder Fehlerkatalog-Eintrag trifft genau seine Regel-ID
+  GraderTests          // akzeptierte Varianten je Aufgabe</code></pre>
+    </section>
+
+    <section id="s10">
+      <div class="head">
+        <p class="eyebrow"><i>10</i> lipu</p>
+        <h2>Datenmodell</h2>
+      </div>
+      <h4>inhalt (schreibgeschützt, im bundle)</h4>
+      <pre><code>// word.json
+{
+  "id": "suli",
+  "book": "pu",                       // pu | ku_suli
+  "pos": ["verb_stativ", "modifier"],
+  "senses": [
+    { "de": "groß", "note": "räumlich" },
+    { "de": "wichtig" },
+    { "de": "erwachsen", "note": "von Personen" }
+  ],
+  "notSenses": ["dick", "viel"],      // für Übungstyp 3
+  "sitelen": "U+F1988",               // UCSUR-Punkt, optional
+  "audio": "suli.m4a",
+  "examples": ["s0142", "s0311"],
+  "frequency": 0.87                   // Nutzungsanteil, quellenbelegt
+}
+
+// sentence.json
+{
+  "id": "s0142",
+  "tp": "jan suli li pana e lipu tawa mi.",
+  "de": ["Die wichtige Person gibt mir ein Dokument."],
+  "alsoDe": ["Der Erwachsene übergibt mir ein Blatt."],
+  "requiredWords": ["pana"],          // Pflichtbausteine für freie Antworten
+  "concepts": ["c04_e_objekt", "c07_praeposition"],
+  "stage": 7,
+  "audio": "s0142.m4a"
+}
+
+// concept.json
+{
+  "id": "c03_li",
+  "stage": 3,
+  "title": "li vor dem Prädikat",
+  "prerequisites": ["c01_mi_sina"],
+  "rule_de": "Nach jedem Subjekt außer mi und sina steht li.",
+  "xray": "ona | li | suli",
+  "errors": [
+    { "wrong": "mi li moku.", "right": "mi moku.",
+      "why": "Nach mi entfällt li." }
+  ]
+}</code></pre>
+      <h4>fortschritt (swiftdata, gerätelokal)</h4>
+      <pre><code>@Model final class ItemState {          // eine Zeile je Übungsrichtung
+  var itemID: String                    // "suli:recall" | "s0142:produce"
+  var stability: Double                 // FSRS
+  var difficulty: Double
+  var due: Date
+  var lapses: Int
+  var lastReview: Date?
+}
+
+@Model final class ConceptState {
+  var conceptID: String
+  var mastery: Double                   // 0…1, verfällt langsam
+  var consecutiveCorrect: Int
+  var errorCount: Int                   // speist die Fehlerdiagnose
+}
+
+@Model final class SessionLog {         // Grundlage für Abschnitt 18
+  var date: Date
+  var itemsSeen: Int
+  var accuracy: Double
+  var secondsActive: Int
+}</code></pre>
+      <p>
+        Wichtig an diesem Schnitt: Inhalte und Fortschritt teilen nur String-IDs.
+        Ein Inhaltsupdate darf Sätze ergänzen oder korrigieren, ohne
+        Nutzerdaten zu migrieren. Verschwindet eine ID, wird ihr Fortschritt
+        stillschweigend verworfen.
+      </p>
+    </section>
+
+    <section id="s11">
+      <div class="head">
+        <p class="eyebrow"><i>11</i> tenpo mute</p>
+        <h2>Wiederholungsplanung</h2>
+      </div>
+      <p>
+        Zwei getrennte Mechanismen, weil Wörter und Regeln unterschiedlich vergessen
+        werden.
+      </p>
+      <p>
+        <strong>Wörter und Sätze</strong> laufen über FSRS (freies, gut dokumentiertes
+        Verfahren, in Swift portierbar; SM-2 als Notlösung, falls die Portierung länger
+        dauert als geschätzt). Je Wort existieren bis zu drei unabhängige Items:
+        Erkennen, Abrufen, im Satz verwenden. Erkennen wird zuerst freigeschaltet,
+        Abrufen nach dem ersten Erfolg, Satzverwendung ab der Stufe, die das Wort
+        einführt.
+      </p>
+      <p>
+        <strong>Konzepte</strong> laufen nicht über Karten, sondern über einen
+        Beherrschungswert 0…1, der bei korrekter Anwendung <em>in beliebiger Aufgabe</em>
+        steigt und über Wochen langsam verfällt. Sinkt er unter 0,6, mischt der Planer
+        gezielt Aufgaben ein, die dieses Konzept erfordern — nicht die alte Lektion
+        erneut. Das ist der Unterschied zwischen „Lektion wiederholen“ und „Regel
+        wieder beherrschen“.
+      </p>
+      <p>
+        Sitzungszusammenstellung, in dieser Prioritätsfolge: überfällige Items → das
+        schwächste Konzept → neuer Stoff, aber nur wenn weniger als 20 Items überfällig
+        sind → ein Lesetext. Damit läuft niemand in einen Rückstandsberg, der Kurs
+        wartet lieber.
+      </p>
+    </section>
+
+    <section id="s12">
+      <div class="head">
+        <p class="eyebrow"><i>12</i> pali</p>
+        <h2>Inhalte produzieren</h2>
+      </div>
+      <p>
+        Der eigentliche Aufwand liegt nicht im Code, sondern hier. Größenordnung für
+        v1.0:
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>Artefakt</th><th>Menge</th><th>Aufwand</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Worteinträge mit Bedeutungsräumen und Nicht-Lesarten</td><td class="num">137</td><td class="num">~25 h</td></tr>
+            <tr><td>Konzeptkarten mit Röntgen und Begründung</td><td class="num">24</td><td class="num">~20 h</td></tr>
+            <tr><td>Fehlerkatalog-Einträge</td><td class="num">~60</td><td class="num">~10 h</td></tr>
+            <tr><td>Beispiel- und Übungssätze mit Übersetzungsvarianten</td><td class="num">~600</td><td class="num">~70 h</td></tr>
+            <tr><td>Lesetexte (150–300 Wörter, nur bekannter Stoff)</td><td class="num">20</td><td class="num">~30 h</td></tr>
+            <tr><td>Community-Review und Einarbeitung</td><td>—</td><td class="num">~25 h</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Zwei Werkzeuge, die den Aufwand halbieren</h3>
+      <ul>
+        <li>
+          <strong>Redaktions-CLI</strong> im selben Repo: prüft bei jedem Commit, dass
+          jeder Satz parst, nur Wörter aus bereits eingeführten Stufen nutzt, jedes
+          Konzept mindestens acht Übungssätze hat und jede referenzierte ID existiert.
+          Ohne diese Prüfung wird die Satzdatenbank innerhalb weniger Wochen inkonsistent.
+        </li>
+        <li>
+          <strong>Frequenzdaten als Reihenfolge-Autorität</strong>: Die Wortreihenfolge
+          innerhalb der Stufen folgt gemessener Nutzungshäufigkeit aus den öffentlichen
+          Community-Erhebungen, nicht dem Bauchgefühl. Lizenz je Quelle vor Nutzung
+          prüfen und Herkunft in der App nennen.
+        </li>
+      </ul>
+      <div class="note risk">
+        <p>
+          Urheberrecht, klar getrennt: Wortlisten und Grammatikregeln sind nicht
+          schutzfähig, die Formulierungen in <em>pu</em> und <em>ku</em> sehr wohl.
+          Alle Glossen, Erklärungen und Beispielsätze werden neu geschrieben.
+          Community-Texte nur mit ausdrücklicher Erlaubnis oder passender
+          CC-Lizenz, jeweils mit Nennung — pro Text dokumentiert, nicht pauschal.
+        </p>
+      </div>
+    </section>
+
+    <section id="s13">
+      <div class="head">
+        <p class="eyebrow"><i>13</i> sitelen</p>
+        <h2>sitelen pona &amp; Audio</h2>
+      </div>
+      <h3>Schrift</h3>
+      <p>
+        sitelen pona wird über UCSUR-Codepunkte in der Private Use Area kodiert; es
+        gibt mehrere freie Schriftarten dafür. Zwei Wege, bewusst zu wählen:
+        eine fertige Schrift einbetten (schnell, aber Lizenz je Schrift prüfen und
+        Textauswahl/VoiceOver liefern Kauderwelsch) oder 137 eigene SVG-Glyphen
+        zeichnen (aufwändiger, dafür lizenzsicher, animierbar für die
+        Schreibrichtung und barrierefrei benennbar). Empfehlung: eingebettete
+        Schrift für die Lesephase, eigene SVGs erst, wenn Schreibübungen kommen.
+        In jedem Fall bleibt sitelen pona optional und außerhalb des Pflichtpfads.
+      </p>
+      <h3>Audio</h3>
+      <p>
+        Systemsprachsynthese kennt kein toki pona; eine fremdsprachige Stimme
+        klingt falsch und lehrt falsche Aussprache. Deshalb echte Aufnahmen:
+        137 Einzelwörter für v1.0 (ein Sprechtermin, sauber geschnitten, ~2 MB als
+        AAC). Sätze werden <em>nicht</em> aus Wortdateien zusammengesetzt — die
+        Prosodie verrät es sofort; stattdessen ~300 Sätze separat aufnehmen, wenn die
+        Hörübungen kommen. Aussprache ist ohnehin gutmütig: 14 Laute, feste
+        Silbenstruktur, Betonung auf der ersten Silbe.
+      </p>
+    </section>
+
+    <section id="s14">
+      <div class="head">
+        <p class="eyebrow"><i>14</i> ale</p>
+        <h2>Zugänglichkeit</h2>
+      </div>
+      <ul>
+        <li>
+          <strong>VoiceOver liest toki pona falsch vor.</strong> Jedes Wort erhält
+          ein <code>accessibilityLabel</code> mit deutscher Lautschrift plus, wo
+          verfügbar, die Aufnahme. Ohne das ist die App für blinde Nutzer wertlos —
+          und es ist mit gepflegten Wortdaten fast kostenlos.
+        </li>
+        <li>
+          <strong>Rückmeldung nie nur über Farbe.</strong> Richtig/falsch immer
+          zusätzlich über Symbol, Text und optional Haptik.
+        </li>
+        <li>
+          <strong>Kachel-Bauen braucht eine Tastatur-Alternative.</strong>
+          Drag-and-drop ist für Schaltersteuerung und VoiceOver unbenutzbar;
+          Antippen zum Anfügen muss überall gleichwertig funktionieren.
+        </li>
+        <li>
+          <strong>Dynamic Type bis XXL</strong> ohne abgeschnittene Kacheln;
+          Satzröntgen bricht dann zeilenweise um statt horizontal zu scrollen.
+        </li>
+        <li>
+          <strong>Oberfläche Deutsch, Inhalte lokalisierbar.</strong> Glossen und
+          Erklärungen liegen von Anfang an unter Sprachschlüsseln, damit eine
+          englische Fassung später keine Datenmigration braucht.
+        </li>
+      </ul>
+    </section>
+
+    <section id="s15">
+      <div class="head">
+        <p class="eyebrow"><i>15</i> mani</p>
+        <h2>Preismodell</h2>
+      </div>
+      <p>
+        Kostenlos: die 120 <em>pu</em>-Wörter, Stufen 1–6, Wörterbuch und
+        Grammatikreferenz vollständig, unbegrenztes Üben. Wer nur das nutzt, hat ein
+        funktionierendes Lernwerkzeug — das ist beabsichtigt, nicht ein
+        Konvertierungsleck.
+      </p>
+      <p>
+        Einmalkauf (Richtwert 9,99 €), Arbeitstitel <em>lipu suli</em>: Stufen 7–12,
+        die 17 <em>nimi ku suli</em>, Lesestrecke, Hörübungen, sitelen pona, iCloud-Sync.
+        Kein Abo. Begründung ist nicht Nostalgie, sondern Zielgruppe: Der Kurs hat ein
+        Ende, ein Abo für 137 Wörter wirkt unseriös, und die Community, über die die
+        App wächst, reagiert auf Abos ausgesprochen negativ. Family Sharing an,
+        Bildungsrabatt unnötig bei dem Preis.
+      </p>
+    </section>
+
+    <section id="s16">
+      <div class="head">
+        <p class="eyebrow"><i>16</i> tenpo kama</p>
+        <h2>Roadmap</h2>
+      </div>
+      <p>
+        Angesetzt für eine Person Entwicklung plus parallele Redaktion; die
+        Reihenfolge ist strikt, weil jeder Schritt vom vorigen abhängt.
+      </p>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>Woche</th><th>Meilenstein</th><th>fertig, wenn</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="num">1–2</td><td><code>TokiPonaKit</code>: Lexikon, Tokenizer, Parser</td><td>600 Golden-Sätze parsen, jeder Katalogfehler trifft seine Regel-ID</td></tr>
+            <tr><td class="num">3</td><td>Bewerter und Planer</td><td>Freitext-Bewertung auf Testkorpus ohne Falsch-Negative</td></tr>
+            <tr><td class="num">4–5</td><td>Übungsbildschirm, Typen 1–5, SwiftData</td><td>Eine Lektion vollständig spielbar, Fortschritt übersteht Neustart</td></tr>
+            <tr><td class="num">6</td><td>Stufenpfad, Wörterbuch, Grammatikreferenz</td><td>App ohne Platzhalter navigierbar</td></tr>
+            <tr><td class="num">7</td><td>Übungstypen 6–9, Rückmeldungsblatt mit Röntgen</td><td>Alle MVP-Typen inhaltlich befüllt</td></tr>
+            <tr><td class="num">8</td><td>Inhalte Stufen 1–12 eingespielt, Audio der 137 Wörter</td><td>Redaktions-CLI grün, kein toter Verweis</td></tr>
+            <tr><td class="num">9</td><td>Feinschliff: Zugänglichkeit, Dark Mode, Erinnerungen, Onboarding</td><td>VoiceOver-Durchlauf einer ganzen Lektion bestanden</td></tr>
+            <tr><td class="num">10</td><td>TestFlight mit Community-Review, App-Store-Abgabe</td><td>Grammatik-Feedback der Reviewer eingearbeitet</td></tr>
+            <tr><td class="num">11+</td><td>v1.1: Lesestrecke, Hörübungen, sitelen pona, iCloud</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="caption">
+        Die Reihenfolge ist absichtlich unbequem: Der Parser kommt vor jedem Screen.
+        Ein hübscher Übungsbildschirm über einer Zeichenketten-Prüfung wäre in Woche 8
+        nicht mehr zu retten.
+      </p>
+    </section>
+
+    <section id="s17">
+      <div class="head">
+        <p class="eyebrow"><i>17</i> ike</p>
+        <h2>Risiken &amp; offene Entscheidungen</h2>
+      </div>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>Risiko</th><th>Wirkung</th><th>Gegenmaßnahme</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Falsch-negative Bewertung freier Sätze</td><td>Hoch — Vertrauensverlust, Rezensionen</td><td>Kachel-Bauen als Standard, Freitext optional, „auch richtig“-Meldung, wöchentliche Queue-Durchsicht</td></tr>
+            <tr><td>Redaktionsaufwand unterschätzt (~180 h)</td><td>Hoch — verschiebt alles</td><td>Stufen 1–6 zuerst vollständig; ein halber Kurs, der stimmt, ist besser als ein ganzer, der wackelt</td></tr>
+            <tr><td>Community-Ablehnung wegen präskriptiver Setzungen</td><td>Mittel — Wachstumskanal fällt weg</td><td><em>pu</em> als Bewertungsgrundlage offenlegen, Varianten als Varianten zeigen, früh im Review fragen</td></tr>
+            <tr><td>Lizenzen von Schrift, Frequenzdaten, Texten</td><td>Mittel — Nachbesserung nach Abgabe</td><td>Pro Artefakt dokumentierte Herkunft, Zweifelsfälle ersetzen statt hoffen</td></tr>
+            <tr><td>Kleiner Markt</td><td>Mittel — Erlöse tragen keine Vollzeitarbeit</td><td>Als Nebenprojekt planen; Einmalkauf statt Abo-Erwartung an Wachstum</td></tr>
+            <tr><td>Parser trifft die Grammatik nicht sauber</td><td>Mittel — Kernversprechen</td><td>Golden-Korpus <em>vor</em> dem Parser schreiben; Test-First ist hier keine Stilfrage</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Vor dem Start zu entscheiden</h3>
+      <ul>
+        <li><strong>Name.</strong> Arbeitstitel <em>lipu sona</em>. Vor der Wahl gegen bestehende Community-Projekte prüfen — Namen wie <em>o kama sona</em> sind belegt, und eine Kollision beschädigt genau den Kanal, über den die App wachsen soll.</li>
+        <li><strong>Wer sprechen die Aufnahmen?</strong> Betrifft Woche 8 und braucht Vorlauf.</li>
+        <li><strong>Wird <em>ku lili</em> überhaupt gezeigt?</strong> Empfehlung: nein, nicht einmal als Nachschlagewerk — es verwässert den Kanon, und dafür gibt es Linku.</li>
+        <li><strong>iPad und Mac (Catalyst) ab v1.0?</strong> Empfehlung: iPhone zuerst, das Layout aber von Anfang an nicht auf 390 pt festnageln.</li>
+      </ul>
+    </section>
+
+    <section id="s18">
+      <div class="head">
+        <p class="eyebrow"><i>18</i> nanpa</p>
+        <h2>Woran wir Erfolg messen</h2>
+      </div>
+      <p>
+        Nicht Installationen und nicht Streak-Länge — beides lässt sich mit Druck
+        erkaufen. Vier Zahlen, die tatsächlich Lernen abbilden:
+      </p>
+      <div class="cols">
+        <div class="card">
+          <h4>zeit bis zum ersten eigenen satz</h4>
+          <p>Vom ersten Start bis zum ersten selbst gebauten korrekten Satz. Ziel: unter 6 Minuten.</p>
+        </div>
+        <div class="card">
+          <h4>fehlerquote je konzept</h4>
+          <p>Pro Regel über alle Nutzer. Ein Ausreißer bedeutet: Erklärung ist schlecht, nicht die Lernenden.</p>
+        </div>
+        <div class="card">
+          <h4>anteil produktiver aufgaben</h4>
+          <p>Bauen und Tippen gegen Erkennen. Sinkt der Anteil, ist die App zur Karteikarten-App verkommen.</p>
+        </div>
+        <div class="card">
+          <h4>stufe-12-abschlüsse</h4>
+          <p>Wie viele beenden den Kurs? Die ehrlichste Zahl, und die einzige, die die Produktidee bestätigt.</p>
+        </div>
+      </div>
+      <p>
+        Alles davon lässt sich aus <code>SessionLog</code> und
+        <code>ConceptState</code> gerätelokal berechnen und anonym aggregiert
+        übermitteln, wenn der Nutzer zustimmt.
+      </p>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>lipu sona pi toki pona — Planungsstand</span>
+    <span>Bewertungsgrundlage: pu (120 nimi) + nimi ku suli (17)</span>
+    <span>o pona!</span>
+  </footer>
+
+</div>
