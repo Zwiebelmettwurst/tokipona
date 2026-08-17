@@ -1,0 +1,2587 @@
+{
+  "attribution": {
+    "source": "lipu sona pona",
+    "url": "https://lipu-sona.pona.la/de/",
+    "repository": "https://github.com/pona-la/lipu-sona",
+    "license": "MIT",
+    "copyright": "© 2020 /dev/urandom und Mitwirkende",
+    "note": "Übungssätze und Übersetzungen übernommen und bearbeitet; Erklärtexte der App sind eigenständig formuliert."
+  },
+  "lessons": [
+    {
+      "lesson": 1,
+      "title": "Einfache Sätze",
+      "stage": 1,
+      "concepts": [
+        "c_mi_sina",
+        "c_li"
+      ],
+      "words": [
+        {
+          "word": "mi",
+          "courseGloss": "ich, wir"
+        },
+        {
+          "word": "sina",
+          "courseGloss": "du, Sie, ihr"
+        },
+        {
+          "word": "ona",
+          "courseGloss": "er, sie, es, sie"
+        },
+        {
+          "word": "li",
+          "courseGloss": "(zw. Subjekt und Verb/Adjektiv)"
+        },
+        {
+          "word": "pona",
+          "courseGloss": "gut, einfach, Verbessern, reparieren"
+        },
+        {
+          "word": "ike",
+          "courseGloss": "schlecht, böse, komplex, unnötig"
+        },
+        {
+          "word": "suli",
+          "courseGloss": "groß, großartig, wichtig, wachsen"
+        },
+        {
+          "word": "lili",
+          "courseGloss": "klein, wenig, jung, schrumpfen"
+        },
+        {
+          "word": "kili",
+          "courseGloss": "Frucht, Gemüse, Pilz"
+        },
+        {
+          "word": "soweli",
+          "courseGloss": "Landsäugetier, Tier"
+        }
+      ],
+      "exercises": 5
+    },
+    {
+      "lesson": 2,
+      "title": "Adjektive",
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "words": [
+        {
+          "word": "ala",
+          "courseGloss": "nein, nicht, Null"
+        },
+        {
+          "word": "ale",
+          "courseGloss": "alle, alles, Universum"
+        },
+        {
+          "word": "utala",
+          "courseGloss": "Kampf, streiten, Wettstreit"
+        },
+        {
+          "word": "wawa",
+          "courseGloss": "stark, energetisch, mächtig"
+        },
+        {
+          "word": "suwi",
+          "courseGloss": "süß, niedlich"
+        },
+        {
+          "word": "jan",
+          "courseGloss": "Person, Leute, Volk, Menschheit"
+        },
+        {
+          "word": "mama",
+          "courseGloss": "Elternteil, Vorfahre, Erschaffer, Ursprung"
+        },
+        {
+          "word": "meli",
+          "courseGloss": "Frau, weiblich, Ehefrau"
+        },
+        {
+          "word": "mije",
+          "courseGloss": "Mann, männlich, Ehemann"
+        },
+        {
+          "word": "moku",
+          "courseGloss": "Nahrung, esssen"
+        }
+      ],
+      "exercises": 10
+    },
+    {
+      "lesson": 3,
+      "title": "Verben und Objekte",
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "words": [
+        {
+          "word": "e",
+          "courseGloss": "(gibt ein Objekt an)"
+        },
+        {
+          "word": "ijo",
+          "courseGloss": "Ding, Objekt"
+        },
+        {
+          "word": "ilo",
+          "courseGloss": "Werkzeug, Maschine, Gerät"
+        },
+        {
+          "word": "lipu",
+          "courseGloss": "Buch, Dokument, Papier"
+        },
+        {
+          "word": "lukin",
+          "courseGloss": "Auge, sehen, schauen, suchen"
+        },
+        {
+          "word": "olin",
+          "courseGloss": "Liebe, Mitgefühl, Zuneigung"
+        },
+        {
+          "word": "pali",
+          "courseGloss": "tun, machen, arbeiten, schaffen"
+        },
+        {
+          "word": "pana",
+          "courseGloss": "geben, senden, abgeben, absondern"
+        },
+        {
+          "word": "telo",
+          "courseGloss": "Wasser, Flüssigkeit, bewässern, waschen"
+        },
+        {
+          "word": "tomo",
+          "courseGloss": "Wohnung, Heim, Raum, Zimmer, Gebäude"
+        }
+      ],
+      "exercises": 11
+    },
+    {
+      "lesson": 4,
+      "title": "Oh nein! Mehr Vokabeln",
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "words": [
+        {
+          "word": "jo",
+          "courseGloss": "haben/beinhalten/halten/tragen"
+        },
+        {
+          "word": "kala",
+          "courseGloss": "Fisch, Wassertier, Meeresgetier"
+        },
+        {
+          "word": "kasi",
+          "courseGloss": "Pflanze, Gras, Kraut, Blatt"
+        },
+        {
+          "word": "pipi",
+          "courseGloss": "Insekt, Käfer"
+        },
+        {
+          "word": "sitelen",
+          "courseGloss": "Symbol, Bild, Schrift, zeichnen"
+        },
+        {
+          "word": "toki",
+          "courseGloss": "Rede, sprechen, Sprache"
+        },
+        {
+          "word": "waso",
+          "courseGloss": "Vogel, fliegende Kreatur"
+        },
+        {
+          "word": "ma",
+          "courseGloss": "Erde, Land, draußen, Gebiet"
+        },
+        {
+          "word": "kiwen",
+          "courseGloss": "harter Gegenstand, Metall, Stein, fest"
+        },
+        {
+          "word": "ko",
+          "courseGloss": "Pulver, Puder, Paste, halbfest"
+        }
+      ],
+      "exercises": 10
+    },
+    {
+      "lesson": 5,
+      "title": "Dies und das",
+      "stage": 11,
+      "concepts": [
+        "c_ni",
+        "c_en"
+      ],
+      "words": [
+        {
+          "word": "ante",
+          "courseGloss": "anders, verändert, ändern"
+        },
+        {
+          "word": "awen",
+          "courseGloss": "bleiben, währen, fortführen, beschützen, fortdauern"
+        },
+        {
+          "word": "en",
+          "courseGloss": "und (verbindet Subjekte)"
+        },
+        {
+          "word": "kalama",
+          "courseGloss": "Geräusch, Krach, Töne machen"
+        },
+        {
+          "word": "kulupu",
+          "courseGloss": "Gruppe, Gemeinschaft, Gesellschaft"
+        },
+        {
+          "word": "lape",
+          "courseGloss": "Schlaf, Pause, ruhen"
+        },
+        {
+          "word": "mute",
+          "courseGloss": "viel, viele, mehr, Menge, sehr"
+        },
+        {
+          "word": "ni",
+          "courseGloss": "dies, das"
+        },
+        {
+          "word": "pakala",
+          "courseGloss": "Bruch, Fehler, kaputt, (allgemeiner Fluch)"
+        },
+        {
+          "word": "seli",
+          "courseGloss": "Feuer, Hitze, Wärme, chemische Reaktion"
+        }
+      ],
+      "exercises": 10
+    },
+    {
+      "lesson": 6,
+      "title": "Präpositionen und Orte",
+      "stage": 6,
+      "concepts": [
+        "c_praeposition"
+      ],
+      "words": [
+        {
+          "word": "kepeken",
+          "courseGloss": "benutzen, benutzend, mithilfe von"
+        },
+        {
+          "word": "lon",
+          "courseGloss": "in, an, auf, wahr, anwesend, existierend"
+        },
+        {
+          "word": "sama",
+          "courseGloss": "gleich wie, ähnlich, wie, Geschwister"
+        },
+        {
+          "word": "tan",
+          "courseGloss": "von, wegen, Grund, Ursache"
+        },
+        {
+          "word": "tawa",
+          "courseGloss": "zu, für, bewegen, aus der Perspektive von"
+        },
+        {
+          "word": "sewi",
+          "courseGloss": "hoch, oben, Himmel, heilig, göttlich"
+        },
+        {
+          "word": "noka",
+          "courseGloss": "Fuß, Bein, unten, unter"
+        },
+        {
+          "word": "poka",
+          "courseGloss": "Hüfte, Seite, neben, in der Nähe"
+        },
+        {
+          "word": "monsi",
+          "courseGloss": "hinten, hinter, Hintern"
+        },
+        {
+          "word": "sinpin",
+          "courseGloss": "Gesicht, vorne, Wand"
+        }
+      ],
+      "exercises": 10
+    },
+    {
+      "lesson": 7,
+      "title": "Ausrufe, Fragen, Befehle und Namen",
+      "stage": 7,
+      "concepts": [
+        "c_frage",
+        "c_o",
+        "c_namen"
+      ],
+      "words": [
+        {
+          "word": "a",
+          "courseGloss": "(emotionaler Ausruf)"
+        },
+        {
+          "word": "anu",
+          "courseGloss": "oder"
+        },
+        {
+          "word": "mu",
+          "courseGloss": "(Tiergeräusch)"
+        },
+        {
+          "word": "o",
+          "courseGloss": "(Anrede, Befehle)"
+        },
+        {
+          "word": "seme",
+          "courseGloss": "was? (für Fragen)"
+        },
+        {
+          "word": "kute",
+          "courseGloss": "hören, gehorchen, Ohr"
+        },
+        {
+          "word": "nimi",
+          "courseGloss": "Wort, Name"
+        },
+        {
+          "word": "lawa",
+          "courseGloss": "Kopf, Kontrolle, Regel, Haupt-..."
+        },
+        {
+          "word": "anpa",
+          "courseGloss": "nieder, bescheiden, abhängig, bezwingen/besiegen, sich beugen"
+        },
+        {
+          "word": "insa",
+          "courseGloss": "innen, Inhalte, Mitte, Magen"
+        }
+      ],
+      "exercises": 10
+    },
+    {
+      "lesson": 8,
+      "title": "Bunte Sprache",
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "words": [
+        {
+          "word": "kule",
+          "courseGloss": "Farbe, bunt"
+        },
+        {
+          "word": "jelo",
+          "courseGloss": "gelb (und Schattierungen)"
+        },
+        {
+          "word": "laso",
+          "courseGloss": "blau, grün (und Schattierungen)"
+        },
+        {
+          "word": "loje",
+          "courseGloss": "rot (und Schattierungen)"
+        },
+        {
+          "word": "pimeja",
+          "courseGloss": "schwarz, dunkel"
+        },
+        {
+          "word": "walo",
+          "courseGloss": "weiß, hell"
+        },
+        {
+          "word": "nasa",
+          "courseGloss": "ungewöhnlich, merkwürdig, verrükt, betrunken"
+        },
+        {
+          "word": "jaki",
+          "courseGloss": "schmutzig, eklig, giftig"
+        },
+        {
+          "word": "moli",
+          "courseGloss": "Tod, sterben"
+        },
+        {
+          "word": "unpa",
+          "courseGloss": "Sex"
+        }
+      ],
+      "exercises": 10
+    },
+    {
+      "lesson": 9,
+      "title": "Komplexe Adjektive und Kontext",
+      "stage": 9,
+      "concepts": [
+        "c_pi",
+        "c_la"
+      ],
+      "words": [
+        {
+          "word": "pi",
+          "courseGloss": "(gruppiert Adjektive um)"
+        },
+        {
+          "word": "la",
+          "courseGloss": "(stellt Kontext voran)"
+        },
+        {
+          "word": "luka",
+          "courseGloss": "Hand, Arm"
+        },
+        {
+          "word": "linja",
+          "courseGloss": "langes biegsames Objekt, Schnur, Haar"
+        },
+        {
+          "word": "palisa",
+          "courseGloss": "langes hartes Objekt, Stock"
+        },
+        {
+          "word": "selo",
+          "courseGloss": "äußere Form, Hülle, Haut, Grenze"
+        },
+        {
+          "word": "sijelo",
+          "courseGloss": "Körper, körperlicher Zustand, Torso"
+        },
+        {
+          "word": "len",
+          "courseGloss": "Stoff, Kleidung, Privatsphärenschutz"
+        },
+        {
+          "word": "lete",
+          "courseGloss": "kalt, roh"
+        },
+        {
+          "word": "musi",
+          "courseGloss": "unterhaltsam, künstlerisch, Spaß, Spiel"
+        }
+      ],
+      "exercises": 11
+    },
+    {
+      "lesson": 10,
+      "title": "Hilfsverben, Zeit und Ort",
+      "stage": 5,
+      "concepts": [
+        "c_praeverb",
+        "c_la"
+      ],
+      "words": [
+        {
+          "word": "kama",
+          "courseGloss": "kommen, Zukunft, Ereignis"
+        },
+        {
+          "word": "ken",
+          "courseGloss": "können, Fähigkeit, Möglichkeit"
+        },
+        {
+          "word": "open",
+          "courseGloss": "Start, anfangen, öffnen"
+        },
+        {
+          "word": "pini",
+          "courseGloss": "Ende, aufhören, schließen"
+        },
+        {
+          "word": "sona",
+          "courseGloss": "Wissen, kennen"
+        },
+        {
+          "word": "wile",
+          "courseGloss": "wollen, brauchen, Wunsch, Verlangen"
+        },
+        {
+          "word": "lupa",
+          "courseGloss": "Loch, Tür, Fenster"
+        },
+        {
+          "word": "nasin",
+          "courseGloss": "Weg, Straße, Art und Weise, Lehre"
+        },
+        {
+          "word": "nena",
+          "courseGloss": "Hügel, Berg, Knopf, Erhebung, Nase"
+        },
+        {
+          "word": "tenpo",
+          "courseGloss": "Zeit, Moment"
+        }
+      ],
+      "exercises": 12
+    },
+    {
+      "lesson": 11,
+      "title": "Nummern",
+      "stage": 12,
+      "concepts": [
+        "c_zahlen"
+      ],
+      "words": [
+        {
+          "word": "wan",
+          "courseGloss": "eins, Teil (von etwas), vereint"
+        },
+        {
+          "word": "tu",
+          "courseGloss": "zweit, trennen, getrennt"
+        },
+        {
+          "word": "sike",
+          "courseGloss": "Kreis, rund, Ball, Jahr"
+        },
+        {
+          "word": "mani",
+          "courseGloss": "Geld, großes domestiziertes Tier"
+        },
+        {
+          "word": "esun",
+          "courseGloss": "Handel, Markt, Laden, Tausch"
+        },
+        {
+          "word": "mun",
+          "courseGloss": "Mond, Stern, Nachthimmel-Objetk"
+        },
+        {
+          "word": "nanpa",
+          "courseGloss": "Nummer, (Ordnungsnummer)"
+        },
+        {
+          "word": "poki",
+          "courseGloss": "Box, Behälter, Schüssel, Tasse, Schubladen"
+        },
+        {
+          "word": "sin",
+          "courseGloss": "neu, zusätzlich, frisch, extra"
+        },
+        {
+          "word": "suno",
+          "courseGloss": "Sonne, Licht, Helligkeit, scheinen"
+        }
+      ],
+      "exercises": 10
+    },
+    {
+      "lesson": 12,
+      "title": "Abschluss",
+      "stage": 12,
+      "concepts": [],
+      "words": [
+        {
+          "word": "akesi",
+          "courseGloss": "\"nicht niedliches\" Tier, Echse"
+        },
+        {
+          "word": "alasa",
+          "courseGloss": "jagen, sammeln"
+        },
+        {
+          "word": "kon",
+          "courseGloss": "Luft, Essenz, Geist, flüchtig"
+        },
+        {
+          "word": "pan",
+          "courseGloss": "Brot, Getreide, Mais, Reis, Pizza"
+        },
+        {
+          "word": "pilin",
+          "courseGloss": "Herz, fühlen, Gefühl, Sinn"
+        },
+        {
+          "word": "pu",
+          "courseGloss": "das offizielle Toki-Pona-Buch, damit interagieren"
+        },
+        {
+          "word": "supa",
+          "courseGloss": "horizontale Oberfläche"
+        },
+        {
+          "word": "taso",
+          "courseGloss": "aber, jedoch, nur"
+        },
+        {
+          "word": "uta",
+          "courseGloss": "Mund, Lippen"
+        },
+        {
+          "word": "weka",
+          "courseGloss": "abwesend, weg, entfernt, entfernen"
+        }
+      ],
+      "exercises": 12
+    },
+    {
+      "lesson": 13,
+      "title": "Wörterbuch-Spezial-Seite",
+      "stage": 12,
+      "concepts": [],
+      "words": [
+        {
+          "word": "namako",
+          "courseGloss": "Gewürz, zusätzlich"
+        },
+        {
+          "word": "kin",
+          "courseGloss": "auch, ebenfalls"
+        },
+        {
+          "word": "oko",
+          "courseGloss": "Auge"
+        },
+        {
+          "word": "kipisi",
+          "courseGloss": "schneiden, teilen"
+        },
+        {
+          "word": "leko",
+          "courseGloss": "Quadrat, Block, (Treppen)"
+        },
+        {
+          "word": "monsuta",
+          "courseGloss": "Angst, Monster, gruselig"
+        },
+        {
+          "word": "misikeke",
+          "courseGloss": "Medizin, Heilung"
+        },
+        {
+          "word": "tonsi",
+          "courseGloss": "genderqueer, trans, nichtbinär"
+        },
+        {
+          "word": "jasima",
+          "courseGloss": "spiegeln, reflektieren, umkehren, Gegenteil"
+        },
+        {
+          "word": "soko",
+          "courseGloss": "Pilz"
+        },
+        {
+          "word": "meso",
+          "courseGloss": "durchschnittlich, mittel"
+        },
+        {
+          "word": "epiku",
+          "courseGloss": "episch, großartig, fantastisch"
+        },
+        {
+          "word": "kokosila",
+          "courseGloss": "nicht in Toki Pona sprechen, während man in einer Toki-Pona-Gruppe ist"
+        },
+        {
+          "word": "lanpan",
+          "courseGloss": "ergreifen, stehlen, nehmen"
+        },
+        {
+          "word": "n",
+          "courseGloss": "äh..., hmm....."
+        },
+        {
+          "word": "kijetesantakalu",
+          "courseGloss": "Waschbär oder andere Marderverwandte"
+        },
+        {
+          "word": "ku",
+          "courseGloss": "(mit dem) Toki-Pona-Wörterbuch (interagieren)"
+        }
+      ],
+      "exercises": 0
+    }
+  ],
+  "items": [
+    {
+      "id": "lsp01_00",
+      "lesson": 1,
+      "stage": 1,
+      "concepts": [
+        "c_mi_sina",
+        "c_li"
+      ],
+      "direction": "de_tp",
+      "tp": "soweli li suli.",
+      "alsoAccepted": [],
+      "de": [
+        "Tiere sind wichtig."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp01_01",
+      "lesson": 1,
+      "stage": 1,
+      "concepts": [
+        "c_mi_sina",
+        "c_li"
+      ],
+      "direction": "de_tp",
+      "tp": "ona li lili.",
+      "alsoAccepted": [],
+      "de": [
+        "Er ist klein."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp01_02",
+      "lesson": 1,
+      "stage": 1,
+      "concepts": [
+        "c_mi_sina",
+        "c_li"
+      ],
+      "direction": "de_tp",
+      "tp": "mi suli.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich bin großartig."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp01_03",
+      "lesson": 1,
+      "stage": 1,
+      "concepts": [
+        "c_mi_sina",
+        "c_li"
+      ],
+      "direction": "de_tp",
+      "tp": "ona li soweli.",
+      "alsoAccepted": [],
+      "de": [
+        "es ist ein Hund."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp01_04",
+      "lesson": 1,
+      "stage": 1,
+      "concepts": [
+        "c_mi_sina",
+        "c_li"
+      ],
+      "direction": "de_tp",
+      "tp": "sina ike.",
+      "alsoAccepted": [],
+      "de": [
+        "Du bist schlecht."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp02_00",
+      "lesson": 2,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "tp_de",
+      "tp": "meli mi li pona.",
+      "alsoAccepted": [],
+      "de": [
+        "Meine Frau ist gut."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp02_01",
+      "lesson": 2,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "tp_de",
+      "tp": "mije sina li suli.",
+      "alsoAccepted": [],
+      "de": [
+        "Dein Mann ist (groß/wichtig)."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp02_02",
+      "lesson": 2,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "tp_de",
+      "tp": "mama mije mi li wawa.",
+      "alsoAccepted": [],
+      "de": [
+        "Mein Vater ist stark."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp02_03",
+      "lesson": 2,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "tp_de",
+      "tp": "soweli ale li pona.",
+      "alsoAccepted": [],
+      "de": [
+        "Alle Tiere sind gut."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp02_04",
+      "lesson": 2,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "tp_de",
+      "tp": "kili li moku suli.",
+      "alsoAccepted": [],
+      "de": [
+        "Früchte sind wichtige Nahrung."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp02_05",
+      "lesson": 2,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "de_tp",
+      "tp": "meli mi li suwi.",
+      "alsoAccepted": [],
+      "de": [
+        "Meine Frau ist niedlich."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp02_06",
+      "lesson": 2,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "de_tp",
+      "tp": "jan utala ale li ike.",
+      "alsoAccepted": [],
+      "de": [
+        "Alle Kämpfer sind böse."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp02_07",
+      "lesson": 2,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "de_tp",
+      "tp": "jan pona mi li jan pona sina.",
+      "alsoAccepted": [],
+      "de": [
+        "Meine Freunde sind deine Freunde."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp02_08",
+      "lesson": 2,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "de_tp",
+      "tp": "jan lili mije sina li wawa.",
+      "alsoAccepted": [],
+      "de": [
+        "Dein Sohn ist stark."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp02_09",
+      "lesson": 2,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "de_tp",
+      "tp": "kili lili li suwi.",
+      "alsoAccepted": [],
+      "de": [
+        "Die kleine Frucht ist süß."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp03_00",
+      "lesson": 3,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "tp_de",
+      "tp": "jan lili li pana e telo lukin.",
+      "alsoAccepted": [],
+      "de": [
+        "Ein Kind weint (gibt Augen-Wasser ab)."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp03_01",
+      "lesson": 3,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "tp_de",
+      "tp": "ona li lukin e lipu.",
+      "alsoAccepted": [],
+      "de": [
+        "(Er/sie/es) sieht ein Dokument."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp03_02",
+      "lesson": 3,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "tp_de",
+      "tp": "soweli ike li utala e meli.",
+      "alsoAccepted": [],
+      "de": [
+        "Das böse Tier greift eine Frau an."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp03_03",
+      "lesson": 3,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "tp_de",
+      "tp": "jan utala li moku e kili suli.",
+      "alsoAccepted": [],
+      "de": [
+        "Die Kämpferin isst (eine große Frucht/ein großes Gemüse/einen großen Pilz)."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp03_04",
+      "lesson": 3,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "tp_de",
+      "tp": "soweli lili li moku e telo.",
+      "alsoAccepted": [],
+      "de": [
+        "Kleine Tiere trinken Wasser."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp03_05",
+      "lesson": 3,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "tp_de",
+      "tp": "mi telo e ijo suli.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich (wässere/wasche) etwas Großes."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp03_06",
+      "lesson": 3,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "de_tp",
+      "tp": "ona li olin e jan ale.",
+      "alsoAccepted": [],
+      "de": [
+        "Sie liebt alle Menschen."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp03_07",
+      "lesson": 3,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "de_tp",
+      "tp": "tomo telo li pona.",
+      "alsoAccepted": [],
+      "de": [
+        "Das Badezimmer (\"Wasser-Haus\") ist gut."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp03_08",
+      "lesson": 3,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "de_tp",
+      "tp": "mi pana e lipu.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich händige Dokumente aus."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp03_09",
+      "lesson": 3,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "de_tp",
+      "tp": "jan utala ike li lukin e tomo sina.",
+      "alsoAccepted": [],
+      "de": [
+        "Ein böser Krieger sieht dein Haus."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp03_10",
+      "lesson": 3,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "de_tp",
+      "tp": "ilo mi li pali pona.",
+      "alsoAccepted": [],
+      "de": [
+        "Meine Geräte funktionieren gut."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp04_00",
+      "lesson": 4,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "tp_de",
+      "tp": "mi moku ala e soweli.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich esse keine Tiere (bzw. Fleisch)."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp04_01",
+      "lesson": 4,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "tp_de",
+      "tp": "jan pona sina li toki e ma, e telo.",
+      "alsoAccepted": [],
+      "de": [
+        "Dein Fruend spricht über das Land und das Wasser."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp04_02",
+      "lesson": 4,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "tp_de",
+      "tp": "jan suli li lukin e ma tomo, li sitelen e ijo.",
+      "alsoAccepted": [],
+      "de": [
+        "Eine wichtige Person sieht die Stadt und schreibt Dinge auf."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp04_03",
+      "lesson": 4,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "tp_de",
+      "tp": "ma li jo e kasi ike.",
+      "alsoAccepted": [],
+      "de": [
+        "Das Land hat Unkraut (\"schlechte Pflanzen\")."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp04_04",
+      "lesson": 4,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "tp_de",
+      "tp": "pipi lili li suli, li pona.",
+      "alsoAccepted": [],
+      "de": [
+        "Kleine Käfer sind wichtig und gut."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp04_05",
+      "lesson": 4,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "de_tp",
+      "tp": "ma tomo sina li jo ala e jan pali.",
+      "alsoAccepted": [],
+      "de": [
+        "Deine Stadt hat keine Arbeiter."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp04_06",
+      "lesson": 4,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "de_tp",
+      "tp": "mije mi li pali ala, li moku, li utala.",
+      "alsoAccepted": [],
+      "de": [
+        "Mein Mann arbeitet nicht und isst nur und kämpft."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp04_07",
+      "lesson": 4,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "de_tp",
+      "tp": "ma mama mi li suli.",
+      "alsoAccepted": [],
+      "de": [
+        "Mein Heimatland (\"ursprüngliches Land\") ist groß."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp04_08",
+      "lesson": 4,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "de_tp",
+      "tp": "sitelen sina li pona lukin.",
+      "alsoAccepted": [],
+      "de": [
+        "Dein Gemälde sieht gut aus."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp04_09",
+      "lesson": 4,
+      "stage": 4,
+      "concepts": [
+        "c_e_objekt"
+      ],
+      "direction": "de_tp",
+      "tp": "jan pona mi li jo e kala e kili li pali e moku pona.",
+      "alsoAccepted": [],
+      "de": [
+        "Mein Freund hat Fische und Früchte und macht gutes Essen."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp05_00",
+      "lesson": 5,
+      "stage": 11,
+      "concepts": [
+        "c_ni",
+        "c_en"
+      ],
+      "direction": "tp_de",
+      "tp": "kulupu sina li ante mute.",
+      "alsoAccepted": [],
+      "de": [
+        "Deine Gemeinschaft ist sehr anders."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp05_01",
+      "lesson": 5,
+      "stage": 11,
+      "concepts": [
+        "c_ni",
+        "c_en"
+      ],
+      "direction": "tp_de",
+      "tp": "jan ike li pakala e ilo mi.",
+      "alsoAccepted": [],
+      "de": [
+        "Eine schlechte Person zerstört meine Werkzeuge."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp05_02",
+      "lesson": 5,
+      "stage": 11,
+      "concepts": [
+        "c_ni",
+        "c_en"
+      ],
+      "direction": "tp_de",
+      "tp": "mi pali e tomo ni.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich baue dieses Haus."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp05_03",
+      "lesson": 5,
+      "stage": 11,
+      "concepts": [
+        "c_ni",
+        "c_en"
+      ],
+      "direction": "tp_de",
+      "tp": "jan utala pona mute li awen e kulupu ni.",
+      "alsoAccepted": [],
+      "de": [
+        "Der gute Kämpfer schützt diese Gemeinschaft."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp05_04",
+      "lesson": 5,
+      "stage": 11,
+      "concepts": [
+        "c_ni",
+        "c_en"
+      ],
+      "direction": "tp_de",
+      "tp": "kulupu suli li awen, li suli e ona.",
+      "alsoAccepted": [],
+      "de": [
+        "Die große Gemeinschaft dauert an und vergrößert sich."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp05_05",
+      "lesson": 5,
+      "stage": 11,
+      "concepts": [
+        "c_ni",
+        "c_en"
+      ],
+      "direction": "de_tp",
+      "tp": "moku seli li pona mute.",
+      "alsoAccepted": [],
+      "de": [
+        "Warmes Essen ist sehr gut."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp05_06",
+      "lesson": 5,
+      "stage": 11,
+      "concepts": [
+        "c_ni",
+        "c_en"
+      ],
+      "direction": "de_tp",
+      "tp": "jan lili lape li kalama ala.",
+      "alsoAccepted": [],
+      "de": [
+        "Schlafende Kinder machen keinen Krach."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp05_07",
+      "lesson": 5,
+      "stage": 11,
+      "concepts": [
+        "c_ni",
+        "c_en"
+      ],
+      "direction": "de_tp",
+      "tp": "jan pali mute li toki e ni: ona li wawa, li kiwen.",
+      "alsoAccepted": [],
+      "de": [
+        "Die Arbeiter sagen, dass sie stark und robust sind."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp05_08",
+      "lesson": 5,
+      "stage": 11,
+      "concepts": [
+        "c_ni",
+        "c_en"
+      ],
+      "direction": "de_tp",
+      "tp": "sina ante lukin.",
+      "alsoAccepted": [],
+      "de": [
+        "Du siehst anders aus."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp05_09",
+      "lesson": 5,
+      "stage": 11,
+      "concepts": [
+        "c_ni",
+        "c_en"
+      ],
+      "direction": "de_tp",
+      "tp": "tomo ni li awen e seli.",
+      "alsoAccepted": [],
+      "de": [
+        "Dieses Haus erhält die Hitze."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp06_00",
+      "lesson": 6,
+      "stage": 6,
+      "concepts": [
+        "c_praeposition"
+      ],
+      "direction": "tp_de",
+      "tp": "ona li toki tawa mama mije ona kepeken ilo toki.",
+      "alsoAccepted": [],
+      "de": [
+        "Sie reden mit ihrem Vater mithilfe eines Telefons."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp06_01",
+      "lesson": 6,
+      "stage": 6,
+      "concepts": [
+        "c_praeposition"
+      ],
+      "direction": "tp_de",
+      "tp": "moku suwi li ike tawa mi.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich mag süßes Essen nicht",
+        "Süßes Essen ist schlecht für mich."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp06_02",
+      "lesson": 6,
+      "stage": 6,
+      "concepts": [
+        "c_praeposition"
+      ],
+      "direction": "tp_de",
+      "tp": "ma mama mi li utala e ma poka.",
+      "alsoAccepted": [],
+      "de": [
+        "Mein Heimatland bekämpft ein Nachbarland."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp06_03",
+      "lesson": 6,
+      "stage": 6,
+      "concepts": [
+        "c_praeposition"
+      ],
+      "direction": "tp_de",
+      "tp": "meli sama sina li jan pona mi.",
+      "alsoAccepted": [],
+      "de": [
+        "Deine Schwester ist mein Freund."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp06_04",
+      "lesson": 6,
+      "stage": 6,
+      "concepts": [
+        "c_praeposition"
+      ],
+      "direction": "tp_de",
+      "tp": "pipi lili li lon sinpin sina.",
+      "alsoAccepted": [],
+      "de": [
+        "Ein kleiner Käfer ist auf deinem Gesicht."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp06_05",
+      "lesson": 6,
+      "stage": 6,
+      "concepts": [
+        "c_praeposition"
+      ],
+      "direction": "de_tp",
+      "tp": "sina pakala e tomo tawa mi.",
+      "alsoAccepted": [],
+      "de": [
+        "Du hast mein Auto kaputtgemacht."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp06_06",
+      "lesson": 6,
+      "stage": 6,
+      "concepts": [
+        "c_praeposition"
+      ],
+      "direction": "de_tp",
+      "tp": "(jan) mije li pana e moku tawa jan lili.",
+      "alsoAccepted": [],
+      "de": [
+        "Der Mann füttert (\"gibt Essen\") die Kinder."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp06_07",
+      "lesson": 6,
+      "stage": 6,
+      "concepts": [
+        "c_praeposition"
+      ],
+      "direction": "de_tp",
+      "tp": "tomo toki ni li ike tawa mi.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich mag diesen Chatraum (\"Rede-Haus\") nicht."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp06_08",
+      "lesson": 6,
+      "stage": 6,
+      "concepts": [
+        "c_praeposition"
+      ],
+      "direction": "de_tp",
+      "tp": "mi pona e tomo tan sina.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich habe wegen dir das Haus repariert."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp06_09",
+      "lesson": 6,
+      "stage": 6,
+      "concepts": [
+        "c_praeposition"
+      ],
+      "direction": "de_tp",
+      "tp": "ona li lukin e lipu lon tomo lipu.",
+      "alsoAccepted": [],
+      "de": [
+        "Sie lesen Bücher in der Bücherei."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp07_00",
+      "lesson": 7,
+      "stage": 7,
+      "concepts": [
+        "c_frage",
+        "c_o",
+        "c_namen"
+      ],
+      "direction": "tp_de",
+      "tp": "jan Lisa o, moku ala e kili ni a!",
+      "alsoAccepted": [],
+      "de": [
+        "Lisa, iss diese Frucht/dieses Gemüse/diesen Pilz nicht!"
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp07_01",
+      "lesson": 7,
+      "stage": 7,
+      "concepts": [
+        "c_frage",
+        "c_o",
+        "c_namen"
+      ],
+      "direction": "tp_de",
+      "tp": "kulupu Kensa li anpa e kulupu ale ante.",
+      "alsoAccepted": [],
+      "de": [
+        "Die Mannschaft aus Kansas hat alle anderen Mannschaften besiegt."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp07_02",
+      "lesson": 7,
+      "stage": 7,
+      "concepts": [
+        "c_frage",
+        "c_o",
+        "c_namen"
+      ],
+      "direction": "tp_de",
+      "tp": "o toki insa ala e ni: jan pali li anpa tawa jan lawa.",
+      "alsoAccepted": [],
+      "de": [
+        "Denke nicht, dass Arbeiter für den Chef gering sind."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp07_03",
+      "lesson": 7,
+      "stage": 7,
+      "concepts": [
+        "c_frage",
+        "c_o",
+        "c_namen"
+      ],
+      "direction": "tp_de",
+      "tp": "sina pali e ni tan seme?",
+      "alsoAccepted": [],
+      "de": [
+        "Warum hast du das gemacht?"
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp07_04",
+      "lesson": 7,
+      "stage": 7,
+      "concepts": [
+        "c_frage",
+        "c_o",
+        "c_namen"
+      ],
+      "direction": "tp_de",
+      "tp": "insa mi li pakala. o pona e mi a!",
+      "alsoAccepted": [],
+      "de": [
+        "(Mein Bauch",
+        "Meine inneren Organe ) sind verletzt. Hilf mir!"
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp07_05",
+      "lesson": 7,
+      "stage": 7,
+      "concepts": [
+        "c_frage",
+        "c_o",
+        "c_namen"
+      ],
+      "direction": "de_tp",
+      "tp": "mi toki insa e ni: jan sewi li lon ala.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich glaube nicht, dass es Götter gibt."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp07_06",
+      "lesson": 7,
+      "stage": 7,
+      "concepts": [
+        "c_frage",
+        "c_o",
+        "c_namen"
+      ],
+      "direction": "de_tp",
+      "tp": "o kalama ala lon tomo lipu.",
+      "alsoAccepted": [],
+      "de": [
+        "Macht in der Bibliothek keinen Krach."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp07_07",
+      "lesson": 7,
+      "stage": 7,
+      "concepts": [
+        "c_frage",
+        "c_o",
+        "c_namen"
+      ],
+      "direction": "de_tp",
+      "tp": "jan lawa mi li toki e ni: o lape ala lon tomo pali.",
+      "alsoAccepted": [],
+      "de": [
+        "Mein Chef sagt mir, nicht im Büro zu schlafen."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp07_08",
+      "lesson": 7,
+      "stage": 7,
+      "concepts": [
+        "c_frage",
+        "c_o",
+        "c_namen"
+      ],
+      "direction": "de_tp",
+      "tp": "jan sama mije sina li sama mute lukin sina.",
+      "alsoAccepted": [],
+      "de": [
+        "Dein Bruder sieht aus wie du."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp07_09",
+      "lesson": 7,
+      "stage": 7,
+      "concepts": [
+        "c_frage",
+        "c_o",
+        "c_namen"
+      ],
+      "direction": "de_tp",
+      "tp": "o tawa ala lon ma.",
+      "alsoAccepted": [],
+      "de": [
+        "Gehe nicht nach draußen."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp08_00",
+      "lesson": 8,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "tp_de",
+      "tp": "kule loje li pona tawa mi.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich mag die Farbe rot."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp08_01",
+      "lesson": 8,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "tp_de",
+      "tp": "o pana e telo kili jelo tawa mi.",
+      "alsoAccepted": [],
+      "de": [
+        "Gib mir den gelbenen Saft (oder Limonade)."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp08_02",
+      "lesson": 8,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "tp_de",
+      "tp": "kasi kule sina li pona lukin tawa mi.",
+      "alsoAccepted": [],
+      "de": [
+        "Mir gefällt, wie deine Blumen aussehen."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp08_03",
+      "lesson": 8,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "tp_de",
+      "tp": "mi moku ala e telo nasa.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich trinke keinen Alkohol."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp08_04",
+      "lesson": 8,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "tp_de",
+      "tp": "o moli ala e ona a!",
+      "alsoAccepted": [],
+      "de": [
+        "Töte sie nicht!"
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp08_05",
+      "lesson": 8,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "de_tp",
+      "tp": "tomo sina li suli. tomo mi li lili.",
+      "alsoAccepted": [],
+      "de": [
+        "Dein Haus ist größer als meins."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp08_06",
+      "lesson": 8,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "de_tp",
+      "tp": "kasi kule laso li pona mute tawa mi. kasi kule loje li pona lili tawa mi.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich mag blaue Blumen mehr als rote Blumen."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp08_07",
+      "lesson": 8,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "de_tp",
+      "tp": "jaki a! moku ni li ike mute a!",
+      "alsoAccepted": [],
+      "de": [
+        "Igitt! Dieses Essen ist schrecklich!"
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp08_08",
+      "lesson": 8,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "de_tp",
+      "tp": "mi lon tomo loje.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich bin im roten Haus."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp08_09",
+      "lesson": 8,
+      "stage": 2,
+      "concepts": [
+        "c_modifikator"
+      ],
+      "direction": "de_tp",
+      "tp": "jan nasa li kute ala e mi.",
+      "alsoAccepted": [],
+      "de": [
+        "Die betrunkene Person hört mir nicht zu."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp09_00",
+      "lesson": 9,
+      "stage": 9,
+      "concepts": [
+        "c_pi",
+        "c_la"
+      ],
+      "direction": "tp_de",
+      "tp": "kulupu pi jan mute li ike tawa mi.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich mag keine Gemeinschaften mit vielen Menschen."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp09_01",
+      "lesson": 9,
+      "stage": 9,
+      "concepts": [
+        "c_pi",
+        "c_la"
+      ],
+      "direction": "tp_de",
+      "tp": "tomo ni la mi toki kepeken toki pona, mi toki kepeken toki Inli.",
+      "alsoAccepted": [],
+      "de": [
+        "In diesem Haus rede ich Toki Pona und Englisch."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp09_02",
+      "lesson": 9,
+      "stage": 9,
+      "concepts": [
+        "c_pi",
+        "c_la"
+      ],
+      "direction": "tp_de",
+      "tp": "sina moku e soweli lete la ona li ike tawa sijelo sina.",
+      "alsoAccepted": [],
+      "de": [
+        "Wenn du rohes Fleisch isst, ist das schlecht für deinen Körper."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp09_03",
+      "lesson": 9,
+      "stage": 9,
+      "concepts": [
+        "c_pi",
+        "c_la"
+      ],
+      "direction": "tp_de",
+      "tp": "kalama musi ona li pona mute.",
+      "alsoAccepted": [],
+      "de": [
+        "Ihre Musik (\"unterhaltsame Geräusche\") ist sehr gut."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp09_04",
+      "lesson": 9,
+      "stage": 9,
+      "concepts": [
+        "c_pi",
+        "c_la"
+      ],
+      "direction": "tp_de",
+      "tp": "sina kepeken ike e ilo la ona li pakala.",
+      "alsoAccepted": [],
+      "de": [
+        "Wenn du die Geräte misshandelst (\"schlecht benutzen\"), werden sie kaputtgehen (\"kaputt sein\")."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp09_05",
+      "lesson": 9,
+      "stage": 9,
+      "concepts": [
+        "c_pi",
+        "c_la"
+      ],
+      "direction": "de_tp",
+      "tp": "sewi laso li pona mute tawa mi. sewi pi pimeja walo li pona lili tawa mi.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich mag blauen Himmel mehr als grauen Himmel."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp09_06",
+      "lesson": 9,
+      "stage": 9,
+      "concepts": [
+        "c_pi",
+        "c_la"
+      ],
+      "direction": "de_tp",
+      "tp": "sewi li pimeja la o awen lon tomo.",
+      "alsoAccepted": [],
+      "de": [
+        "Falls es draußen dunkel ist, bleib zuhause."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp09_07",
+      "lesson": 9,
+      "stage": 9,
+      "concepts": [
+        "c_pi",
+        "c_la"
+      ],
+      "direction": "de_tp",
+      "tp": "ona li lon tomo pi telo nasa.",
+      "alsoAccepted": [],
+      "de": [
+        "Er ist in der Bar (\"Haus des merkwürdigen Wassers\")."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp09_08",
+      "lesson": 9,
+      "stage": 9,
+      "concepts": [
+        "c_pi",
+        "c_la"
+      ],
+      "direction": "de_tp",
+      "tp": "jan pi kalama suli li toki e ijo nasa.",
+      "alsoAccepted": [],
+      "de": [
+        "Die laute Person (\"Person der großen Geräusche\") sagt merkwürdige Dinge."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp09_09",
+      "lesson": 9,
+      "stage": 9,
+      "concepts": [
+        "c_pi",
+        "c_la"
+      ],
+      "direction": "de_tp",
+      "tp": "meli ni pi linja walo li pona lukin.",
+      "alsoAccepted": [],
+      "de": [
+        "Diese Blondine (\"Frau des weißen Haars\") sieht gut aus."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp09_10",
+      "lesson": 9,
+      "stage": 9,
+      "concepts": [
+        "c_pi",
+        "c_la"
+      ],
+      "direction": "de_tp",
+      "tp": "sina toki ala tawa jan la sina jo ala e jan pona.",
+      "alsoAccepted": [],
+      "de": [
+        "Wenn du nicht mit Leuten redest, dann wirst du keine Freunde haben."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp10_00",
+      "lesson": 10,
+      "stage": 5,
+      "concepts": [
+        "c_praeverb",
+        "c_la"
+      ],
+      "direction": "tp_de",
+      "tp": "o open e lupa.",
+      "alsoAccepted": [],
+      "de": [
+        "Öffne die Tür."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp10_01",
+      "lesson": 10,
+      "stage": 5,
+      "concepts": [
+        "c_praeverb",
+        "c_la"
+      ],
+      "direction": "tp_de",
+      "tp": "tenpo lili la mi kama tawa sina.",
+      "alsoAccepted": [],
+      "de": [
+        "Gleich komme ich zu dir."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp10_02",
+      "lesson": 10,
+      "stage": 5,
+      "concepts": [
+        "c_praeverb",
+        "c_la"
+      ],
+      "direction": "tp_de",
+      "tp": "mi wile tawa ma ante.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich will in andere Länder (reisen)."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp10_03",
+      "lesson": 10,
+      "stage": 5,
+      "concepts": [
+        "c_praeverb",
+        "c_la"
+      ],
+      "direction": "tp_de",
+      "tp": "sina ken ala ken kama tawa tomo mi?",
+      "alsoAccepted": [],
+      "de": [
+        "Kannst du zu meinem Haus kommen?"
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp10_04",
+      "lesson": 10,
+      "stage": 5,
+      "concepts": [
+        "c_praeverb",
+        "c_la"
+      ],
+      "direction": "tp_de",
+      "tp": "sina kama tawa tomo mi la o kepeken e nasin Linkan.",
+      "alsoAccepted": [],
+      "de": [
+        "Wenn du zu meinem Haus kommst, nimm (benutze) die Lincoln-Straße."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp10_05",
+      "lesson": 10,
+      "stage": 5,
+      "concepts": [
+        "c_praeverb",
+        "c_la"
+      ],
+      "direction": "tp_de",
+      "tp": "sina lon nena la sina ken lukin e ijo mute.",
+      "alsoAccepted": [],
+      "de": [
+        "Wenn du auf einem Hügel bist, kannst du viele Dinge sehen."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp10_06",
+      "lesson": 10,
+      "stage": 5,
+      "concepts": [
+        "c_praeverb",
+        "c_la"
+      ],
+      "direction": "de_tp",
+      "tp": "sina sona ala sona pali e ona?",
+      "alsoAccepted": [
+        "sina sona pali e ona anu seme?"
+      ],
+      "de": [
+        "Weißt du, wie man es macht?"
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp10_07",
+      "lesson": 10,
+      "stage": 5,
+      "concepts": [
+        "c_praeverb",
+        "c_la"
+      ],
+      "direction": "de_tp",
+      "tp": "ale li ken.",
+      "alsoAccepted": [],
+      "de": [
+        "Alles ist möglich."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp10_08",
+      "lesson": 10,
+      "stage": 5,
+      "concepts": [
+        "c_praeverb",
+        "c_la"
+      ],
+      "direction": "de_tp",
+      "tp": "sina ken ala ken open e lupa?",
+      "alsoAccepted": [
+        "sina ken open e lupa anu seme?"
+      ],
+      "de": [
+        "Kannst du die Tür öffnen?"
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp10_09",
+      "lesson": 10,
+      "stage": 5,
+      "concepts": [
+        "c_praeverb",
+        "c_la"
+      ],
+      "direction": "de_tp",
+      "tp": "sina kute ala e jan sona la pali sina li ike.",
+      "alsoAccepted": [],
+      "de": [
+        "Wenn du den Experten (Leute des Wissens) nicht zuhörst, wird deine Arbeit schlecht sein."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp10_10",
+      "lesson": 10,
+      "stage": 5,
+      "concepts": [
+        "c_praeverb",
+        "c_la"
+      ],
+      "direction": "de_tp",
+      "tp": "tenpo suli la mi pali e ni.",
+      "alsoAccepted": [
+        "mi pali e ni lon tenpo suli."
+      ],
+      "de": [
+        "Ich arbeite lange daran."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp10_11",
+      "lesson": 10,
+      "stage": 5,
+      "concepts": [
+        "c_praeverb",
+        "c_la"
+      ],
+      "direction": "de_tp",
+      "tp": "mi awen kama sona e toki pona.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich lerne weiterhin Toki Pona."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp11_00",
+      "lesson": 11,
+      "stage": 12,
+      "concepts": [
+        "c_zahlen"
+      ],
+      "direction": "tp_de",
+      "tp": "mi wile esun e soweli suli tu wan ni.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich würde gerne einen Handel über diese drei großen Tiere machen."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp11_01",
+      "lesson": 11,
+      "stage": 12,
+      "concepts": [
+        "c_zahlen"
+      ],
+      "direction": "tp_de",
+      "tp": "tenpo suno pini la mi lon tomo sona.",
+      "alsoAccepted": [],
+      "de": [
+        "Gestern war ich in der Schule/Universität (\"Haus des Wissens\")."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp11_02",
+      "lesson": 11,
+      "stage": 12,
+      "concepts": [
+        "c_zahlen"
+      ],
+      "direction": "tp_de",
+      "tp": "tenpo mun wan pini la lete li lon.",
+      "alsoAccepted": [],
+      "de": [
+        "Vor einem Monat war es kalt."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp11_03",
+      "lesson": 11,
+      "stage": 12,
+      "concepts": [
+        "c_zahlen"
+      ],
+      "direction": "tp_de",
+      "tp": "sina pona nanpa wan tawa mi.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich mag dich am meisten."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp11_04",
+      "lesson": 11,
+      "stage": 12,
+      "concepts": [
+        "c_zahlen"
+      ],
+      "direction": "tp_de",
+      "tp": "tenpo suno mute mute la telo sewi li awen.",
+      "alsoAccepted": [],
+      "de": [
+        "Der Regen währte 40 Tage lang."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp11_05",
+      "lesson": 11,
+      "stage": 12,
+      "concepts": [
+        "c_zahlen"
+      ],
+      "direction": "de_tp",
+      "tp": "mi lon tomo nanpa mute luka tu pi nasin Wasintan.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich lebe im Haus #27 in der Washington-Straße."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp11_06",
+      "lesson": 11,
+      "stage": 12,
+      "concepts": [
+        "c_zahlen"
+      ],
+      "direction": "de_tp",
+      "tp": "ilo pi sitelen tawa li toki e ni: tenpo suno kama la suno li lon.",
+      "alsoAccepted": [],
+      "de": [
+        "Der Fernseher (\"Gerät der bewegten Bilder\") hat gesagt, dass es morgen sonnig ist."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp11_07",
+      "lesson": 11,
+      "stage": 12,
+      "concepts": [
+        "c_zahlen"
+      ],
+      "direction": "de_tp",
+      "tp": "tenpo pimeja ni la lete li lon.",
+      "alsoAccepted": [],
+      "de": [
+        "Heute Nacht wird es kalt."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp11_08",
+      "lesson": 11,
+      "stage": 12,
+      "concepts": [
+        "c_zahlen"
+      ],
+      "direction": "de_tp",
+      "tp": "(tenpo mun",
+      "alsoAccepted": [
+        "tenpo sike mun) nanpa luka li (pona",
+        "suwi)."
+      ],
+      "de": [
+        "Mai (\"der 5. Monat\") ist schön."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp11_09",
+      "lesson": 11,
+      "stage": 12,
+      "concepts": [
+        "c_zahlen"
+      ],
+      "direction": "de_tp",
+      "tp": "sina jo e ilo mute pi kalama musi a!",
+      "alsoAccepted": [],
+      "de": [
+        "Du hast viele Musikinstrumente!"
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp12_00",
+      "lesson": 12,
+      "stage": 12,
+      "concepts": [],
+      "direction": "tp_de",
+      "tp": "sina wile kama sona e toki pona la pu li nasin pona nanpa wan tawa ni.",
+      "alsoAccepted": [],
+      "de": [
+        "Wenn du Toki Pona lernen willst, ist das offizielle Buch der beste Weg dafür."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp12_01",
+      "lesson": 12,
+      "stage": 12,
+      "concepts": [],
+      "direction": "tp_de",
+      "tp": "tenpo suno ni la mi pilin pona mute.",
+      "alsoAccepted": [],
+      "de": [
+        "Heute fühle ich mich gut."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp12_02",
+      "lesson": 12,
+      "stage": 12,
+      "concepts": [],
+      "direction": "tp_de",
+      "tp": "sina wile ala wile moku e pan sike?",
+      "alsoAccepted": [],
+      "de": [
+        "Willst du Pizza essen?"
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp12_03",
+      "lesson": 12,
+      "stage": 12,
+      "concepts": [],
+      "direction": "tp_de",
+      "tp": "supa lape mi li pakala. mi ken ala lape tan ni.",
+      "alsoAccepted": [],
+      "de": [
+        "Mein Bett (\"Schlaf-Oberfläche\") ist kaputt. Deswegen kann ich nicht schlafen."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp12_04",
+      "lesson": 12,
+      "stage": 12,
+      "concepts": [],
+      "direction": "tp_de",
+      "tp": "jan Mali Konto li toki e ni: o weka e ijo ike sina.",
+      "alsoAccepted": [],
+      "de": [
+        "Marie Kondo sagt: Werde unnötige Dinge los."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp12_05",
+      "lesson": 12,
+      "stage": 12,
+      "concepts": [],
+      "direction": "tp_de",
+      "tp": "kulupu ijo tu wan li lon. ona li kulupu kiwen, li kulupu telo, li kulupu kon.",
+      "alsoAccepted": [],
+      "de": [
+        "Es gibt drei Kategorien von Materie. Diese sind: Feststoffe, Flüssigkeiten und Gase."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp12_06",
+      "lesson": 12,
+      "stage": 12,
+      "concepts": [],
+      "direction": "tp_de",
+      "tp": "taso, meli lili pi jan lawa li lon tomo awen ante.",
+      "alsoAccepted": [],
+      "de": [
+        "Aber die Prinzessin ist in einem anderen Schloss."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp12_07",
+      "lesson": 12,
+      "stage": 12,
+      "concepts": [],
+      "direction": "de_tp",
+      "tp": "mi lukin e akesi seli laso suli a!",
+      "alsoAccepted": [],
+      "de": [
+        "Ich habe einen Drachen (große grüne Feuer-Echse) gesehen!"
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp12_08",
+      "lesson": 12,
+      "stage": 12,
+      "concepts": [],
+      "direction": "de_tp",
+      "tp": "toki! sina pilin seme?",
+      "alsoAccepted": [],
+      "de": [
+        "Hallo! Wie geht es dir? (\"Wie fühlst du?\")"
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp12_09",
+      "lesson": 12,
+      "stage": 12,
+      "concepts": [],
+      "direction": "de_tp",
+      "tp": "jan alasa li pana e moku soweli mute e kili mute tawa mi mute.",
+      "alsoAccepted": [],
+      "de": [
+        "Die Jägerin gab uns viel Fleisch und viele Früchte."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp12_10",
+      "lesson": 12,
+      "stage": 12,
+      "concepts": [],
+      "direction": "de_tp",
+      "tp": "mi lukin e lipu. tenpo lili la ona li pini.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich lese ein Dokument. Sehr bald (in kurzer Zeit) wird es enden."
+      ],
+      "rejectedVariants": []
+    },
+    {
+      "id": "lsp12_11",
+      "lesson": 12,
+      "stage": 12,
+      "concepts": [],
+      "direction": "de_tp",
+      "tp": "mi ken toki pi pona mute kepeken toki pona.",
+      "alsoAccepted": [],
+      "de": [
+        "Ich spreche gut Toki Pona."
+      ],
+      "rejectedVariants": []
+    }
+  ],
+  "rejected": [],
+  "mismatches": [
+    {
+      "lesson": 13,
+      "prompts": 2,
+      "answers": 4
+    },
+    {
+      "lesson": 13,
+      "block": 0,
+      "prompts": 5,
+      "answers": 4
+    },
+    {
+      "lesson": 13,
+      "block": 1,
+      "prompts": 5,
+      "answers": 1
+    }
+  ]
+}
