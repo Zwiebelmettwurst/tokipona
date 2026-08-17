@@ -695,6 +695,16 @@
   }
 
   function showSheet(correct, detail) {
+    // Die Aufgabe ist beantwortet: „Prüfen“ hat seinen Zweck erfüllt und
+    // verschwindet, damit nur noch ein Knopf im Bild ist. Die Antwort bleibt
+    // lesbar, lässt sich aber nicht mehr ändern.
+    const screen = app.querySelector('.screen');
+    if (screen) {
+      const actions = screen.querySelector('.actions');
+      if (actions) actions.remove();
+      screen.classList.add('answered');
+    }
+
     const sheet = el(`
       <div class="sheet">
         <div class="verdict ${correct ? 'good' : 'bad'}">
