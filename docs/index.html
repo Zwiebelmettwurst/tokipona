@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>o toki! — toki pona lernen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Prototyp und Produktplan einer App, die toki pona über Satzbau lehrt statt über Vokabellisten.">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="icon" href="./icon-192.png">
+<meta name="theme-color" content="#143A38">
+
+<style>
+  :root {
+    --ground: #EFF1EE;
+    --surface: #F8F9F7;
+    --sunk: #E6EAE6;
+    --ink: #14181A;
+    --ink-dim: #5A6461;
+    --ink-faint: #8A938F;
+    --accent: #1C6F6A;
+    --accent-ink: #FFFFFF;
+    --accent-soft: rgba(28, 111, 106, 0.10);
+    --gold: #A2711A;
+    --rule: rgba(20, 24, 26, 0.13);
+    --rule-strong: rgba(20, 24, 26, 0.28);
+
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, "DejaVu Sans Mono", monospace;
+    --serif: ui-serif, Charter, "Bitstream Charter", "Iowan Old Style", Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #101314;
+      --surface: #171B1C;
+      --sunk: #1D2223;
+      --ink: #E6EAE7;
+      --ink-dim: #98A49F;
+      --ink-faint: #6E7A76;
+      --accent: #5CC7BA;
+      --accent-ink: #0B1211;
+      --accent-soft: rgba(92, 199, 186, 0.13);
+      --gold: #DDAF57;
+      --rule: rgba(230, 234, 231, 0.14);
+      --rule-strong: rgba(230, 234, 231, 0.32);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #101314;
+    --surface: #171B1C;
+    --sunk: #1D2223;
+    --ink: #E6EAE7;
+    --ink-dim: #98A49F;
+    --ink-faint: #6E7A76;
+    --accent: #5CC7BA;
+    --accent-ink: #0B1211;
+    --accent-soft: rgba(92, 199, 186, 0.13);
+    --gold: #DDAF57;
+    --rule: rgba(230, 234, 231, 0.14);
+    --rule-strong: rgba(230, 234, 231, 0.32);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 40rem; margin: 0 auto; padding: 3.5rem 1.4rem 5rem; }
+  p { max-width: 62ch; }
+
+  .alphabet {
+    display: grid;
+    grid-template-columns: repeat(14, minmax(0, 1fr));
+    border: 1px solid var(--rule-strong);
+    background: var(--surface);
+    margin-bottom: 1.75rem;
+  }
+  .alphabet span {
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    text-align: center;
+    padding: 0.45rem 0;
+    border-right: 1px solid var(--rule);
+  }
+  .alphabet span:last-child { border-right: 0; }
+  .alphabet .vow { color: var(--accent); }
+
+  h1 {
+    font-family: var(--mono);
+    font-size: clamp(2rem, 9vw, 2.75rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin: 0 0 0.5rem;
+  }
+
+  .standfirst { font-size: 1.1875rem; color: var(--ink-dim); margin: 0 0 2rem; }
+
+  .cards { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2.5rem; }
+
+  a.card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--rule-strong);
+    background: var(--surface);
+    padding: 1.1rem 1.2rem;
+  }
+  a.card:hover { border-color: var(--accent); }
+  a.card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  a.card b {
+    display: block;
+    font-family: var(--mono);
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--accent);
+    margin-bottom: 0.2rem;
+  }
+  a.card span { display: block; color: var(--ink-dim); font-size: 0.9375rem; }
+
+  a.card.primary { background: var(--accent); border-color: var(--accent); }
+  a.card.primary b, a.card.primary span { color: var(--accent-ink); }
+  a.card.primary span { opacity: 0.85; }
+
+  h2 {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    font-weight: 500;
+    margin: 2.25rem 0 0.6rem;
+    border-top: 1px solid var(--rule-strong);
+    padding-top: 0.9rem;
+  }
+
+  ol, ul { padding-left: 1.2rem; margin: 0; }
+  li { margin-bottom: 0.35rem; max-width: 62ch; }
+  li::marker { color: var(--ink-faint); }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.875em;
+    background: var(--sunk);
+    padding: 0.1em 0.35em;
+  }
+
+  .tp { font-family: var(--mono); color: var(--accent); }
+
+  footer {
+    margin-top: 3rem;
+    border-top: 1px solid var(--rule-strong);
+    padding-top: 1rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    line-height: 1.7;
+  }
+  footer a { color: var(--ink-faint); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="alphabet">
+    <span class="vow">a</span><span class="vow">e</span><span class="vow">i</span><span>j</span><span>k</span><span>l</span><span>m</span><span>n</span><span class="vow">o</span><span>p</span><span>s</span><span>t</span><span class="vow">u</span><span>w</span>
+  </div>
+
+  <h1>o toki!</h1>
+  <p class="standfirst">
+    Eine App, die toki pona über Satzbau lehrt statt über Vokabellisten —
+    mit einem Parser, der jeden Satz wirklich versteht und erklärt, was daran
+    nicht stimmt.
+  </p>
+
+  <div class="cards">
+    <a class="card primary" href="./prototype.html">
+      <b>Prototyp öffnen</b>
+      <span>Zwölf Lektionen, Wiederholungssystem, Sandkasten. Läuft offline.</span>
+    </a>
+    <a class="card" href="./lipu-sona-plan.html">
+      <b>Produktplan lesen</b>
+      <span>Curriculum, Übungstypen, Architektur, Roadmap — 18 Abschnitte.</span>
+    </a>
+  </div>
+
+  <h2>auf dem handy installieren</h2>
+  <ol>
+    <li><b>iPhone:</b> in Safari öffnen → Teilen-Symbol → <i>Zum Home-Bildschirm</i>.</li>
+    <li><b>Android:</b> in Chrome öffnen → Menü → <i>App installieren</i>.</li>
+  </ol>
+  <p>
+    Danach startet sie wie eine App, ohne Browserleiste, und funktioniert ohne Netz.
+    Der Fortschritt liegt auf dem Gerät — kein Konto, keine Übertragung.
+  </p>
+
+  <h2>was der prototyp kann</h2>
+  <ul>
+    <li><b>Sätze bauen</b> statt Antworten erkennen — Wortkacheln, nicht Multiple Choice.</li>
+    <li><b>Satzröntgen</b> nach jeder Antwort: welches Wort welche Rolle trägt.</li>
+    <li><b>Fehlersuche</b> aus richtigen Sätzen erzeugt und vom Parser geprüft.</li>
+    <li><b>Umschreiben</b> — <span class="tp">tomo tawa</span> für Auto, <span class="tp">telo pimeja wawa</span> für Kaffee.</li>
+    <li><b>Freies Tippen</b> mit Prüfung im Tippen; andere Wortwahl ist erlaubt.</li>
+    <li><b>Wiederholung</b> nach Lernschritten: 10 Minuten, dann Tage.</li>
+    <li><b>Sandkasten:</b> schreib irgendetwas, die App zerlegt es.</li>
+  </ul>
+
+  <h2>was noch fehlt</h2>
+  <p>
+    Ton (137 Wortaufnahmen brauchen einen Sprecher), die Lesestrecke,
+    <span class="tp">sitelen pona</span> — und die eigentliche iOS-Fassung. Der
+    Sprachkern <code>TokiPonaKit</code> liegt als Swift-Paket im Repository; der
+    Prototyp hier ist seine Zeile-für-Zeile-Entsprechung in JavaScript und dient
+    als ausführbare Vorlage für die SwiftUI-Ansichten.
+  </p>
+
+  <footer>
+    Übungssätze und Lektionsaufbau aus
+    <a href="https://lipu-sona.pona.la/de/">lipu sona pona</a>
+    (MIT-Lizenz, © 2020 /dev/urandom und Mitwirkende), übernommen und bearbeitet.<br>
+    Erklärtexte, Parser und Oberfläche sind eigenständig entstanden.<br>
+    <span class="tp">o pona!</span>
+  </footer>
+
+</div>
+</body>
+</html>

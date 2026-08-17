@@ -1,0 +1,16 @@
+{
+  "name": "o toki! — toki pona lernen",
+  "short_name": "o toki!",
+  "description": "Sätze bauen statt Vokabeln abhaken: zwölf Lektionen toki pona mit echter Grammatikprüfung.",
+  "lang": "de",
+  "start_url": "./prototype.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EFF1EE",
+  "theme_color": "#143A38",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

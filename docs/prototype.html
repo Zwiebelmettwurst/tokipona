@@ -1,0 +1,2080 @@
+<title>o toki!</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Sätze bauen statt Vokabeln abhaken: zwölf Lektionen toki pona mit echter Grammatikprüfung.">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="icon" href="./icon-192.png">
+<meta name="theme-color" content="#143A38">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="o toki!">
+
+<style>
+:root {
+  --ground: #EFF1EE;
+  --surface: #FFFFFF;
+  --sunk: #E6EAE6;
+  --ink: #14181A;
+  --ink-dim: #5A6461;
+  --ink-faint: #8A938F;
+  --accent: #1C6F6A;
+  --accent-ink: #FFFFFF;
+  --accent-soft: rgba(28, 111, 106, 0.10);
+  --gold: #B9821A;
+  --gold-soft: rgba(185, 130, 26, 0.13);
+  --wrong: #AE3D28;
+  --wrong-soft: rgba(174, 61, 40, 0.10);
+  --rule: rgba(20, 24, 26, 0.12);
+  --rule-strong: rgba(20, 24, 26, 0.26);
+  --shadow: 0 1px 0 rgba(20, 24, 26, 0.16);
+
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, "DejaVu Sans Mono", monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #101314;
+    --surface: #191E1F;
+    --sunk: #22282A;
+    --ink: #E6EAE7;
+    --ink-dim: #98A49F;
+    --ink-faint: #6E7A76;
+    --accent: #5CC7BA;
+    --accent-ink: #0B1211;
+    --accent-soft: rgba(92, 199, 186, 0.14);
+    --gold: #DDAF57;
+    --gold-soft: rgba(221, 175, 87, 0.15);
+    --wrong: #E9846C;
+    --wrong-soft: rgba(233, 132, 108, 0.13);
+    --rule: rgba(230, 234, 231, 0.13);
+    --rule-strong: rgba(230, 234, 231, 0.3);
+    --shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #101314;
+  --surface: #191E1F;
+  --sunk: #22282A;
+  --ink: #E6EAE7;
+  --ink-dim: #98A49F;
+  --ink-faint: #6E7A76;
+  --accent: #5CC7BA;
+  --accent-ink: #0B1211;
+  --accent-soft: rgba(92, 199, 186, 0.14);
+  --gold: #DDAF57;
+  --gold-soft: rgba(221, 175, 87, 0.15);
+  --wrong: #E9846C;
+  --wrong-soft: rgba(233, 132, 108, 0.13);
+  --rule: rgba(230, 234, 231, 0.13);
+  --rule-strong: rgba(230, 234, 231, 0.3);
+  --shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+#app {
+  max-width: 30rem;
+  min-height: 100vh;
+  margin: 0 auto;
+  background: var(--ground);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ---------------- Kopfzeile ---------------- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.level {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+}
+
+.ring {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.metric {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  color: var(--ink-dim);
+}
+
+.metric b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.metric.gold b { color: var(--gold); }
+.topbar .spacer { margin-left: auto; }
+
+.goalbar {
+  height: 3px;
+  background: var(--sunk);
+  position: relative;
+  overflow: hidden;
+}
+.goalbar span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--gold);
+  transition: width 0.4s ease;
+}
+
+/* ---------------- Pfad ---------------- */
+
+.screen { padding: 1.1rem; display: flex; flex-direction: column; gap: 1rem; flex: 1; }
+
+.hello h1 {
+  font-family: var(--mono);
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.15rem;
+}
+.hello p { margin: 0; color: var(--ink-dim); font-size: 0.9375rem; }
+
+.path { display: flex; flex-direction: column; gap: 0.55rem; }
+
+.lesson {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--rule);
+  border-radius: 0.7rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.lesson[data-state="locked"] { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+.lesson[data-state="current"] { border-color: var(--accent); }
+.lesson:not([data-state="locked"]):hover { border-color: var(--accent); }
+
+.lesson .badge {
+  width: 2.2rem;
+  height: 2.2rem;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  background: var(--sunk);
+  color: var(--ink-dim);
+}
+.lesson[data-state="current"] .badge { background: var(--accent); color: var(--accent-ink); }
+.lesson[data-state="done"] .badge { background: var(--accent-soft); color: var(--accent); }
+
+.lesson .body { flex: 1; min-width: 0; }
+.lesson .body b { display: block; font-size: 0.9375rem; font-weight: 600; }
+.lesson .body span {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dots { display: flex; gap: 2px; flex: none; }
+.dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--sunk); }
+.dots i.on { background: var(--accent); }
+
+/* ---------------- Karten ---------------- */
+
+.card {
+  border: 1px solid var(--rule);
+  border-radius: 0.7rem;
+  background: var(--surface);
+  padding: 0.95rem 1rem;
+  box-shadow: var(--shadow);
+}
+
+.card h2 {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+}
+
+.concepts { display: flex; flex-direction: column; gap: 0.5rem; }
+.concept { display: flex; align-items: center; gap: 0.6rem; font-size: 0.875rem; }
+.concept span { flex: 1; }
+.concept .bar { width: 5.5rem; height: 5px; background: var(--sunk); border-radius: 3px; overflow: hidden; }
+.concept .bar i { display: block; height: 100%; background: var(--accent); transition: width 0.5s ease; }
+.concept code { font-family: var(--mono); font-size: 0.75rem; color: var(--ink-faint); }
+
+/* ---------------- Übung ---------------- */
+
+.exbar {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.75rem 1.1rem;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+}
+.exbar .track { flex: 1; height: 6px; background: var(--sunk); border-radius: 3px; overflow: hidden; }
+.exbar .track i { display: block; height: 100%; background: var(--accent); transition: width 0.35s ease; }
+.exbar button {
+  background: none;
+  border: 0;
+  color: var(--ink-faint);
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 0 0.2rem;
+}
+
+.prompt { font-size: 0.8125rem; color: var(--ink-dim); font-family: var(--mono); letter-spacing: 0.03em; }
+
+.question {
+  font-size: 1.375rem;
+  line-height: 1.35;
+  font-weight: 600;
+  margin: 0.35rem 0 0;
+  text-wrap: balance;
+}
+.question.tp { font-family: var(--mono); font-weight: 500; color: var(--accent); }
+
+.slot {
+  min-height: 3.4rem;
+  border-bottom: 2px dashed var(--rule-strong);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-content: flex-start;
+  padding-bottom: 0.5rem;
+}
+
+.bank { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.tile {
+  font-family: var(--mono);
+  font-size: 0.9375rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 0.45rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.tile:hover { border-color: var(--accent); }
+.tile.used { opacity: 0.25; pointer-events: none; }
+.tile.placed { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+.choices { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.choice {
+  text-align: left;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 0.55rem;
+  background: var(--surface);
+  font-size: 0.9375rem;
+  box-shadow: var(--shadow);
+}
+.choice:hover { border-color: var(--accent); }
+.choice[data-picked="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.choice.tp { font-family: var(--mono); }
+
+.typed {
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 1.0625rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 0.55rem;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.live {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  min-height: 1.2rem;
+  margin-top: 0.4rem;
+}
+.live.bad { color: var(--wrong); }
+.live.good { color: var(--accent); }
+
+.hint { font-size: 0.8125rem; color: var(--ink-faint); margin: 0; }
+
+.actions { margin-top: auto; padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+
+.primary {
+  width: 100%;
+  padding: 0.85rem;
+  border: 0;
+  border-radius: 0.6rem;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 650;
+  font-size: 1rem;
+}
+.primary[disabled] { background: var(--sunk); color: var(--ink-faint); cursor: not-allowed; }
+
+.ghost {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 0.6rem;
+  background: none;
+  font-size: 0.9375rem;
+}
+
+.pickline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.9rem 0 0.2rem;
+}
+
+.lesson.review .badge { background: var(--gold-soft); color: var(--gold); font-size: 1rem; }
+.lesson.review { border-color: var(--gold); }
+
+/* ---------------- Rückmeldung ---------------- */
+
+.sheet {
+  position: sticky;
+  bottom: 0;
+  border-top: 1px solid var(--rule-strong);
+  background: var(--surface);
+  padding: 0.9rem 1.1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  animation: rise 0.22s ease;
+}
+@keyframes rise { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .sheet { animation: none; } * { transition: none !important; } }
+
+.verdict { display: flex; align-items: center; gap: 0.5rem; font-weight: 650; }
+.verdict.good { color: var(--accent); }
+.verdict.bad { color: var(--wrong); }
+.verdict .mark {
+  width: 1.4rem; height: 1.4rem; border-radius: 50%;
+  display: grid; place-items: center; font-size: 0.8125rem;
+  background: var(--accent-soft);
+}
+.verdict.bad .mark { background: var(--wrong-soft); }
+
+.reason { font-size: 0.9375rem; margin: 0; }
+.reason code {
+  font-family: var(--mono);
+  background: var(--sunk);
+  padding: 0.05em 0.3em;
+  border-radius: 0.2rem;
+}
+
+.solution { font-family: var(--mono); font-size: 0.9375rem; color: var(--accent); }
+
+/* ---------------- Satzröntgen ---------------- */
+
+.xray { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.xray .span { display: flex; flex-direction: column; gap: 0.15rem; align-items: center; }
+.xray .span b {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 0.35rem;
+  background: var(--sunk);
+  white-space: nowrap;
+}
+.xray .span i {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 0.5625rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+}
+.xray .span[data-role="Prädikat"] b,
+.xray .span[data-role="Objekt"] b,
+.xray .span[data-role="Präposition"] b,
+.xray .span[data-role="Befehl"] b {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+/* ---------------- Abschluss ---------------- */
+
+.done { text-align: center; display: flex; flex-direction: column; gap: 0.6rem; padding-top: 2.5rem; }
+.done .burst {
+  font-family: var(--mono);
+  font-size: 2.75rem;
+  color: var(--accent);
+  animation: pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+@keyframes pop { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.done h2 { margin: 0; font-size: 1.25rem; }
+.done p { margin: 0; color: var(--ink-dim); }
+
+.tally { display: flex; justify-content: center; gap: 1.75rem; margin: 0.9rem 0; }
+.tally div { display: flex; flex-direction: column; gap: 0.1rem; }
+.tally b { font-family: var(--mono); font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+.tally span { font-family: var(--mono); font-size: 0.625rem; letter-spacing: 0.1em; color: var(--ink-faint); }
+
+/* ---------------- Wörter & Sandkasten ---------------- */
+
+.search {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 0.55rem;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.9375rem;
+}
+
+.words { display: flex; flex-direction: column; gap: 0; }
+.word {
+  display: flex;
+  gap: 0.8rem;
+  padding: 0.6rem 0.2rem;
+  border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+}
+.word b { font-family: var(--mono); font-weight: 500; min-width: 6.5rem; }
+.word span { color: var(--ink-dim); font-size: 0.875rem; flex: 1; }
+.word em {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 0.625rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.08em;
+}
+
+.violation {
+  border-left: 2px solid var(--wrong);
+  padding: 0.1rem 0 0.1rem 0.7rem;
+  font-size: 0.875rem;
+}
+.violation code { font-family: var(--mono); font-size: 0.75rem; color: var(--ink-faint); }
+
+/* ---------------- Reiter ---------------- */
+
+.tabs {
+  display: flex;
+  border-top: 1px solid var(--rule);
+  background: var(--surface);
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+}
+.tabs button {
+  flex: 1;
+  border: 0;
+  background: none;
+  padding: 0.7rem 0.3rem calc(0.7rem + env(safe-area-inset-bottom));
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+.tabs button[data-active="true"] { color: var(--accent); }
+.tabs button .glyph { font-size: 1rem; line-height: 1; }
+
+.foot {
+  font-size: 0.6875rem;
+  color: var(--ink-faint);
+  line-height: 1.5;
+  padding: 0.5rem 0 0;
+}
+.foot a { color: var(--ink-faint); }
+
+</style>
+
+<div id="app"></div>
+
+<script>
+// Erzeugt von prototype/build_data.py — nicht von Hand ändern.
+const TOKIPONA_DATA = {"lexicon":{"a":{"book":"pu","roles":["interjection","particle"],"glosses":["Betonung","ach","ja"]},"akesi":{"book":"pu","roles":["content"],"glosses":["Reptil","Amphibie","Kriechtier"]},"ala":{"book":"pu","roles":["content","number","particle"],"glosses":["nicht","nein","kein","null"]},"alasa":{"book":"pu","roles":["content"],"glosses":["jagen","sammeln","suchen"]},"ale":{"book":"pu","roles":["content","number"],"glosses":["alles","jede","Universum","hundert"]},"anpa":{"book":"pu","roles":["content"],"glosses":["unten","niedrig","unterlegen"]},"ante":{"book":"pu","roles":["content"],"glosses":["anders","verändert","Unterschied"]},"anu":{"book":"pu","roles":["particle"],"glosses":["oder"]},"awen":{"book":"pu","roles":["content","preverb"],"glosses":["bleiben","warten","bewahren","weiterhin"]},"e":{"book":"pu","roles":["particle"],"glosses":["Objektpartikel"]},"en":{"book":"pu","roles":["particle"],"glosses":["und"]},"esun":{"book":"pu","roles":["content"],"glosses":["Handel","Markt","Laden","tauschen"]},"ijo":{"book":"pu","roles":["content"],"glosses":["Ding","Sache","etwas"]},"ike":{"book":"pu","roles":["content"],"glosses":["schlecht","negativ","kompliziert"]},"ilo":{"book":"pu","roles":["content"],"glosses":["Werkzeug","Gerät","Maschine"]},"insa":{"book":"pu","roles":["content"],"glosses":["Inneres","Mitte","Bauch"]},"jaki":{"book":"pu","roles":["content"],"glosses":["schmutzig","eklig","Müll"]},"jan":{"book":"pu","roles":["content"],"glosses":["Mensch","Person","jemand"]},"jelo":{"book":"pu","roles":["content"],"glosses":["gelb"]},"jo":{"book":"pu","roles":["content"],"glosses":["haben","tragen","besitzen"]},"kala":{"book":"pu","roles":["content"],"glosses":["Fisch","Meerestier"]},"kalama":{"book":"pu","roles":["content"],"glosses":["Geräusch","Klang","Lärm machen"]},"kama":{"book":"pu","roles":["content","preverb"],"glosses":["kommen","werden","ankommen","anfangen"]},"kasi":{"book":"pu","roles":["content"],"glosses":["Pflanze","Kraut","Blatt"]},"ken":{"book":"pu","roles":["content","preverb"],"glosses":["können","dürfen","Möglichkeit"]},"kepeken":{"book":"pu","roles":["content","preposition"],"glosses":["benutzen","mit","mittels"]},"kili":{"book":"pu","roles":["content"],"glosses":["Frucht","Gemüse","Pilz"]},"kiwen":{"book":"pu","roles":["content"],"glosses":["hart","Stein","Metall"]},"ko":{"book":"pu","roles":["content"],"glosses":["halbfest","Paste","Pulver","Ton"]},"kon":{"book":"pu","roles":["content"],"glosses":["Luft","Atem","Geist","Essenz"]},"kule":{"book":"pu","roles":["content"],"glosses":["Farbe","farbig","Vielfalt"]},"kulupu":{"book":"pu","roles":["content"],"glosses":["Gruppe","Gemeinschaft","Gesellschaft"]},"kute":{"book":"pu","roles":["content"],"glosses":["hören","zuhören","Ohr"]},"la":{"book":"pu","roles":["particle"],"glosses":["Kontextpartikel"]},"lape":{"book":"pu","roles":["content"],"glosses":["schlafen","ruhen"]},"laso":{"book":"pu","roles":["content"],"glosses":["blau","grün"]},"lawa":{"book":"pu","roles":["content"],"glosses":["Kopf","leiten","Regel"]},"len":{"book":"pu","roles":["content"],"glosses":["Kleidung","Stoff","Schicht","verborgen"]},"lete":{"book":"pu","roles":["content"],"glosses":["kalt","roh","ungekocht"]},"li":{"book":"pu","roles":["particle"],"glosses":["Prädikatspartikel"]},"lili":{"book":"pu","roles":["content"],"glosses":["klein","wenig","jung"]},"linja":{"book":"pu","roles":["content"],"glosses":["Faden","Haar","lange biegsame Sache"]},"lipu":{"book":"pu","roles":["content"],"glosses":["Blatt","Buch","Dokument","flacher Gegenstand"]},"loje":{"book":"pu","roles":["content"],"glosses":["rot"]},"lon":{"book":"pu","roles":["content","preposition"],"glosses":["sein in","existieren","an","bei"]},"luka":{"book":"pu","roles":["content","number"],"glosses":["Hand","Arm","fünf"]},"lukin":{"book":"pu","roles":["content","preverb"],"glosses":["sehen","schauen","Auge","versuchen"]},"lupa":{"book":"pu","roles":["content"],"glosses":["Loch","Öffnung","Tür","Fenster"]},"ma":{"book":"pu","roles":["content"],"glosses":["Land","Erde","Gebiet","draußen"]},"mama":{"book":"pu","roles":["content"],"glosses":["Elternteil","Vorfahr","Ursprung"]},"mani":{"book":"pu","roles":["content"],"glosses":["Geld","Vermögen","Nutztier"]},"meli":{"book":"pu","roles":["content"],"glosses":["Frau","weiblich"]},"mi":{"book":"pu","roles":["content","pronoun"],"glosses":["ich","wir","mein"]},"mije":{"book":"pu","roles":["content"],"glosses":["Mann","männlich"]},"moku":{"book":"pu","roles":["content"],"glosses":["essen","trinken","Nahrung"]},"moli":{"book":"pu","roles":["content"],"glosses":["Tod","sterben","tot"]},"monsi":{"book":"pu","roles":["content"],"glosses":["Rückseite","Rücken","hinten"]},"mu":{"book":"pu","roles":["content","interjection"],"glosses":["Tierlaut"]},"mun":{"book":"pu","roles":["content"],"glosses":["Mond","Stern","Himmelskörper"]},"musi":{"book":"pu","roles":["content"],"glosses":["Spaß","Spiel","Kunst","unterhaltsam"]},"mute":{"book":"pu","roles":["content","number"],"glosses":["viel","viele","Menge","zwanzig"]},"nanpa":{"book":"pu","roles":["content"],"glosses":["Zahl","Nummer"]},"nasa":{"book":"pu","roles":["content"],"glosses":["seltsam","verrückt","berauscht"]},"nasin":{"book":"pu","roles":["content"],"glosses":["Weg","Methode","Straße","Lehre"]},"nena":{"book":"pu","roles":["content"],"glosses":["Erhebung","Hügel","Nase","Knopf"]},"ni":{"book":"pu","roles":["content"],"glosses":["dies","jenes"]},"nimi":{"book":"pu","roles":["content"],"glosses":["Wort","Name"]},"noka":{"book":"pu","roles":["content"],"glosses":["Bein","Fuß","unterer Teil"]},"o":{"book":"pu","roles":["particle"],"glosses":["Anrede- und Befehlspartikel"]},"olin":{"book":"pu","roles":["content"],"glosses":["Liebe","lieben"]},"ona":{"book":"pu","roles":["content","pronoun"],"glosses":["er","sie","es","ihr"]},"open":{"book":"pu","roles":["content"],"glosses":["öffnen","anfangen","einschalten"]},"pakala":{"book":"pu","roles":["content","interjection"],"glosses":["kaputt","Fehler","zerstören"]},"pali":{"book":"pu","roles":["content"],"glosses":["machen","tun","arbeiten","Werk"]},"palisa":{"book":"pu","roles":["content"],"glosses":["Stab","Ast","langer harter Gegenstand"]},"pan":{"book":"pu","roles":["content"],"glosses":["Getreide","Brot","Reis","Nudeln"]},"pana":{"book":"pu","roles":["content"],"glosses":["geben","senden","abgeben"]},"pi":{"book":"pu","roles":["particle"],"glosses":["Umgruppierungspartikel"]},"pilin":{"book":"pu","roles":["content"],"glosses":["fühlen","Gefühl","Herz","meinen"]},"pimeja":{"book":"pu","roles":["content"],"glosses":["dunkel","schwarz","Schatten"]},"pini":{"book":"pu","roles":["content"],"glosses":["Ende","beendet","vergangen"]},"pipi":{"book":"pu","roles":["content"],"glosses":["Insekt","Käfer","Spinne"]},"poka":{"book":"pu","roles":["content"],"glosses":["Seite","Hüfte","nahe bei"]},"poki":{"book":"pu","roles":["content"],"glosses":["Behälter","Kiste","Tasse","Schublade"]},"pona":{"book":"pu","roles":["content"],"glosses":["gut","einfach","positiv","reparieren"]},"pu":{"book":"pu","roles":["content"],"glosses":["das Buch pu","mit pu umgehen"]},"sama":{"book":"pu","roles":["content","preposition"],"glosses":["gleich","ähnlich","wie"]},"seli":{"book":"pu","roles":["content"],"glosses":["Feuer","Hitze","warm","kochen"]},"selo":{"book":"pu","roles":["content"],"glosses":["Haut","Hülle","äußere Form"]},"seme":{"book":"pu","roles":["content"],"glosses":["was","welche","Fragewort"]},"sewi":{"book":"pu","roles":["content"],"glosses":["oben","hoch","erhaben","göttlich"]},"sijelo":{"book":"pu","roles":["content"],"glosses":["Körper","Zustand","Verfassung"]},"sike":{"book":"pu","roles":["content"],"glosses":["Kreis","rund","Zyklus","Jahr"]},"sin":{"book":"pu","roles":["content"],"glosses":["neu","frisch","zusätzlich","nochmal"]},"sina":{"book":"pu","roles":["content","pronoun"],"glosses":["du","ihr","dein"]},"sinpin":{"book":"pu","roles":["content"],"glosses":["Vorderseite","Gesicht","Wand"]},"sitelen":{"book":"pu","roles":["content"],"glosses":["Bild","Zeichen","schreiben","zeichnen"]},"sona":{"book":"pu","roles":["content","preverb"],"glosses":["Wissen","wissen","können"]},"soweli":{"book":"pu","roles":["content"],"glosses":["Landtier","Säugetier"]},"suli":{"book":"pu","roles":["content"],"glosses":["groß","lang","wichtig","erwachsen"]},"suno":{"book":"pu","roles":["content"],"glosses":["Sonne","Licht","Tag"]},"supa":{"book":"pu","roles":["content"],"glosses":["Tisch","Bett","waagerechte Fläche"]},"suwi":{"book":"pu","roles":["content"],"glosses":["süß","niedlich","lieb"]},"tan":{"book":"pu","roles":["content","preposition"],"glosses":["von","wegen","Ursache"]},"taso":{"book":"pu","roles":["content","particle"],"glosses":["aber","nur","jedoch"]},"tawa":{"book":"pu","roles":["content","preposition"],"glosses":["sich bewegen","nach","für","aus Sicht von"]},"telo":{"book":"pu","roles":["content"],"glosses":["Wasser","Flüssigkeit","waschen"]},"tenpo":{"book":"pu","roles":["content"],"glosses":["Zeit","Moment","Periode"]},"toki":{"book":"pu","roles":["content","interjection"],"glosses":["Sprache","sprechen","Gruß"]},"tomo":{"book":"pu","roles":["content"],"glosses":["Haus","Raum","Gebäude"]},"tu":{"book":"pu","roles":["content","number"],"glosses":["zwei","teilen"]},"unpa":{"book":"pu","roles":["content"],"glosses":["Sex","sexuell"]},"uta":{"book":"pu","roles":["content"],"glosses":["Mund","Lippen","küssen"]},"utala":{"book":"pu","roles":["content"],"glosses":["Kampf","Streit","Wettbewerb"]},"walo":{"book":"pu","roles":["content"],"glosses":["weiß","hell","blass"]},"wan":{"book":"pu","roles":["content","number"],"glosses":["eins","einzig","vereinen"]},"waso":{"book":"pu","roles":["content"],"glosses":["Vogel","fliegendes Tier"]},"wawa":{"book":"pu","roles":["content"],"glosses":["stark","kräftig","Energie"]},"weka":{"book":"pu","roles":["content"],"glosses":["weg","abwesend","entfernen"]},"wile":{"book":"pu","roles":["content","preverb"],"glosses":["wollen","brauchen","müssen"]},"epiku":{"book":"kuSuli","roles":["content"],"glosses":["episch","großartig"]},"jasima":{"book":"kuSuli","roles":["content"],"glosses":["spiegeln","umkehren","Gegenteil"]},"kijetesantakalu":{"book":"kuSuli","roles":["content"],"glosses":["Kleinbär","Waschbär","Marder"]},"kin":{"book":"kuSuli","roles":["content","particle"],"glosses":["auch","ebenfalls","tatsächlich"]},"kipisi":{"book":"kuSuli","roles":["content"],"glosses":["schneiden","teilen","Stück"]},"kokosila":{"book":"kuSuli","roles":["content"],"glosses":["die gemeinsame Sprache meiden"]},"ku":{"book":"kuSuli","roles":["content"],"glosses":["das Buch ku","mit ku umgehen"]},"lanpan":{"book":"kuSuli","roles":["content"],"glosses":["nehmen","ergreifen","stehlen"]},"leko":{"book":"kuSuli","roles":["content"],"glosses":["Block","Stufe","Ecke","quadratisch"]},"meso":{"book":"kuSuli","roles":["content"],"glosses":["mittel","mäßig","durchschnittlich"]},"misikeke":{"book":"kuSuli","roles":["content"],"glosses":["Medizin","heilen"]},"monsuta":{"book":"kuSuli","roles":["content"],"glosses":["Angst","Monster","furchterregend"]},"n":{"book":"kuSuli","roles":["content","interjection"],"glosses":["hm","äh"]},"namako":{"book":"kuSuli","roles":["content"],"glosses":["Gewürz","Zusatz","extra"]},"oko":{"book":"kuSuli","roles":["content"],"glosses":["Auge"]},"soko":{"book":"kuSuli","roles":["content"],"glosses":["Pilz"]},"tonsi":{"book":"kuSuli","roles":["content"],"glosses":["nichtbinär","geschlechtsnonkonform"]}},"variants":{"ali":"ale"},"lessons":[{"number":1,"title":"Einfache Sätze","note":"Nach <b>mi</b> und <b>sina</b> allein steht kein <b>li</b>. Bei allen anderen Subjekten steht es: <i>ona li pona.</i>","words":["mi","sina","ona","li","pona","ike","suli","lili","kili","soweli"],"items":[{"id":"lsp01_00","direction":"de_tp","tp":"soweli li suli.","also":[],"de":["Tiere sind wichtig."]},{"id":"lsp01_01","direction":"de_tp","tp":"ona li lili.","also":[],"de":["Er ist klein."]},{"id":"lsp01_02","direction":"de_tp","tp":"mi suli.","also":[],"de":["Ich bin großartig."]},{"id":"lsp01_03","direction":"de_tp","tp":"ona li soweli.","also":[],"de":["es ist ein Hund."]},{"id":"lsp01_04","direction":"de_tp","tp":"sina ike.","also":[],"de":["Du bist schlecht."]}]},{"number":2,"title":"Beifügungen","note":"Die Beifügung steht <b>hinter</b> dem Kopfwort: <i>jan pona</i> ist ein guter Mensch, <i>pona jan</i> gibt es nicht.","words":["ala","ale","utala","wawa","suwi","jan","mama","meli","mije","moku"],"items":[{"id":"lsp02_00","direction":"tp_de","tp":"meli mi li pona.","also":[],"de":["Meine Frau ist gut."]},{"id":"lsp02_01","direction":"tp_de","tp":"mije sina li suli.","also":[],"de":["Dein Mann ist (groß/wichtig)."]},{"id":"lsp02_02","direction":"tp_de","tp":"mama mije mi li wawa.","also":[],"de":["Mein Vater ist stark."]},{"id":"lsp02_03","direction":"tp_de","tp":"soweli ale li pona.","also":[],"de":["Alle Tiere sind gut."]},{"id":"lsp02_04","direction":"tp_de","tp":"kili li moku suli.","also":[],"de":["Früchte sind wichtige Nahrung."]},{"id":"lsp02_05","direction":"de_tp","tp":"meli mi li suwi.","also":[],"de":["Meine Frau ist niedlich."]},{"id":"lsp02_06","direction":"de_tp","tp":"jan utala ale li ike.","also":[],"de":["Alle Kämpfer sind böse."]},{"id":"lsp02_07","direction":"de_tp","tp":"jan pona mi li jan pona sina.","also":[],"de":["Meine Freunde sind deine Freunde."]},{"id":"lsp02_08","direction":"de_tp","tp":"jan lili mije sina li wawa.","also":[],"de":["Dein Sohn ist stark."]},{"id":"lsp02_09","direction":"de_tp","tp":"kili lili li suwi.","also":[],"de":["Die kleine Frucht ist süß."]}]},{"number":3,"title":"Verben und Objekte","note":"<b>e</b> kündigt das Objekt an: <i>mi lukin e sina.</i> Ohne <b>e</b> gibt es kein Objekt.","words":["e","ijo","ilo","lipu","lukin","olin","pali","pana","telo","tomo"],"items":[{"id":"lsp03_00","direction":"tp_de","tp":"jan lili li pana e telo lukin.","also":[],"de":["Ein Kind weint (gibt Augen-Wasser ab)."]},{"id":"lsp03_01","direction":"tp_de","tp":"ona li lukin e lipu.","also":[],"de":["(Er/sie/es) sieht ein Dokument."]},{"id":"lsp03_02","direction":"tp_de","tp":"soweli ike li utala e meli.","also":[],"de":["Das böse Tier greift eine Frau an."]},{"id":"lsp03_03","direction":"tp_de","tp":"jan utala li moku e kili suli.","also":[],"de":["Die Kämpferin isst (eine große Frucht/ein großes Gemüse/einen großen Pilz)."]},{"id":"lsp03_04","direction":"tp_de","tp":"soweli lili li moku e telo.","also":[],"de":["Kleine Tiere trinken Wasser."]},{"id":"lsp03_05","direction":"tp_de","tp":"mi telo e ijo suli.","also":[],"de":["Ich (wässere/wasche) etwas Großes."]},{"id":"lsp03_06","direction":"de_tp","tp":"ona li olin e jan ale.","also":[],"de":["Sie liebt alle Menschen."]},{"id":"lsp03_07","direction":"de_tp","tp":"tomo telo li pona.","also":[],"de":["Das Badezimmer (\"Wasser-Haus\") ist gut."]},{"id":"lsp03_08","direction":"de_tp","tp":"mi pana e lipu.","also":[],"de":["Ich händige Dokumente aus."]},{"id":"lsp03_09","direction":"de_tp","tp":"jan utala ike li lukin e tomo sina.","also":[],"de":["Ein böser Krieger sieht dein Haus."]},{"id":"lsp03_10","direction":"de_tp","tp":"ilo mi li pali pona.","also":[],"de":["Meine Geräte funktionieren gut."]}]},{"number":4,"title":"Mehr Wortschatz","note":"Mehr Wörter, gleiche Bausteine. Achte weiter auf <b>li</b> und <b>e</b>.","words":["jo","kala","kasi","pipi","sitelen","toki","waso","ma","kiwen","ko"],"items":[{"id":"lsp04_00","direction":"tp_de","tp":"mi moku ala e soweli.","also":[],"de":["Ich esse keine Tiere (bzw. Fleisch)."]},{"id":"lsp04_01","direction":"tp_de","tp":"jan pona sina li toki e ma, e telo.","also":[],"de":["Dein Fruend spricht über das Land und das Wasser."]},{"id":"lsp04_02","direction":"tp_de","tp":"jan suli li lukin e ma tomo, li sitelen e ijo.","also":[],"de":["Eine wichtige Person sieht die Stadt und schreibt Dinge auf."]},{"id":"lsp04_03","direction":"tp_de","tp":"ma li jo e kasi ike.","also":[],"de":["Das Land hat Unkraut (\"schlechte Pflanzen\")."]},{"id":"lsp04_04","direction":"tp_de","tp":"pipi lili li suli, li pona.","also":[],"de":["Kleine Käfer sind wichtig und gut."]},{"id":"lsp04_05","direction":"de_tp","tp":"ma tomo sina li jo ala e jan pali.","also":[],"de":["Deine Stadt hat keine Arbeiter."]},{"id":"lsp04_06","direction":"de_tp","tp":"mije mi li pali ala, li moku, li utala.","also":[],"de":["Mein Mann arbeitet nicht und isst nur und kämpft."]},{"id":"lsp04_07","direction":"de_tp","tp":"ma mama mi li suli.","also":[],"de":["Mein Heimatland (\"ursprüngliches Land\") ist groß."]},{"id":"lsp04_08","direction":"de_tp","tp":"sitelen sina li pona lukin.","also":[],"de":["Dein Gemälde sieht gut aus."]},{"id":"lsp04_09","direction":"de_tp","tp":"jan pona mi li jo e kala e kili li pali e moku pona.","also":[],"de":["Mein Freund hat Fische und Früchte und macht gutes Essen."]}]},{"number":5,"title":"Dies und das","note":"<b>ni</b> zeigt auf etwas: <i>ni li pona.</i> <b>en</b> verbindet zwei Subjekte: <i>mi en sina li pona.</i>","words":["ante","awen","en","kalama","kulupu","lape","mute","ni","pakala","seli"],"items":[{"id":"lsp05_00","direction":"tp_de","tp":"kulupu sina li ante mute.","also":[],"de":["Deine Gemeinschaft ist sehr anders."]},{"id":"lsp05_01","direction":"tp_de","tp":"jan ike li pakala e ilo mi.","also":[],"de":["Eine schlechte Person zerstört meine Werkzeuge."]},{"id":"lsp05_02","direction":"tp_de","tp":"mi pali e tomo ni.","also":[],"de":["Ich baue dieses Haus."]},{"id":"lsp05_03","direction":"tp_de","tp":"jan utala pona mute li awen e kulupu ni.","also":[],"de":["Der gute Kämpfer schützt diese Gemeinschaft."]},{"id":"lsp05_04","direction":"tp_de","tp":"kulupu suli li awen, li suli e ona.","also":[],"de":["Die große Gemeinschaft dauert an und vergrößert sich."]},{"id":"lsp05_05","direction":"de_tp","tp":"moku seli li pona mute.","also":[],"de":["Warmes Essen ist sehr gut."]},{"id":"lsp05_06","direction":"de_tp","tp":"jan lili lape li kalama ala.","also":[],"de":["Schlafende Kinder machen keinen Krach."]},{"id":"lsp05_07","direction":"de_tp","tp":"jan pali mute li toki e ni: ona li wawa, li kiwen.","also":[],"de":["Die Arbeiter sagen, dass sie stark und robust sind."]},{"id":"lsp05_08","direction":"de_tp","tp":"sina ante lukin.","also":[],"de":["Du siehst anders aus."]},{"id":"lsp05_09","direction":"de_tp","tp":"tomo ni li awen e seli.","also":[],"de":["Dieses Haus erhält die Hitze."]}]},{"number":6,"title":"Präpositionen und Orte","note":"Präpositionen können selbst Prädikat sein: <i>mi lon tomo.</i> Und als Beifügung: <i>tomo tawa mi</i> ist ein Auto.","words":["kepeken","lon","sama","tan","tawa","sewi","noka","poka","monsi","sinpin"],"items":[{"id":"lsp06_00","direction":"tp_de","tp":"ona li toki tawa mama mije ona kepeken ilo toki.","also":[],"de":["Sie reden mit ihrem Vater mithilfe eines Telefons."]},{"id":"lsp06_01","direction":"tp_de","tp":"moku suwi li ike tawa mi.","also":[],"de":["Ich mag süßes Essen nicht","Süßes Essen ist schlecht für mich."]},{"id":"lsp06_02","direction":"tp_de","tp":"ma mama mi li utala e ma poka.","also":[],"de":["Mein Heimatland bekämpft ein Nachbarland."]},{"id":"lsp06_03","direction":"tp_de","tp":"meli sama sina li jan pona mi.","also":[],"de":["Deine Schwester ist mein Freund."]},{"id":"lsp06_04","direction":"tp_de","tp":"pipi lili li lon sinpin sina.","also":[],"de":["Ein kleiner Käfer ist auf deinem Gesicht."]},{"id":"lsp06_05","direction":"de_tp","tp":"sina pakala e tomo tawa mi.","also":[],"de":["Du hast mein Auto kaputtgemacht."]},{"id":"lsp06_06","direction":"de_tp","tp":"(jan) mije li pana e moku tawa jan lili.","also":[],"de":["Der Mann füttert (\"gibt Essen\") die Kinder."]},{"id":"lsp06_07","direction":"de_tp","tp":"tomo toki ni li ike tawa mi.","also":[],"de":["Ich mag diesen Chatraum (\"Rede-Haus\") nicht."]},{"id":"lsp06_08","direction":"de_tp","tp":"mi pona e tomo tan sina.","also":[],"de":["Ich habe wegen dir das Haus repariert."]},{"id":"lsp06_09","direction":"de_tp","tp":"ona li lukin e lipu lon tomo lipu.","also":[],"de":["Sie lesen Bücher in der Bücherei."]}]},{"number":7,"title":"Ausrufe, Fragen, Befehle, Namen","note":"<b>o</b> ist Anrede und Befehl, <b>seme</b> fragt nach etwas, und <b>X ala X</b> ist die Ja-Nein-Frage.","words":["a","anu","mu","o","seme","kute","nimi","lawa","anpa","insa"],"items":[{"id":"lsp07_00","direction":"tp_de","tp":"jan Lisa o, moku ala e kili ni a!","also":[],"de":["Lisa, iss diese Frucht/dieses Gemüse/diesen Pilz nicht!"]},{"id":"lsp07_01","direction":"tp_de","tp":"kulupu Kensa li anpa e kulupu ale ante.","also":[],"de":["Die Mannschaft aus Kansas hat alle anderen Mannschaften besiegt."]},{"id":"lsp07_02","direction":"tp_de","tp":"o toki insa ala e ni: jan pali li anpa tawa jan lawa.","also":[],"de":["Denke nicht, dass Arbeiter für den Chef gering sind."]},{"id":"lsp07_03","direction":"tp_de","tp":"sina pali e ni tan seme?","also":[],"de":["Warum hast du das gemacht?"]},{"id":"lsp07_04","direction":"tp_de","tp":"insa mi li pakala. o pona e mi a!","also":[],"de":["(Mein Bauch","Meine inneren Organe ) sind verletzt. Hilf mir!"]},{"id":"lsp07_05","direction":"de_tp","tp":"mi toki insa e ni: jan sewi li lon ala.","also":[],"de":["Ich glaube nicht, dass es Götter gibt."]},{"id":"lsp07_06","direction":"de_tp","tp":"o kalama ala lon tomo lipu.","also":[],"de":["Macht in der Bibliothek keinen Krach."]},{"id":"lsp07_07","direction":"de_tp","tp":"jan lawa mi li toki e ni: o lape ala lon tomo pali.","also":[],"de":["Mein Chef sagt mir, nicht im Büro zu schlafen."]},{"id":"lsp07_08","direction":"de_tp","tp":"jan sama mije sina li sama mute lukin sina.","also":[],"de":["Dein Bruder sieht aus wie du."]},{"id":"lsp07_09","direction":"de_tp","tp":"o tawa ala lon ma.","also":[],"de":["Gehe nicht nach draußen."]}]},{"number":8,"title":"Farben","note":"Farbwörter sind Beifügungen wie alle anderen: <i>kili loje</i>.","words":["kule","jelo","laso","loje","pimeja","walo","nasa","jaki","moli","unpa"],"items":[{"id":"lsp08_00","direction":"tp_de","tp":"kule loje li pona tawa mi.","also":[],"de":["Ich mag die Farbe rot."]},{"id":"lsp08_01","direction":"tp_de","tp":"o pana e telo kili jelo tawa mi.","also":[],"de":["Gib mir den gelbenen Saft (oder Limonade)."]},{"id":"lsp08_02","direction":"tp_de","tp":"kasi kule sina li pona lukin tawa mi.","also":[],"de":["Mir gefällt, wie deine Blumen aussehen."]},{"id":"lsp08_03","direction":"tp_de","tp":"mi moku ala e telo nasa.","also":[],"de":["Ich trinke keinen Alkohol."]},{"id":"lsp08_04","direction":"tp_de","tp":"o moli ala e ona a!","also":[],"de":["Töte sie nicht!"]},{"id":"lsp08_05","direction":"de_tp","tp":"tomo sina li suli. tomo mi li lili.","also":[],"de":["Dein Haus ist größer als meins."]},{"id":"lsp08_06","direction":"de_tp","tp":"kasi kule laso li pona mute tawa mi. kasi kule loje li pona lili tawa mi.","also":[],"de":["Ich mag blaue Blumen mehr als rote Blumen."]},{"id":"lsp08_07","direction":"de_tp","tp":"jaki a! moku ni li ike mute a!","also":[],"de":["Igitt! Dieses Essen ist schrecklich!"]},{"id":"lsp08_08","direction":"de_tp","tp":"mi lon tomo loje.","also":[],"de":["Ich bin im roten Haus."]},{"id":"lsp08_09","direction":"de_tp","tp":"jan nasa li kute ala e mi.","also":[],"de":["Die betrunkene Person hört mir nicht zu."]}]},{"number":9,"title":"pi und la","note":"<b>pi</b> gruppiert mehrwortige Beifügungen um: <i>jan pi toki pona</i>. Vor einem einzelnen Wort steht es nie. <b>la</b> stellt den Kontext voran.","words":["pi","la","luka","linja","palisa","selo","sijelo","len","lete","musi"],"items":[{"id":"lsp09_00","direction":"tp_de","tp":"kulupu pi jan mute li ike tawa mi.","also":[],"de":["Ich mag keine Gemeinschaften mit vielen Menschen."]},{"id":"lsp09_01","direction":"tp_de","tp":"tomo ni la mi toki kepeken toki pona, mi toki kepeken toki Inli.","also":[],"de":["In diesem Haus rede ich Toki Pona und Englisch."]},{"id":"lsp09_02","direction":"tp_de","tp":"sina moku e soweli lete la ona li ike tawa sijelo sina.","also":[],"de":["Wenn du rohes Fleisch isst, ist das schlecht für deinen Körper."]},{"id":"lsp09_03","direction":"tp_de","tp":"kalama musi ona li pona mute.","also":[],"de":["Ihre Musik (\"unterhaltsame Geräusche\") ist sehr gut."]},{"id":"lsp09_04","direction":"tp_de","tp":"sina kepeken ike e ilo la ona li pakala.","also":[],"de":["Wenn du die Geräte misshandelst (\"schlecht benutzen\"), werden sie kaputtgehen (\"kaputt sein\")."]},{"id":"lsp09_05","direction":"de_tp","tp":"sewi laso li pona mute tawa mi. sewi pi pimeja walo li pona lili tawa mi.","also":[],"de":["Ich mag blauen Himmel mehr als grauen Himmel."]},{"id":"lsp09_06","direction":"de_tp","tp":"sewi li pimeja la o awen lon tomo.","also":[],"de":["Falls es draußen dunkel ist, bleib zuhause."]},{"id":"lsp09_07","direction":"de_tp","tp":"ona li lon tomo pi telo nasa.","also":[],"de":["Er ist in der Bar (\"Haus des merkwürdigen Wassers\")."]},{"id":"lsp09_08","direction":"de_tp","tp":"jan pi kalama suli li toki e ijo nasa.","also":[],"de":["Die laute Person (\"Person der großen Geräusche\") sagt merkwürdige Dinge."]},{"id":"lsp09_09","direction":"de_tp","tp":"meli ni pi linja walo li pona lukin.","also":[],"de":["Diese Blondine (\"Frau des weißen Haars\") sieht gut aus."]},{"id":"lsp09_10","direction":"de_tp","tp":"sina toki ala tawa jan la sina jo ala e jan pona.","also":[],"de":["Wenn du nicht mit Leuten redest, dann wirst du keine Freunde haben."]}]},{"number":10,"title":"Präverben und Zeit","note":"Präverben stehen vor dem Verb: <i>mi wile moku.</i> Zeit wird über <b>tenpo … la</b> ausgedrückt, nicht über Endungen.","words":["kama","ken","open","pini","sona","wile","lupa","nasin","nena","tenpo"],"items":[{"id":"lsp10_00","direction":"tp_de","tp":"o open e lupa.","also":[],"de":["Öffne die Tür."]},{"id":"lsp10_01","direction":"tp_de","tp":"tenpo lili la mi kama tawa sina.","also":[],"de":["Gleich komme ich zu dir."]},{"id":"lsp10_02","direction":"tp_de","tp":"mi wile tawa ma ante.","also":[],"de":["Ich will in andere Länder (reisen)."]},{"id":"lsp10_03","direction":"tp_de","tp":"sina ken ala ken kama tawa tomo mi?","also":[],"de":["Kannst du zu meinem Haus kommen?"]},{"id":"lsp10_04","direction":"tp_de","tp":"sina kama tawa tomo mi la o kepeken e nasin Linkan.","also":[],"de":["Wenn du zu meinem Haus kommst, nimm (benutze) die Lincoln-Straße."]},{"id":"lsp10_05","direction":"tp_de","tp":"sina lon nena la sina ken lukin e ijo mute.","also":[],"de":["Wenn du auf einem Hügel bist, kannst du viele Dinge sehen."]},{"id":"lsp10_06","direction":"de_tp","tp":"sina sona ala sona pali e ona?","also":["sina sona pali e ona anu seme?"],"de":["Weißt du, wie man es macht?"]},{"id":"lsp10_07","direction":"de_tp","tp":"ale li ken.","also":[],"de":["Alles ist möglich."]},{"id":"lsp10_08","direction":"de_tp","tp":"sina ken ala ken open e lupa?","also":["sina ken open e lupa anu seme?"],"de":["Kannst du die Tür öffnen?"]},{"id":"lsp10_09","direction":"de_tp","tp":"sina kute ala e jan sona la pali sina li ike.","also":[],"de":["Wenn du den Experten (Leute des Wissens) nicht zuhörst, wird deine Arbeit schlecht sein."]},{"id":"lsp10_10","direction":"de_tp","tp":"tenpo suli la mi pali e ni.","also":["mi pali e ni lon tenpo suli."],"de":["Ich arbeite lange daran."]},{"id":"lsp10_11","direction":"de_tp","tp":"mi awen kama sona e toki pona.","also":[],"de":["Ich lerne weiterhin Toki Pona."]}]},{"number":11,"title":"Zahlen","note":"<b>wan tu mute ale</b> — und <b>nanpa</b> für Ordnungszahlen.","words":["wan","tu","sike","mani","esun","mun","nanpa","poki","sin","suno"],"items":[{"id":"lsp11_00","direction":"tp_de","tp":"mi wile esun e soweli suli tu wan ni.","also":[],"de":["Ich würde gerne einen Handel über diese drei großen Tiere machen."]},{"id":"lsp11_01","direction":"tp_de","tp":"tenpo suno pini la mi lon tomo sona.","also":[],"de":["Gestern war ich in der Schule/Universität (\"Haus des Wissens\")."]},{"id":"lsp11_02","direction":"tp_de","tp":"tenpo mun wan pini la lete li lon.","also":[],"de":["Vor einem Monat war es kalt."]},{"id":"lsp11_03","direction":"tp_de","tp":"sina pona nanpa wan tawa mi.","also":[],"de":["Ich mag dich am meisten."]},{"id":"lsp11_04","direction":"tp_de","tp":"tenpo suno mute mute la telo sewi li awen.","also":[],"de":["Der Regen währte 40 Tage lang."]},{"id":"lsp11_05","direction":"de_tp","tp":"mi lon tomo nanpa mute luka tu pi nasin Wasintan.","also":[],"de":["Ich lebe im Haus #27 in der Washington-Straße."]},{"id":"lsp11_06","direction":"de_tp","tp":"ilo pi sitelen tawa li toki e ni: tenpo suno kama la suno li lon.","also":[],"de":["Der Fernseher (\"Gerät der bewegten Bilder\") hat gesagt, dass es morgen sonnig ist."]},{"id":"lsp11_07","direction":"de_tp","tp":"tenpo pimeja ni la lete li lon.","also":[],"de":["Heute Nacht wird es kalt."]},{"id":"lsp11_08","direction":"de_tp","tp":"(tenpo mun","also":["tenpo sike mun) nanpa luka li (pona","suwi)."],"de":["Mai (\"der 5. Monat\") ist schön."]},{"id":"lsp11_09","direction":"de_tp","tp":"sina jo e ilo mute pi kalama musi a!","also":[],"de":["Du hast viele Musikinstrumente!"]}]},{"number":12,"title":"Der Rest von pu","note":"Die letzten Wörter aus <i>pu</i>.","words":["akesi","alasa","kon","pan","pilin","pu","supa","taso","uta","weka"],"items":[{"id":"lsp12_00","direction":"tp_de","tp":"sina wile kama sona e toki pona la pu li nasin pona nanpa wan tawa ni.","also":[],"de":["Wenn du Toki Pona lernen willst, ist das offizielle Buch der beste Weg dafür."]},{"id":"lsp12_01","direction":"tp_de","tp":"tenpo suno ni la mi pilin pona mute.","also":[],"de":["Heute fühle ich mich gut."]},{"id":"lsp12_02","direction":"tp_de","tp":"sina wile ala wile moku e pan sike?","also":[],"de":["Willst du Pizza essen?"]},{"id":"lsp12_03","direction":"tp_de","tp":"supa lape mi li pakala. mi ken ala lape tan ni.","also":[],"de":["Mein Bett (\"Schlaf-Oberfläche\") ist kaputt. Deswegen kann ich nicht schlafen."]},{"id":"lsp12_04","direction":"tp_de","tp":"jan Mali Konto li toki e ni: o weka e ijo ike sina.","also":[],"de":["Marie Kondo sagt: Werde unnötige Dinge los."]},{"id":"lsp12_05","direction":"tp_de","tp":"kulupu ijo tu wan li lon. ona li kulupu kiwen, li kulupu telo, li kulupu kon.","also":[],"de":["Es gibt drei Kategorien von Materie. Diese sind: Feststoffe, Flüssigkeiten und Gase."]},{"id":"lsp12_06","direction":"tp_de","tp":"taso, meli lili pi jan lawa li lon tomo awen ante.","also":[],"de":["Aber die Prinzessin ist in einem anderen Schloss."]},{"id":"lsp12_07","direction":"de_tp","tp":"mi lukin e akesi seli laso suli a!","also":[],"de":["Ich habe einen Drachen (große grüne Feuer-Echse) gesehen!"]},{"id":"lsp12_08","direction":"de_tp","tp":"toki! sina pilin seme?","also":[],"de":["Hallo! Wie geht es dir? (\"Wie fühlst du?\")"]},{"id":"lsp12_09","direction":"de_tp","tp":"jan alasa li pana e moku soweli mute e kili mute tawa mi mute.","also":[],"de":["Die Jägerin gab uns viel Fleisch und viele Früchte."]},{"id":"lsp12_10","direction":"de_tp","tp":"mi lukin e lipu. tenpo lili la ona li pini.","also":[],"de":["Ich lese ein Dokument. Sehr bald (in kurzer Zeit) wird es enden."]},{"id":"lsp12_11","direction":"de_tp","tp":"mi ken toki pi pona mute kepeken toki pona.","also":[],"de":["Ich spreche gut Toki Pona."]}]}],"attribution":{"source":"lipu sona pona","url":"https://lipu-sona.pona.la/de/","repository":"https://github.com/pona-la/lipu-sona","license":"MIT","copyright":"© 2020 /dev/urandom und Mitwirkende","note":"Übungssätze und Übersetzungen übernommen und bearbeitet; Erklärtexte der App sind eigenständig formuliert."},"corpus":{"valid":["mi pona.","sina suli.","mi jan.","mi moku.","sina pona.","sina jan pona.","mi jan lili.","tomo mi li suli.","mama sina li pona.","ona li suli li pona.","kili li moku.","jan li lape.","mi en sina li pona.","soweli mute li musi.","jan lili li moku e kili.","mi lukin e sina.","mi jo e tomo.","ona li pana e mani e lipu.","sina sitelen e nimi.","jan pi toki pona li pona.","mi lukin e lipu pi toki pona.","kulupu pi jan pona li suli.","mi jo e ilo pi kalama musi.","mi wile moku.","sina ken toki.","ona li kama sona.","mi sona toki.","mi wile e ijo.","mi awen lape.","mi tawa tomo.","ona li lon ma.","mi pali kepeken ilo.","jan li pana e lipu tawa mi.","mi lape lon tomo mi.","mi tawa.","ona li sama mi.","tomo tawa mi li pona.","meli sama mi li suli.","ona li toki e ijo lon.","mi moku ala.","sina wile ala wile moku?","ona li pona ala pona?","sina pali e seme?","jan seme li toki?","ona li pona anu seme?","mi wile ala moku.","ona li sona ala sona e toki pona?","o kama pona!","jan Sonja o toki!","sina o lape.","mi pona a!","o pana e telo tawa mi.","jan pona o!","tenpo pini la mi lon ma Tosi.","sina moku la sina wawa.","tenpo suno ni la mi pali.","ken la ona li kama.","mi wile e ni: sina kama.","ona li toki e ni: mi pona.","mi olin e sina taso.","soweli anu waso li pona.","taso mi wile lape.","ona li pona mute anu ike mute.","soweli tu li lape.","jan Sonja li pali e toki pona.","mi jo e kili wan.","ma Tosi li suli.","nimi mi li jan Ken.","jan pi ma Tosi li toki e toki pona tawa mi.","tenpo pini la jan Sonja li pana e lipu pu tawa jan mute.","mi wile ala e ni: sina pakala e ilo mi."],"invalid":[["mi li moku.","liAfterMiSina"],["sina li pona.","liAfterMiSina"],["soweli moku e kili.","missingLi"],["jan pi pona li lape.","piWithSingleWord"],["jan pi li pona.","piWithoutContent"],["mi moku e.","objectWithoutNoun"],["mi moku e kili e.","objectWithoutNoun"],["soweli li.","missingPredicate"],["li pona.","missingSubject"],["la mi pona.","emptyContext"],["mi pona la.","contextWithoutClause"],["jan Claude li pona.","properNameNotTokiponized"],["Sonja li pona.","properNameAsHead"],["mi mokuu.","unknownWord"],["o.","vocativeWithoutContent"],["mi li li pona.","repeatedParticle"]],"external":["mi jo e moku.","mi kama jo e moku.","mi kama tan ma Losi","mi pali e tomo.","mi ken pali e tomo.","ni li ken.","ken la ale li pona.","mi open pali e tomo.","mi pini pali e tomo.","mi sona pali e tomo.","mi sona e ni.","mi sona sitelen.","mi sona e sitelen.","ona li sona ala sona e toki Inli?","jan lili li kama sona toki.","mi kama sona e toki pona.","mi kama sona toki kepeken toki pona.","jan lili li wile moku.","jan lili li wile e ijo musi.","wile sina li suli mute.","ona li lukin e lipu.","ona li awen lukin e lipu.","mi jo e tomo.","mi lukin jo e tomo.","tenpo ni la mi moku.","mi moku lon tenpo ni.","tenpo pini la mi pali e ijo ike mute.","tenpo kama la o moku ala e kasi ni.","tenpo seme la sina pini e pali sina?","soweli wan","waso lili tu","jan nanpa wan","tomo nanpa mute luka luka wan","tenpo suno","tenpo pimeja","ilo nanpa","nanpa pona","suno li lon.","telo sewi li lon.","seli li lon.","lete li lon.","jan pi nanpa wan","mi alasa sona e toki pona.","mi lon tomo ni.","mi taso li lon tomo ni.","kulupu ona li jo e jan tu taso.","mi pali taso.","taso, tenpo kama li wile ala ante.","jan wawa","mama mi","soweli sina","moku ona","wawa sina","suli ona","soweli lili suwi","ona li toki meli.","toki!","mi en sina li moku.","jan utala mute","mi mute","jan lili mute li lape.","kiwen suli li pakala e tomo lipu.","mi pakala lili.","ilo sina li kalama mute ike.","kulupu ni li pona mute.","jan lili li toki e ni: sina pona.","ona li toki e ni: \"toki!","sina pona lukin.","jan pali ni li pali e tomo mi: ona li jo e kiwen mute.","mi pona e tomo kepeken ilo mi.","mi toki kepeken toki pona.","sina kepeken e ilo sitelen.","mi lon tomo sina.","jan ike li kalama mute lon tomo lipu.","ona li toki e ijo lon.","mi en sina li sama.","meli sama mi li pona.","kiwen lili li sama pipi tawa lukin.","mi lape tan ni: mi jo ala e wawa.","mi tawa tan tomo mi.","ona li awen lon tomo lipu.","tomo tawa mi li pona.","mi tawa tomo moku.","sina pona tawa mi.","waso mute li lon sewi.","mi awen lon tomo mi.","mi toki tawa jan sewi.","mi tawa kepeken noka mi.","kiwen lili li lon noka mi.","mi tawa lon poka sina.","jan poka li ike tawa mi.","ona li lon monsi sina.","jan utala mute li lon sinpin mi.","lipu suli li lon sinpin ni.","sinpin ona li pona lukin.","mi tawa!","tawa pona!","moku pona!","lape pona!","o kepeken ala ilo ike.","mi kepeken e ilo.","ona li pona mute anu ike mute.","sina suwi a!","o kute e mi!","sina o!","jan ale o!","jan pali o, kepeken e ilo awen!","sina pona ala pona?","pona.","ona li pali ala pali?","jan lili li moku ala moku?","sina pona anu seme?","sina pali e seme?","jan seme li pakala e ona?","ijo ni li seme?","sewi li laso tan seme?","jan Mimi","ma Kanata","toki Inli","toki Tosi","ma tomo Napoli","jan Kanata","o toki ala a!","sina pali ala pali e ni?","mi jan San.","mi lon ma Mewika.","mi jan Ema.","mi lon ma Tosi.","nimi sina li seme?","jan lawa mi li ike mute.","jan Lopin o, toki!","laso sewi","laso kasi","loje jelo","jelo pimeja","walo pimeja","loje walo","kili loje lili li pona tawa mi.","jan lili li pana e ko jaki tan monsi ona.","jan Simu o, mije li moli.","tomo ni li jo e jaki mute.","ni li ike tawa mi a!","mije mi li unpa ala e jan ante.","mi wawa.","sina wawa lili.","mi wawa mute.","jan wawa ala","jan pi wawa ala","jan wawa mute","jan pi wawa mute","jan toki utala","jan pi toki utala","sina toki pi ma tomo mama sina.","sewi pi pimeja walo li ike tawa mi.","sewi pimeja walo li ike tawa mi.","ma tomo Wasintan li ma tomo lawa pi ma Mewika.","moku ni li pona la mi pana e ona tawa sina.","ona li moli la ni li ike tawa jan ale.","o kalama ala lon tomo lipu.","ni li pona tawa mi.","mi la ni li pona.","soweli li suli.","ona li lili.","mi suli.","ona li soweli.","sina ike.","meli mi li suwi.","jan utala ale li ike.","jan pona mi li jan pona sina.","jan lili mije sina li wawa.","kili lili li suwi.","ona li olin e jan ale.","tomo telo li pona.","mi pana e lipu.","jan utala ike li lukin e tomo sina.","ilo mi li pali pona.","ma tomo sina li jo ala e jan pali.","ma mama mi li suli.","sitelen sina li pona lukin.","jan pona mi li jo e kala e kili li pali e moku pona.","moku seli li pona mute.","jan pali mute li toki e ni: ona li wawa, li kiwen.","sina ante lukin.","tomo ni li awen e seli.","sina pakala e tomo tawa mi.","tomo toki ni li ike tawa mi.","mi pona e tomo tan sina.","ona li lukin e lipu lon tomo lipu.","jan lawa mi li toki e ni: o lape ala lon tomo pali.","jan sama mije sina li sama mute lukin sina.","o tawa ala lon ma.","tomo sina li suli.","tomo mi li lili.","kasi kule laso li pona mute tawa mi.","kasi kule loje li pona lili tawa mi.","jaki a!","moku ni li ike mute a!","mi lon tomo loje.","jan nasa li kute ala e mi.","sewi laso li pona mute tawa mi.","sewi pi pimeja walo li pona lili tawa mi.","sewi li pimeja la o awen lon tomo.","ona li lon tomo pi telo nasa.","jan pi kalama suli li toki e ijo nasa.","meli ni pi linja walo li pona lukin.","sina toki ala tawa jan la sina jo ala e jan pona.","sina sona ala sona pali e ona?","ale li ken.","sina ken ala ken open e lupa?","sina kute ala e jan sona la pali sina li ike.","tenpo suli la mi pali e ni.","mi awen kama sona e toki pona.","mi lon tomo nanpa mute luka tu pi nasin Wasintan.","ilo pi sitelen tawa li toki e ni: tenpo suno kama la suno li lon.","tenpo pimeja ni la lete li lon.","sina jo e ilo mute pi kalama musi a!","mi lukin e akesi seli laso suli a!","sina pilin seme?","jan alasa li pana e moku soweli mute e kili mute tawa mi mute.","mi lukin e lipu.","tenpo lili la ona li pini.","mi ken toki pi pona mute kepeken toki pona.","seli li monsuta e mi.","sina kokosila tan seme?","o pana e len oko tawa sina.","o pana e len lukin tawa sina.","o pana e namako walo suwi tawa mi.","sina wile e ni: mi kipisi e sike pan kepeken nasin seme?","mi tu e sike pan kepeken nasin seme?","kulupu tu","kulupu li tu.","kulupu wan","kulupu li wan.","kulupu mute wan","kulupu mute li wan","sitelen ni li sitelen kepeken sitelen pona.","sina ken ala ken sona e ona.","ma Kanata li suli.","jan pi sona mute li pali pona.","tenpo mute la ona mute li lon."]}};
+
+</script>
+<script>
+// Zeilennaher Port von TokiPonaKit für den Prototyp.
+// Maßgeblich bleibt das Swift-Paket; prototype/test.js prüft beide gegen
+// dieselben Korpora.
+
+const TokiPona = (function (data) {
+  const LEX = data.lexicon;
+  const VARIANTS = data.variants;
+
+  const PREPOSITIONS = new Set(['lon', 'tan', 'tawa', 'kepeken', 'sama']);
+  const PREVERBS = new Set(['wile', 'ken', 'kama', 'awen', 'sona', 'lukin']);
+  const EXT_PREVERBS = new Set(['alasa', 'open', 'pini']);
+  const STRUCTURAL = new Set(['li', 'e', 'la', 'pi', 'o', 'en', 'anu', 'a']);
+  const BOUNDARY = new Set(['li', 'e', 'la', 'o', 'en', 'anu']);
+
+  const VOWELS = new Set(['a', 'e', 'i', 'o', 'u']);
+  const CONSONANTS = new Set(['j', 'k', 'l', 'm', 'n', 'p', 's', 't', 'w']);
+  const FORBIDDEN = new Set(['ji', 'ti', 'wo', 'wu']);
+  const STRIPPED = new Set([...'.,;!?"\'„“»«()[]…·-–—']);
+
+  const lookup = (text) => LEX[VARIANTS[text] || text] || null;
+
+  // ---------------------------------------------------------------- Lautregeln
+
+  function phonoCheck(text) {
+    const lower = text.toLowerCase();
+    if (!lower) return { kind: 'emptyString', detail: '' };
+    for (const c of lower) {
+      if (!VOWELS.has(c) && !CONSONANTS.has(c)) return { kind: 'foreignLetter', detail: c };
+    }
+    const chars = [...lower];
+    let i = 0, first = true;
+    while (i < chars.length) {
+      let syllable = '';
+      if (CONSONANTS.has(chars[i])) { syllable += chars[i]; i += 1; }
+      else if (!first) return { kind: 'missingVowel', detail: '' };
+      if (i >= chars.length || !VOWELS.has(chars[i])) {
+        return { kind: syllable ? 'danglingConsonant' : 'missingVowel', detail: syllable };
+      }
+      syllable += chars[i];
+      i += 1;
+      if (FORBIDDEN.has(syllable)) return { kind: 'forbiddenSyllable', detail: syllable };
+      if (i < chars.length && chars[i] === 'n') {
+        const next = i + 1 < chars.length ? chars[i + 1] : null;
+        if (next && VOWELS.has(next)) { /* eröffnet die nächste Silbe */ }
+        else if (next && (next === 'n' || next === 'm')) {
+          return { kind: 'forbiddenSyllable', detail: 'n' + next };
+        } else { syllable += 'n'; i += 1; }
+      }
+      first = false;
+    }
+    return null;
+  }
+
+  const PHONO_MESSAGE = {
+    emptyString: () => 'Leere Zeichenkette.',
+    foreignLetter: (c) => `„${c}“ gehört nicht zu den 14 Buchstaben von toki pona.`,
+    forbiddenSyllable: (s) => `Die Silbe „${s}“ ist in toki pona nicht erlaubt.`,
+    missingVowel: () => 'Jede Silbe braucht einen Vokal.',
+    danglingConsonant: () => 'Nach dem letzten Vokal ist nur „n“ erlaubt.',
+  };
+
+  // ---------------------------------------------------------------- Tokenizer
+
+  function editDistance(a, b) {
+    if (!a.length) return b.length;
+    if (!b.length) return a.length;
+    let prev = [...Array(b.length + 1).keys()];
+    for (let i = 1; i <= a.length; i += 1) {
+      const cur = [i, ...Array(b.length).fill(0)];
+      for (let j = 1; j <= b.length; j += 1) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+      }
+      prev = cur;
+    }
+    return prev[b.length];
+  }
+
+  const SPELLINGS = [...Object.keys(LEX), ...Object.keys(VARIANTS)].sort();
+
+  function suggest(text) {
+    let best = null;
+    for (const candidate of SPELLINGS) {
+      if (Math.abs(candidate.length - text.length) > 1) continue;
+      if (editDistance(text, candidate) === 1) {
+        if (best !== null && best.length <= candidate.length) continue;
+        best = candidate;
+      }
+    }
+    return best;
+  }
+
+  function makeToken(original, index, offset, colon) {
+    const token = {
+      original, text: original.toLowerCase(), index, offset,
+      followedByColon: colon, word: null, kind: null, suggestion: null, problem: null,
+    };
+    if (/^[A-ZÄÖÜ]/.test(original)) {
+      const problem = phonoCheck(token.text);
+      if (problem) { token.kind = 'malformedName'; token.problem = problem; }
+      else token.kind = 'properName';
+    } else if (lookup(token.text)) {
+      token.kind = 'known';
+      token.word = lookup(token.text);
+    } else {
+      token.kind = 'unknown';
+      token.suggestion = suggest(token.text);
+    }
+    return token;
+  }
+
+  const isParticle = (t, p) => t.text === p && STRUCTURAL.has(p) && t.word !== null;
+  const isBoundary = (t) => t.word !== null && BOUNDARY.has(t.text);
+  const isProperName = (t) => t.kind === 'properName' || t.kind === 'malformedName';
+  const canModify = (t) => (t.kind === 'known'
+    ? (!t.word.roles.includes('particle') || t.word.roles.includes('content'))
+    : true);
+  const isPreposition = (t) => t.word !== null && PREPOSITIONS.has(t.text);
+  const isPreverb = (t) => t.word !== null && (PREVERBS.has(t.text) || EXT_PREVERBS.has(t.text));
+
+  function tokenize(input) {
+    const tokens = [];
+    let raw = '', start = 0;
+    const flush = () => {
+      if (!raw) return;
+      let body = raw, colon = false;
+      while (body.endsWith(':')) { colon = true; body = body.slice(0, -1); }
+      body = [...body].filter((c) => !STRIPPED.has(c)).join('');
+      raw = '';
+      if (!body) return;
+      tokens.push(makeToken(body, tokens.length, start, colon));
+    };
+    [...input].forEach((character, position) => {
+      if (/\s/.test(character)) flush();
+      else { if (!raw) start = position; raw += character; }
+    });
+    flush();
+    return tokens;
+  }
+
+  function splitUtterances(input) {
+    const out = [];
+    let current = '';
+    for (const c of input) {
+      current += c;
+      if ('.!?'.includes(c)) { if (current.trim()) out.push(current.trim()); current = ''; }
+    }
+    if (current.trim()) out.push(current.trim());
+    return out;
+  }
+
+  // ---------------------------------------------------------------- Parser
+
+  const CONCEPT_OF_RULE = {
+    liAfterMiSina: 'c_mi_sina',
+    missingLi: 'c_li', missingSubject: 'c_li', missingPredicate: 'c_li', repeatedParticle: 'c_li',
+    objectWithoutNoun: 'c_e_objekt',
+    piWithSingleWord: 'c_pi', piWithoutContent: 'c_pi',
+    vocativeWithoutContent: 'c_o',
+    emptyContext: 'c_la', contextWithoutClause: 'c_la',
+    properNameNotTokiponized: 'c_namen', properNameAsHead: 'c_namen',
+  };
+
+  class Engine {
+    constructor(tokens) {
+      this.tokens = tokens;
+      this.pos = 0;
+      this.limit = tokens.length;
+      this.violations = [];
+      this.suppress = false;
+    }
+
+    report(rule, tokens, message, correction = null) {
+      if (this.suppress && (rule === 'unknownWord' || rule === 'properNameNotTokiponized')) return;
+      this.violations.push({
+        rule, message, correction,
+        concept: CONCEPT_OF_RULE[rule] || null,
+        tokenIndices: tokens.map((t) => t.index),
+      });
+    }
+
+    run() {
+      if (!this.tokens.length) { this.report('emptyUtterance', [], 'Der Satz ist leer.'); return null; }
+      this.reportLexicalIssues();
+
+      let start = 0, end = this.tokens.length;
+      const finals = [];
+      let question = this.tokens.some((t) => t.text === 'seme' && t.word);
+
+      if (end - start > 1 && this.tokens[start].text === 'taso' && this.tokens[start].word) start += 1;
+
+      let changed = true;
+      while (changed) {
+        changed = false;
+        if (end - start >= 3
+            && this.tokens[end - 2].text === 'anu' && this.tokens[end - 2].word
+            && this.tokens[end - 1].text === 'seme' && this.tokens[end - 1].word) {
+          question = true;
+          finals.unshift(this.tokens[end - 2], this.tokens[end - 1]);
+          end -= 2; changed = true;
+        }
+        while (end - start > 1 && this.tokens[end - 1].word
+               && (this.tokens[end - 1].text === 'a' || this.tokens[end - 1].text === 'kin')) {
+          finals.unshift(this.tokens[end - 1]);
+          end -= 1; changed = true;
+        }
+      }
+
+      const interjection = { contexts: [], clause: { kind: 'interjection', subjects: [], predicates: [] },
+                             finalParticles: finals, isQuestion: question };
+      if (start >= end) return interjection;
+      if (end - start === 1) {
+        const word = this.tokens[start].word;
+        if (word && word.roles.includes('interjection')) return interjection;
+      }
+
+      const contexts = [];
+      let segment = start;
+      for (;;) {
+        const la = this.indexOfTopLevel('la', segment, end);
+        if (la === null) break;
+        if (la === segment) {
+          this.report('emptyContext', [this.tokens[la]], 'Vor „la“ fehlt der Kontext.');
+        } else {
+          const clause = this.parseClause(segment, la);
+          if (clause) {
+            if (clause.kind === 'fragment' && clause.subjects.length === 1) {
+              contexts.push({ kind: 'phrase', phrase: clause.subjects[0] });
+            } else contexts.push({ kind: 'clause', clause });
+          }
+        }
+        segment = la + 1;
+      }
+
+      if (segment >= end) {
+        this.report('contextWithoutClause', [this.tokens[end - 1]], 'Nach „la“ fehlt der Hauptsatz.');
+        return { contexts, clause: null, finalParticles: finals, isQuestion: question };
+      }
+
+      const clause = this.parseClause(segment, end);
+      if (clause && clause.predicates.some((p) => p.isPolarQuestion)) question = true;
+      return { contexts, clause, finalParticles: finals, isQuestion: question };
+    }
+
+    reportLexicalIssues() {
+      for (const token of this.tokens) {
+        if (token.kind === 'unknown') {
+          this.report('unknownWord', [token],
+            token.suggestion
+              ? `„${token.original}“ steht nicht im Wortschatz. Meintest du „${token.suggestion}“?`
+              : `„${token.original}“ steht nicht im Wortschatz.`,
+            token.suggestion);
+        } else if (token.kind === 'malformedName') {
+          const message = PHONO_MESSAGE[token.problem.kind](token.problem.detail);
+          this.report('properNameNotTokiponized', [token],
+            `„${token.original}“ ist kein toki-pona-Name: ${message}`);
+        }
+      }
+    }
+
+    parseClause(from, to) {
+      if (from >= to) return null;
+
+      const oIndex = this.indexOfTopLevel('o', from, to);
+      if (oIndex !== null) return this.parseDirective(from, oIndex, to);
+
+      const liIndex = this.indexOfTopLevel('li', from, to);
+
+      if (liIndex === from) {
+        this.report('missingSubject', [this.tokens[liIndex]], 'Vor „li“ fehlt das Satzsubjekt.');
+      }
+      if (liIndex === from + 1 && this.isBarePronoun(this.tokens[from])) {
+        this.report('liAfterMiSina', [this.tokens[liIndex]],
+          `Nach „${this.tokens[from].text}“ als alleinigem Subjekt entfällt „li“.`,
+          this.tokens[from].text + ' ' + this.tokens.slice(from + 2, to).map((t) => t.text).join(' '));
+      }
+
+      let subjects = [], predicates = [];
+
+      if (liIndex !== null) {
+        if (liIndex > from) {
+          this.pos = from; this.limit = liIndex;
+          subjects = this.parseSubjectChain();
+          this.reportLeftovers(liIndex);
+        }
+        this.pos = liIndex; this.limit = to;
+        predicates = this.parsePredicateChain();
+      } else if (this.isBarePronoun(this.tokens[from])) {
+        this.pos = from; this.limit = Math.min(from + 1, to);
+        const subject = this.parseNounPhrase();
+        if (subject) subjects = [subject];
+        this.pos = from + 1; this.limit = to;
+        if (this.pos < to) {
+          predicates = [this.parsePredicate(null)];
+          predicates = predicates.concat(this.parsePredicateChain());
+        }
+      } else {
+        this.pos = from; this.limit = to;
+        subjects = this.parseSubjectChain();
+        if (this.pos < to) {
+          if (isParticle(this.tokens[this.pos], 'e')) {
+            this.report('missingLi', [this.tokens[this.pos]], 'Vor dem Prädikat fehlt „li“.',
+              this.correctionWithLi(from, to));
+            this.pos = to;
+            return { kind: 'declarative', subjects, predicates: [] };
+          }
+          this.reportLeftovers(to);
+        }
+        return { kind: 'fragment', subjects, predicates: [] };
+      }
+
+      return { kind: 'declarative', subjects, predicates };
+    }
+
+    parseDirective(from, oIndex, to) {
+      let subjects = [];
+      if (oIndex > from) {
+        this.pos = from; this.limit = oIndex;
+        subjects = this.parseSubjectChain();
+        this.reportLeftovers(oIndex);
+      }
+      const marker = this.tokens[oIndex];
+      this.pos = oIndex + 1; this.limit = to;
+      let predicates = [];
+      if (this.pos < to) {
+        predicates.push(this.parsePredicate(marker));
+        predicates = predicates.concat(this.parsePredicateChain());
+      }
+      if (!subjects.length && !predicates.length) {
+        this.report('vocativeWithoutContent', [marker],
+          '„o“ braucht eine Anrede davor oder einen Befehl danach.');
+      }
+      return { kind: predicates.length ? 'imperative' : 'vocative', subjects, predicates };
+    }
+
+    parseSubjectChain() {
+      const phrases = [];
+      const first = this.parseNounPhrase(true);
+      if (!first) return phrases;
+      phrases.push(first);
+      while (this.pos < this.limit
+             && (isParticle(this.tokens[this.pos], 'en') || isParticle(this.tokens[this.pos], 'anu'))) {
+        this.pos += 1;
+        const next = this.parseNounPhrase(true);
+        if (!next) break;
+        phrases.push(next);
+      }
+      return phrases;
+    }
+
+    chainsPredicate(token) {
+      return isParticle(token, 'li') || isParticle(token, 'anu');
+    }
+
+    parsePredicateChain() {
+      const predicates = [];
+      while (this.pos < this.limit && this.chainsPredicate(this.tokens[this.pos])) {
+        const marker = this.tokens[this.pos];
+        this.pos += 1;
+        if (this.pos < this.limit && isParticle(this.tokens[this.pos], 'li')) {
+          this.report('repeatedParticle', [this.tokens[this.pos]], '„li“ steht doppelt.');
+          continue;
+        }
+        predicates.push(this.parsePredicate(marker));
+      }
+      return predicates;
+    }
+
+    parsePredicate(marker) {
+      const preverbs = [];
+      let negated = false, polar = false;
+
+      while (this.pos < this.limit && isPreverb(this.tokens[this.pos])) {
+        const preverb = this.tokens[this.pos];
+        if (this.pos + 1 >= this.limit) break;
+        const next = this.tokens[this.pos + 1];
+        if (isBoundary(next)) break;
+        if (next.text === 'ala' && next.word) {
+          if (this.pos + 2 < this.limit && this.tokens[this.pos + 2].text === preverb.text) {
+            if (this.pos + 3 >= this.limit || isBoundary(this.tokens[this.pos + 3])) break;
+            polar = true;
+            preverbs.push({ token: preverb, isNegated: false });
+            this.pos += 3;
+            continue;
+          }
+          if (this.pos + 2 < this.limit && !isBoundary(this.tokens[this.pos + 2])) {
+            preverbs.push({ token: preverb, isNegated: true });
+            negated = true;
+            this.pos += 2;
+            continue;
+          }
+          break;
+        }
+        preverbs.push({ token: preverb, isNegated: false });
+        this.pos += 1;
+      }
+
+      let core = { kind: 'missing' };
+      if (this.pos < this.limit && isPreposition(this.tokens[this.pos])) {
+        core = { kind: 'prepositional', phrase: this.parsePrepositionalPhrase() };
+      } else if (this.pos < this.limit && !isBoundary(this.tokens[this.pos])) {
+        const phrase = this.parseNounPhrase();
+        if (phrase) core = { kind: 'phrase', phrase };
+      } else {
+        this.report('missingPredicate', marker ? [marker] : [],
+          marker ? `Nach „${marker.text}“ fehlt das Prädikat.` : 'Dem Satz fehlt das Prädikat.');
+      }
+
+      if (core.kind === 'phrase') {
+        const mods = core.phrase.modifiers;
+        mods.forEach((modifier, offset) => {
+          if (modifier.kind !== 'simple' || modifier.token.text !== 'ala' || !modifier.token.word) return;
+          const following = mods[offset + 1];
+          if (following && following.kind === 'simple'
+              && following.token.text === core.phrase.head.text) polar = true;
+          else negated = true;
+        });
+      }
+
+      const objects = [], prepositions = [];
+      while (this.pos < this.limit) {
+        const token = this.tokens[this.pos];
+        if (isParticle(token, 'e')) {
+          this.pos += 1;
+          if (this.pos < this.limit && isParticle(this.tokens[this.pos], 'e')) {
+            this.report('repeatedParticle', [this.tokens[this.pos]], '„e“ steht doppelt.');
+            continue;
+          }
+          const object = this.parseNounPhrase();
+          if (object) {
+            objects.push(object);
+            while (this.pos < this.limit && isParticle(this.tokens[this.pos], 'en')) {
+              this.pos += 1;
+              const further = this.parseNounPhrase();
+              if (!further) break;
+              objects.push(further);
+            }
+          } else {
+            this.report('objectWithoutNoun', [token], 'Nach „e“ fehlt das Objekt.');
+          }
+        } else if (isPreposition(token)) {
+          const phrase = this.parsePrepositionalPhrase();
+          if (phrase.object === null) {
+            if (objects.length) objects[objects.length - 1].modifiers.push({ kind: 'simple', token });
+            else if (core.kind === 'phrase') core.phrase.modifiers.push({ kind: 'simple', token });
+            else prepositions.push(phrase);
+          } else prepositions.push(phrase);
+        } else break;
+      }
+
+      if (this.pos < this.limit && !this.chainsPredicate(this.tokens[this.pos])) {
+        this.report('unexpectedToken', [this.tokens[this.pos]],
+          `„${this.tokens[this.pos].original}“ passt an dieser Stelle nicht in den Satzbau.`);
+        while (this.pos < this.limit && !this.chainsPredicate(this.tokens[this.pos])) this.pos += 1;
+      }
+
+      return { marker, preverbs, core, objects, prepositions, isNegated: negated, isPolarQuestion: polar };
+    }
+
+    parsePrepositionalPhrase() {
+      const preposition = this.tokens[this.pos];
+      this.pos += 1;
+      let object = null;
+      if (this.pos < this.limit && !isBoundary(this.tokens[this.pos])
+          && !isParticle(this.tokens[this.pos], 'pi')) {
+        object = this.parseNounPhrase();
+      }
+      return { preposition, object };
+    }
+
+    parseNounPhrase(allowPrepositionAsModifier = false) {
+      if (this.pos >= this.limit) return null;
+      const head = this.tokens[this.pos];
+
+      if (isBoundary(head) || isParticle(head, 'pi')) {
+        this.report('particleInPhrasePosition', [head],
+          `„${head.text}“ ist ein Partikel und kann keine Phrase anführen.`);
+        return null;
+      }
+      if (isProperName(head)) {
+        this.report('properNameAsHead', [head],
+          'Namen stehen als Beifügung hinter einem Wort wie jan, ma oder toki.',
+          `jan ${head.original}`);
+      }
+
+      this.pos += 1;
+      const modifiers = [];
+      let embedded = null;
+
+      if (head.followedByColon) {
+        embedded = this.parseEmbedded();
+        return { head, modifiers, embedded };
+      }
+
+      while (this.pos < this.limit) {
+        const token = this.tokens[this.pos];
+
+        if (isParticle(token, 'pi')) {
+          this.pos += 1;
+          const group = [];
+          while (this.pos < this.limit && !isBoundary(this.tokens[this.pos])
+                 && !isParticle(this.tokens[this.pos], 'pi') && canModify(this.tokens[this.pos])) {
+            group.push(this.tokens[this.pos]);
+            this.pos += 1;
+          }
+          if (!group.length) {
+            this.report('piWithoutContent', [token], 'Nach „pi“ fehlt die Wortgruppe.');
+          } else if (group.length === 1) {
+            this.report('piWithSingleWord', [token, group[0]],
+              '„pi“ gruppiert nur mehrwortige Beifügungen um; vor einem einzelnen Wort entfällt es.',
+              `${head.text} ${group[0].text}`);
+            modifiers.push({ kind: 'simple', token: group[0] });
+          } else {
+            modifiers.push({ kind: 'group', tokens: group });
+          }
+          continue;
+        }
+
+        if (isBoundary(token)) break;
+        if (isPreposition(token) && !allowPrepositionAsModifier) break;
+        if (!canModify(token)) break;
+
+        modifiers.push({ kind: 'simple', token });
+        this.pos += 1;
+
+        if (token.followedByColon) { embedded = this.parseEmbedded(); break; }
+      }
+
+      return { head, modifiers, embedded };
+    }
+
+    parseEmbedded() {
+      if (this.pos >= this.limit) return null;
+      const slice = this.tokens.slice(this.pos, this.limit);
+      this.pos = this.limit;
+      const engine = new Engine(slice);
+      engine.suppress = true;
+      const utterance = engine.run();
+      if (!utterance) return null;
+      this.violations = this.violations.concat(engine.violations);
+      return utterance;
+    }
+
+    indexOfTopLevel(particle, from, to) {
+      for (let index = from; index < to; index += 1) {
+        if (isParticle(this.tokens[index], particle)) return index;
+        if (this.tokens[index].followedByColon) return null;
+      }
+      return null;
+    }
+
+    isBarePronoun(token) {
+      return token.word !== null && token.word.roles.includes('pronoun')
+        && (token.text === 'mi' || token.text === 'sina');
+    }
+
+    reportLeftovers(bound) {
+      if (this.pos >= bound) return;
+      this.report('unexpectedToken', [this.tokens[this.pos]],
+        `„${this.tokens[this.pos].original}“ passt an dieser Stelle nicht in den Satzbau.`);
+      this.pos = bound;
+    }
+
+    correctionWithLi(from, to) {
+      const objectIndex = this.indexOfTopLevel('e', from, to);
+      if (objectIndex === null) return null;
+      const insertion = Math.max(from + 1, objectIndex - 1);
+      const words = this.tokens.slice(from, to).map((t) => t.text);
+      words.splice(insertion - from, 0, 'li');
+      return words.join(' ');
+    }
+  }
+
+  function parse(input) {
+    const tokens = tokenize(input);
+    const engine = new Engine(tokens);
+    const utterance = engine.run();
+    return { tokens, utterance, violations: engine.violations, isValid: !engine.violations.length };
+  }
+
+  // ---------------------------------------------------------------- Satzröntgen
+
+  const phraseTokens = (phrase) => {
+    const out = [phrase.head];
+    for (const modifier of phrase.modifiers) {
+      if (modifier.kind === 'group') out.push(...modifier.tokens);
+      else out.push(modifier.token);
+    }
+    return out;
+  };
+  const phraseText = (phrase) => phraseTokens(phrase).map((t) => t.text).join(' ');
+
+  function xray(utterance) {
+    if (!utterance) return [];
+    const spans = [];
+    const push = (tokens, role) => spans.push({
+      text: tokens.map((t) => t.text).join(' '), role, indices: tokens.map((t) => t.index),
+    });
+
+    for (const context of utterance.contexts) {
+      if (context.kind === 'phrase') push(phraseTokens(context.phrase), 'Kontext');
+      else spans.push(...clauseSpans(context.clause, true));
+    }
+    if (utterance.clause) spans.push(...clauseSpans(utterance.clause, false));
+    for (const particle of utterance.finalParticles) push([particle], 'Partikel');
+    return spans;
+
+    function clauseSpans(clause, contextual) {
+      const out = [];
+      const add = (tokens, role) => out.push({
+        text: tokens.map((t) => t.text).join(' '), role, indices: tokens.map((t) => t.index),
+      });
+      const vocative = clause.kind === 'vocative' || clause.kind === 'imperative';
+      for (const subject of clause.subjects) {
+        add(phraseTokens(subject), vocative ? 'Anrede' : (contextual ? 'Kontext' : 'Subjekt'));
+        if (subject.embedded) out.push(...xray(subject.embedded));
+      }
+      for (const predicate of clause.predicates) {
+        if (predicate.marker) {
+          add([predicate.marker], predicate.marker.text === 'o' ? 'Befehl' : 'Prädikat');
+        }
+        for (const preverb of predicate.preverbs) add([preverb.token], 'Präverb');
+        if (predicate.core.kind === 'phrase') {
+          add(phraseTokens(predicate.core.phrase), 'Verb');
+          if (predicate.core.phrase.embedded) out.push(...xray(predicate.core.phrase.embedded));
+        } else if (predicate.core.kind === 'prepositional') {
+          add([predicate.core.phrase.preposition], 'Verb');
+          if (predicate.core.phrase.object) add(phraseTokens(predicate.core.phrase.object), 'Ergänzung');
+        }
+        for (const object of predicate.objects) {
+          add(phraseTokens(object), 'Objekt');
+          if (object.embedded) out.push(...xray(object.embedded));
+        }
+        for (const prepositional of predicate.prepositions) {
+          add([prepositional.preposition], 'Präposition');
+          if (prepositional.object) add(phraseTokens(prepositional.object), 'Ergänzung');
+        }
+      }
+      return out;
+    }
+  }
+
+  return {
+    parse, tokenize, splitUtterances, xray, phonoCheck, suggest, editDistance,
+    lookup, phraseText, lexicon: LEX,
+  };
+})(TOKIPONA_DATA);
+
+
+</script>
+<script>
+// Prototyp des Übungsflows. Zeigt den Kernkreislauf des Plans:
+// bauen statt erkennen, sofortige Rückmeldung mit Satzröntgen, sichtbarer
+// Fortschritt — ohne Herzen und ohne Bestenliste.
+
+(function (DATA, TP) {
+  const KEY = 'o-toki-fortschritt-v1';
+  const GOAL = 40;
+  const CONCEPT_LABELS = {
+    c_mi_sina: 'mi und sina ohne li',
+    c_li: 'li vor dem Prädikat',
+    c_modifikator: 'Beifügung folgt dem Kopf',
+    c_e_objekt: 'e vor dem Objekt',
+    c_pi: 'pi gruppiert um',
+    c_la: 'la stellt Kontext voran',
+    c_praeposition: 'Präpositionen',
+    c_praeverb: 'Präverben',
+    c_frage: 'Fragen',
+    c_o: 'o für Anrede und Befehl',
+    c_namen: 'Namen',
+    c_ni: 'ni zeigt auf etwas',
+    c_en: 'en verbindet Subjekte',
+    c_zahlen: 'Zahlen',
+  };
+
+  // Die Kernfertigkeit von toki pona: ausdrücken, wofür es kein Wort gibt.
+  // Jede Umschreibung ist beim Bauen durch den Parser gelaufen.
+  const COMPOUNDS = [
+    { de: 'Auto', tp: 'tomo tawa', literal: 'sich bewegendes Haus' },
+    { de: 'Kaffee', tp: 'telo pimeja wawa', literal: 'dunkles starkes Wasser' },
+    { de: 'Computer', tp: 'ilo sona', literal: 'Wissens-Gerät' },
+    { de: 'Telefon', tp: 'ilo toki', literal: 'Sprech-Gerät' },
+    { de: 'Uhr', tp: 'ilo tenpo', literal: 'Zeit-Gerät' },
+    { de: 'Fahrrad', tp: 'ilo tawa', literal: 'Bewegungs-Gerät' },
+    { de: 'Brille', tp: 'len lukin', literal: 'Seh-Kleidung' },
+    { de: 'Bibliothek', tp: 'tomo lipu', literal: 'Dokumenten-Haus' },
+    { de: 'Restaurant', tp: 'tomo moku', literal: 'Essens-Haus' },
+    { de: 'Schule', tp: 'tomo sona', literal: 'Wissens-Haus' },
+    { de: 'Kino', tp: 'tomo pi sitelen tawa', literal: 'Haus der bewegten Bilder' },
+    { de: 'Musik', tp: 'kalama musi', literal: 'unterhaltsamer Klang' },
+    { de: 'Regen', tp: 'telo tan sewi', literal: 'Wasser von oben' },
+    { de: 'Bier', tp: 'telo nasa', literal: 'seltsames Wasser' },
+    { de: 'Suppe', tp: 'telo moku', literal: 'Ess-Wasser' },
+    { de: 'Arzt', tp: 'jan pi pona sijelo', literal: 'Mensch der Körper-Güte' },
+    { de: 'Lehrerin', tp: 'jan pi pana sona', literal: 'Mensch, der Wissen gibt' },
+    { de: 'Freund', tp: 'jan pona', literal: 'guter Mensch' },
+  ];
+
+  const app = document.getElementById('app');
+  const today = () => new Date().toISOString().slice(0, 10);
+
+  const blank = {
+    xp: 0, streak: 0, lastDay: null, dayXp: 0, done: {}, mastery: {}, seenWords: {}, srs: {},
+  };
+
+  // Lernschritte wie in bewährten Karteikartensystemen: erst zehn Minuten,
+  // dann Tage. Der kurze erste Schritt macht die Wiederholung schon in der
+  // ersten Sitzung sichtbar, statt sie auf morgen zu vertagen.
+  const MINUTE = 60000;
+  const DAY = 86400000;
+  const STEPS = [10 * MINUTE, DAY, 3 * DAY, 7 * DAY];
+
+  let state = load();
+  let session = null;
+  let tab = 'pfad';
+
+  function load() {
+    try {
+      const stored = JSON.parse(localStorage.getItem(KEY));
+      return stored ? Object.assign({}, blank, stored) : Object.assign({}, blank);
+    } catch (error) {
+      return Object.assign({}, blank);
+    }
+  }
+
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (error) { /* egal */ }
+  }
+
+  function level() { return Math.floor(state.xp / 100) + 1; }
+  function levelProgress() { return state.xp % 100; }
+
+  function award(points) {
+    const day = today();
+    if (state.lastDay !== day) {
+      // Schongang: ein verpasster Tag kostet einen Punkt, nicht die ganze Serie.
+      const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+      state.streak = state.lastDay === yesterday ? state.streak + 1 : Math.max(1, state.streak - 1);
+      state.lastDay = day;
+      state.dayXp = 0;
+    }
+    state.xp += points;
+    state.dayXp += points;
+    save();
+  }
+
+  function schedule(key, correct) {
+    const now = Date.now();
+    const card = state.srs[key] || { reps: 0, interval: 0, ease: 2.5, due: now };
+    if (correct) {
+      card.reps += 1;
+      if (card.reps <= STEPS.length) card.interval = STEPS[card.reps - 1];
+      else card.interval = Math.round(card.interval * card.ease);
+      card.ease = Math.min(2.8, card.ease + 0.05);
+    } else {
+      card.reps = 0;
+      card.interval = STEPS[0];
+      card.ease = Math.max(1.4, card.ease - 0.2);
+    }
+    card.due = now + card.interval;
+    state.srs[key] = card;
+  }
+
+  const dueKeys = () => {
+    const now = Date.now();
+    return Object.keys(state.srs).filter((key) => state.srs[key].due <= now);
+  };
+
+  function taskFromKey(key) {
+    const [kind, rest] = [key.slice(0, 1), key.slice(2)];
+    if (kind === 'w') {
+      const lesson = DATA.lessons.find((l) => l.words.includes(rest)) || DATA.lessons[0];
+      return TP.lexicon[rest] ? { type: 'word', word: rest, lesson, concepts: [] } : null;
+    }
+    if (kind === 'c') {
+      const compound = COMPOUNDS[Number(rest)];
+      return compound ? { type: 'compound', compound, lesson: DATA.lessons[0], concepts: [] } : null;
+    }
+    for (const lesson of DATA.lessons) {
+      const item = lesson.items.find((i) => i.id === rest);
+      if (item) {
+        return { type: item.direction === 'de_tp' ? 'build' : 'choose', item, lesson,
+                 concepts: lessonConcepts(lesson) };
+      }
+    }
+    return null;
+  }
+
+  function keyOf(task) {
+    if (task.type === 'word') return 'w:' + task.word;
+    if (task.type === 'compound') return 'c:' + COMPOUNDS.indexOf(task.compound);
+    if (task.item) return 's:' + task.item.id;
+    return null;
+  }
+
+  function bumpMastery(concepts, correct) {
+    for (const concept of concepts || []) {
+      const value = state.mastery[concept] || 0;
+      state.mastery[concept] = Math.max(0, Math.min(1, value + (correct ? 0.12 : -0.08)));
+    }
+  }
+
+  const lessonOf = (number) => DATA.lessons.find((l) => l.number === number);
+  const unlocked = (number) => number === DATA.lessons[0].number
+    || Boolean(state.done[DATA.lessons[DATA.lessons.findIndex((l) => l.number === number) - 1].number]);
+
+  // ------------------------------------------------------------ Aufgabenbau
+
+  const shuffle = (list) => {
+    const out = list.slice();
+    for (let i = out.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
+    return out;
+  };
+
+  function buildSession(lesson) {
+    const builds = shuffle(lesson.items.filter((i) => i.direction === 'de_tp'));
+    const reads = shuffle(lesson.items.filter((i) => i.direction === 'tp_de'));
+    const words = shuffle(lesson.words.filter((w) => TP.lexicon[w]));
+    const tasks = [];
+
+    words.slice(0, 2).forEach((word) => tasks.push({ type: 'word', word, lesson, concepts: [] }));
+    builds.slice(0, 3).forEach((item) =>
+      tasks.push({ type: 'build', item, lesson, concepts: lessonConcepts(lesson) }));
+    reads.slice(0, 2).forEach((item) =>
+      tasks.push({ type: 'choose', item, lesson, concepts: lessonConcepts(lesson) }));
+
+    const flawed = brokenSentence(lesson);
+    if (flawed) tasks.push({ type: 'fix', flawed, lesson, concepts: [flawed.violation.concept].filter(Boolean) });
+
+    const compound = availableCompounds(lesson)[0];
+    if (compound) tasks.push({ type: 'compound', compound, lesson, concepts: [] });
+
+    if (builds[3]) tasks.push({ type: 'free', item: builds[3], lesson, concepts: lessonConcepts(lesson) });
+
+    return {
+      lesson,
+      queue: tasks.length ? tasks : builds.slice(0, 4).map((item) => ({ type: 'build', item, lesson, concepts: [] })),
+      index: 0,
+      correct: 0,
+      total: 0,
+      xp: 0,
+      retried: new Set(),
+    };
+  }
+
+  function buildReviewSession() {
+    const tasks = shuffle(dueKeys()).map(taskFromKey).filter(Boolean).slice(0, 12);
+    return {
+      lesson: null, review: true, queue: tasks, index: 0, correct: 0, total: 0, xp: 0,
+      retried: new Set(),
+    };
+  }
+
+  // Umschreibungen, deren Wörter die Lernende schon kennt.
+  function availableCompounds(lesson) {
+    const known = new Set(DATA.lessons.filter((l) => l.number <= lesson.number).flatMap((l) => l.words));
+    return shuffle(COMPOUNDS.filter((compound) =>
+      TP.tokenize(compound.tp).every((token) => token.text === 'pi' || known.has(token.text))));
+  }
+
+  // Fehlersätze entstehen aus richtigen: eine Regel gezielt verletzen und vom
+  // Parser bestätigen lassen, dass genau sie anschlägt. Kein Handbetrieb.
+  const MUTATIONS = [
+    { rule: 'liAfterMiSina', apply: (words) =>
+        (['mi', 'sina'].includes(words[0]) && words[1] !== 'li' ? [words[0], 'li', ...words.slice(1)] : null) },
+    { rule: 'missingLi', apply: (words) =>
+        (words.includes('li') && words.includes('e') && !['mi', 'sina'].includes(words[0])
+          ? words.filter((w, i) => i !== words.indexOf('li')) : null) },
+    { rule: 'piWithSingleWord', apply: (words) =>
+        (words.length > 2 && !words.includes('pi') && !TP.lexicon[words[1]]?.roles.includes('particle')
+          ? [words[0], 'pi', ...words.slice(1)] : null) },
+  ];
+
+  function brokenSentence(lesson) {
+    for (const item of shuffle(lesson.items)) {
+      const words = TP.tokenize(item.tp).map((t) => t.text);
+      for (const mutation of shuffle(MUTATIONS)) {
+        const broken = mutation.apply(words);
+        if (!broken) continue;
+        const result = TP.parse(broken.join(' ') + '.');
+        if (result.violations.length !== 1) continue;
+        if (result.violations[0].rule !== mutation.rule) continue;
+        return { words: broken, correct: item.tp, violation: result.violations[0] };
+      }
+    }
+    return null;
+  }
+
+  function lessonConcepts(lesson) {
+    const map = {
+      1: ['c_mi_sina', 'c_li'], 2: ['c_modifikator'], 3: ['c_e_objekt'], 4: ['c_e_objekt'],
+      5: ['c_ni', 'c_en'], 6: ['c_praeposition'], 7: ['c_frage', 'c_o', 'c_namen'],
+      8: ['c_modifikator'], 9: ['c_pi', 'c_la'], 10: ['c_praeverb'], 11: ['c_zahlen'], 12: [],
+    };
+    return map[lesson.number] || [];
+  }
+
+  function distractorWords(lesson, exclude, count) {
+    const pool = DATA.lessons
+      .filter((l) => l.number <= lesson.number)
+      .flatMap((l) => l.words)
+      .filter((w) => !exclude.includes(w) && TP.lexicon[w]);
+    return shuffle([...new Set(pool)]).slice(0, count);
+  }
+
+  // ------------------------------------------------------------ Darstellung
+
+  const el = (html) => {
+    const template = document.createElement('template');
+    template.innerHTML = html.trim();
+    return template.content.firstElementChild;
+  };
+  const escape = (text) => String(text).replace(/[&<>"]/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function render() {
+    app.innerHTML = '';
+    if (session) { renderSession(); return; }
+    app.append(topbar());
+    if (tab === 'pfad') app.append(pathScreen());
+    else if (tab === 'nimi') app.append(wordScreen());
+    else app.append(sandboxScreen());
+    app.append(tabs());
+  }
+
+  function topbar() {
+    const bar = el(`
+      <div>
+        <div class="topbar">
+          <div class="level"><div class="ring">${level()}</div><span>Stufe</span></div>
+          <div class="metric spacer gold"><b>${state.dayXp}</b>/${GOAL} XP heute</div>
+          <div class="metric"><b>${state.streak}</b> Tage</div>
+        </div>
+        <div class="goalbar"><span style="width:${Math.min(100, (state.dayXp / GOAL) * 100)}%"></span></div>
+      </div>`);
+    return bar;
+  }
+
+  function tabs() {
+    const bar = el(`
+      <nav class="tabs">
+        <button data-tab="pfad"><span class="glyph">◈</span>nasin</button>
+        <button data-tab="nimi"><span class="glyph">◍</span>nimi</button>
+        <button data-tab="toki"><span class="glyph">◐</span>o toki</button>
+      </nav>`);
+    bar.querySelectorAll('button').forEach((button) => {
+      button.dataset.active = button.dataset.tab === tab;
+      button.onclick = () => { tab = button.dataset.tab; render(); };
+    });
+    return bar;
+  }
+
+  function pathScreen() {
+    const next = DATA.lessons.find((l) => !state.done[l.number]) || DATA.lessons[DATA.lessons.length - 1];
+    const screen = el(`
+      <div class="screen">
+        <div class="hello">
+          <h1>o kama pona!</h1>
+          <p>${state.xp ? `Weiter bei „${escape(next.title)}“.`
+                        : 'Zwölf Lektionen. Du baust Sätze, statt Vokabeln abzuhaken.'}</p>
+        </div>
+        <div class="path"></div>
+      </div>`);
+
+    const due = dueKeys().length;
+    if (due) {
+      const card = el(`
+        <button class="lesson review" data-state="current">
+          <span class="badge">↻</span>
+          <span class="body">
+            <b>${due} ${due === 1 ? 'Karte' : 'Karten'} fällig</b>
+            <span>wörter, sätze und umschreibungen von vorher</span>
+          </span>
+        </button>`);
+      card.onclick = () => { session = buildReviewSession(); render(); };
+      screen.querySelector('.hello').after(card);
+    }
+
+    const path = screen.querySelector('.path');
+    DATA.lessons.forEach((lesson) => {
+      const open = unlocked(lesson.number);
+      const done = Boolean(state.done[lesson.number]);
+      const stateName = done ? 'done' : (open ? (lesson.number === next.number ? 'current' : 'open') : 'locked');
+      const card = el(`
+        <button class="lesson" data-state="${stateName}">
+          <span class="badge">${done ? '✓' : lesson.number}</span>
+          <span class="body">
+            <b>${escape(lesson.title)}</b>
+            <span>${lesson.words.slice(0, 5).join(' · ')}</span>
+          </span>
+          <span class="dots">${lesson.words.map((word) =>
+            `<i class="${state.seenWords[word] ? 'on' : ''}"></i>`).join('')}</span>
+        </button>`);
+      if (open) card.onclick = () => { session = buildSession(lesson); render(); };
+      else card.disabled = true;
+      path.append(card);
+    });
+
+    const active = Object.keys(state.mastery);
+    if (active.length) {
+      const card = el('<div class="card"><h2>konzepte</h2><div class="concepts"></div></div>');
+      const list = card.querySelector('.concepts');
+      active.sort((a, b) => state.mastery[b] - state.mastery[a]).forEach((concept) => {
+        list.append(el(`
+          <div class="concept">
+            <span>${escape(CONCEPT_LABELS[concept] || concept)}</span>
+            <span class="bar"><i style="width:${Math.round(state.mastery[concept] * 100)}%"></i></span>
+          </div>`));
+      });
+      screen.append(card);
+    }
+
+    screen.append(el(`
+      <p class="foot">
+        Prototyp. Übungssätze aus <a href="https://lipu-sona.pona.la/de/">lipu sona pona</a>
+        (MIT, © 2020 /dev/urandom und Mitwirkende), geprüft von TokiPonaKit.
+      </p>`));
+    return screen;
+  }
+
+  // ------------------------------------------------------------ Übungslauf
+
+  function renderSession() {
+    if (session.index >= session.queue.length) { renderDone(); return; }
+    const task = session.queue[session.index];
+
+    const head = el(`
+      <div class="exbar">
+        <button aria-label="Abbrechen">✕</button>
+        <span class="track"><i style="width:${(session.index / session.queue.length) * 100}%"></i></span>
+        <span class="metric">✓ <b>${session.correct}</b></span>
+      </div>`);
+    head.querySelector('button').onclick = () => { session = null; render(); };
+    app.append(head);
+
+    if (task.type === 'word') app.append(wordTask(task));
+    else if (task.type === 'build') app.append(buildTask(task));
+    else if (task.type === 'choose') app.append(chooseTask(task));
+    else if (task.type === 'fix') app.append(fixTask(task));
+    else if (task.type === 'compound') app.append(compoundTask(task));
+    else app.append(freeTask(task));
+  }
+
+  function screenWith(inner) {
+    return el(`<div class="screen">${inner}</div>`);
+  }
+
+  function wordTask(task) {
+    const entry = TP.lexicon[task.word];
+    const right = entry.glosses.slice(0, 3).join(', ');
+    const options = shuffle([right, ...distractorWords(task.lesson, [task.word], 3)
+      .map((w) => TP.lexicon[w].glosses.slice(0, 3).join(', '))]);
+
+    const screen = screenWith(`
+      <p class="prompt">was heißt das wort?</p>
+      <h2 class="question tp">${escape(task.word)}</h2>
+      <div class="choices"></div>
+      <div class="actions"><button class="primary" disabled>Prüfen</button></div>`);
+
+    let picked = null;
+    const list = screen.querySelector('.choices');
+    const button = screen.querySelector('.primary');
+    options.forEach((option) => {
+      const choice = el(`<button class="choice">${escape(option)}</button>`);
+      choice.onclick = () => {
+        picked = option;
+        list.querySelectorAll('.choice').forEach((c) => { c.dataset.picked = 'false'; });
+        choice.dataset.picked = 'true';
+        button.disabled = false;
+      };
+      list.append(choice);
+    });
+
+    button.onclick = () => {
+      state.seenWords[task.word] = true;
+      finish(task, picked === right, {
+        solution: `${task.word} — ${right}`,
+        xray: null,                     // eine Wortbedeutung hat keinen Satzbau
+        reason: picked === right ? null
+          : `<b>${escape(task.word)}</b> deckt: ${escape(entry.glosses.join(', '))}.`,
+      });
+    };
+    return screen;
+  }
+
+  function chooseTask(task) {
+    const right = task.item.de[0];
+    const pool = task.lesson.items
+      .filter((i) => i.id !== task.item.id)
+      .flatMap((i) => i.de)
+      .filter((text) => text !== right);
+    const options = shuffle([right, ...shuffle(pool).slice(0, 2)]);
+
+    const screen = screenWith(`
+      <p class="prompt">was bedeutet der satz?</p>
+      <h2 class="question tp">${escape(task.item.tp)}</h2>
+      <div class="choices"></div>
+      <div class="actions"><button class="primary" disabled>Prüfen</button></div>`);
+
+    let picked = null;
+    const list = screen.querySelector('.choices');
+    const button = screen.querySelector('.primary');
+    options.forEach((option) => {
+      const choice = el(`<button class="choice">${escape(option)}</button>`);
+      choice.onclick = () => {
+        picked = option;
+        list.querySelectorAll('.choice').forEach((c) => { c.dataset.picked = 'false'; });
+        choice.dataset.picked = 'true';
+        button.disabled = false;
+      };
+      list.append(choice);
+    });
+
+    button.onclick = () => finish(task, picked === right, {
+      solution: right,
+      xray: task.item.tp,
+    });
+    return screen;
+  }
+
+  // Fehlersuche: das falsche Wort antippen. Die Stelle kommt aus dem Parser,
+  // nicht aus einer Handliste — deshalb stimmt sie immer.
+  function fixTask(task) {
+    const screen = screenWith(`
+      <p class="prompt">hier stimmt ein wort nicht — tipp es an</p>
+      <div class="pickline"></div>
+      <p class="hint">Ein Wort steht zu viel oder fehlt an dieser Stelle.</p>
+      <div class="actions"><button class="primary" disabled>Prüfen</button></div>`);
+
+    const line = screen.querySelector('.pickline');
+    const button = screen.querySelector('.primary');
+    let picked = null;
+
+    task.flawed.words.forEach((word, index) => {
+      const chip = el(`<button class="tile">${escape(word)}</button>`);
+      chip.onclick = () => {
+        picked = index;
+        line.querySelectorAll('.tile').forEach((t) => t.classList.remove('placed'));
+        chip.classList.add('placed');
+        button.disabled = false;
+      };
+      line.append(chip);
+    });
+
+    button.onclick = () => {
+      const wanted = task.flawed.violation.tokenIndices;
+      const correct = wanted.includes(picked);
+      finish(task, correct, {
+        solution: task.flawed.correct,
+        xray: task.flawed.correct,
+        reason: escape(task.flawed.violation.message),
+      });
+    };
+    return screen;
+  }
+
+  // Umschreiben: der Kern der Sprache. Nicht „wie heißt Kaffee“, sondern
+  // „wie drückst du Kaffee mit 120 Wörtern aus“.
+  function compoundTask(task) {
+    const right = task.compound;
+    const options = shuffle([right, ...shuffle(COMPOUNDS.filter((c) => c !== right)).slice(0, 2)]);
+
+    const screen = screenWith(`
+      <p class="prompt">dafür gibt es kein wort — wie sagst du es?</p>
+      <h2 class="question">${escape(right.de)}</h2>
+      <div class="choices"></div>
+      <div class="actions"><button class="primary" disabled>Prüfen</button></div>`);
+
+    let picked = null;
+    const list = screen.querySelector('.choices');
+    const button = screen.querySelector('.primary');
+    options.forEach((option) => {
+      const choice = el(`<button class="choice tp">${escape(option.tp)}</button>`);
+      choice.onclick = () => {
+        picked = option;
+        list.querySelectorAll('.choice').forEach((c) => { c.dataset.picked = 'false'; });
+        choice.dataset.picked = 'true';
+        button.disabled = false;
+      };
+      list.append(choice);
+    });
+
+    button.onclick = () => finish(task, picked === right, {
+      solution: right.tp,
+      xray: right.tp,
+      reason: `<b>${escape(right.tp)}</b> — wörtlich: ${escape(right.literal)}.`,
+    });
+    return screen;
+  }
+
+  function buildTask(task) {
+    const solution = TP.tokenize(task.item.tp).map((t) => t.text);
+    const extras = distractorWords(task.lesson, solution, Math.min(3, Math.max(2, 6 - solution.length)));
+    const bank = shuffle(solution.concat(extras));
+
+    const screen = screenWith(`
+      <p class="prompt">bau den satz</p>
+      <h2 class="question">${escape(task.item.de[0])}</h2>
+      <div class="slot"></div>
+      <div class="bank"></div>
+      <div class="actions"><button class="primary" disabled>Prüfen</button></div>`);
+
+    const slot = screen.querySelector('.slot');
+    const bankRow = screen.querySelector('.bank');
+    const button = screen.querySelector('.primary');
+    const chosen = [];
+
+    const sync = () => {
+      slot.innerHTML = '';
+      chosen.forEach((word, position) => {
+        const tile = el(`<button class="tile placed">${escape(word)}</button>`);
+        tile.onclick = () => {
+          chosen.splice(position, 1);
+          sync();
+        };
+        slot.append(tile);
+      });
+      bankRow.querySelectorAll('.tile').forEach((tile) => {
+        const used = chosen.filter((w) => w === tile.dataset.word).length;
+        const available = bank.filter((w) => w === tile.dataset.word).length;
+        tile.classList.toggle('used', Number(tile.dataset.slot) < used || used >= available);
+      });
+      button.disabled = chosen.length === 0;
+    };
+
+    bank.forEach((word, position) => {
+      const tile = el(`<button class="tile" data-word="${escape(word)}" data-slot="${position}">${escape(word)}</button>`);
+      tile.onclick = () => { chosen.push(word); sync(); };
+      bankRow.append(tile);
+    });
+    sync();
+
+    button.onclick = () => {
+      const answer = chosen.join(' ');
+      const accepted = [task.item.tp, ...task.item.also]
+        .map((s) => TP.tokenize(s).map((t) => t.text).join(' '));
+      const correct = accepted.includes(answer);
+      finish(task, correct, {
+        solution: task.item.tp,
+        xray: answer || task.item.tp,
+        grade: correct ? null : grade(answer, task.item),
+      });
+    };
+    return screen;
+  }
+
+  function freeTask(task) {
+    const screen = screenWith(`
+      <p class="prompt">schreib es selbst — freie eingabe</p>
+      <h2 class="question">${escape(task.item.de[0])}</h2>
+      <input class="typed" autocomplete="off" autocapitalize="off" spellcheck="false"
+             placeholder="toki pona …" aria-label="Deine Antwort">
+      <p class="live"></p>
+      <p class="hint">Der Parser prüft den Satzbau, während du tippst. Andere Wortwahl als
+        die Musterlösung ist in Ordnung, solange die Grammatik stimmt.</p>
+      <div class="actions"><button class="primary" disabled>Prüfen</button></div>`);
+
+    const input = screen.querySelector('.typed');
+    const live = screen.querySelector('.live');
+    const button = screen.querySelector('.primary');
+
+    input.oninput = () => {
+      const text = input.value.trim();
+      button.disabled = !text;
+      if (!text) { live.textContent = ''; live.className = 'live'; return; }
+      const result = TP.parse(text);
+      if (result.isValid) {
+        live.textContent = '✓ Satzbau in Ordnung';
+        live.className = 'live good';
+      } else {
+        live.textContent = '• ' + result.violations[0].message;
+        live.className = 'live bad';
+      }
+    };
+    input.onkeydown = (event) => { if (event.key === 'Enter' && !button.disabled) button.click(); };
+
+    button.onclick = () => {
+      const answer = input.value.trim();
+      const verdict = grade(answer, task.item);
+      finish(task, verdict.correct, {
+        solution: task.item.tp,
+        xray: answer || task.item.tp,
+        grade: verdict,
+      });
+    };
+    setTimeout(() => input.focus(), 50);
+    return screen;
+  }
+
+  // ------------------------------------------------------------ Bewertung
+
+  // Schichten aus Plan, Abschnitt 6: normalisieren, strukturell parsen,
+  // gegen Musterlösung und Pflichtbausteine abgleichen.
+  function grade(answer, item) {
+    const normalise = (text) => TP.tokenize(text).map((t) => t.text).join(' ');
+    const accepted = [item.tp, ...item.also].map(normalise);
+    const given = normalise(answer);
+
+    if (accepted.includes(given)) return { correct: true, exact: true, violations: [] };
+
+    const result = TP.parse(answer);
+    if (!result.isValid) {
+      return { correct: false, exact: false, violations: result.violations, utterance: result.utterance };
+    }
+
+    // Grammatisch sauber: zählt, wenn die tragenden Inhaltswörter vorkommen.
+    const content = TP.tokenize(item.tp)
+      .filter((t) => t.word && !t.word.roles.includes('particle') && !t.word.roles.includes('pronoun'))
+      .map((t) => t.text);
+    const mine = new Set(TP.tokenize(answer).map((t) => t.text));
+    const missing = content.filter((word) => !mine.has(word));
+
+    if (!missing.length) {
+      return { correct: true, exact: false, variant: true, violations: [], utterance: result.utterance };
+    }
+    return {
+      correct: false, exact: false, violations: [], utterance: result.utterance,
+      missing,
+    };
+  }
+
+  function finish(task, correct, detail) {
+    session.total += 1;
+    if (correct) {
+      session.correct += 1;
+      const points = session.retried.has(session.index) ? 5 : 10;
+      session.xp += points;
+      award(points);
+    } else if ((task.attempts || 0) < 1) {
+      // Ein zweiter Anlauf in derselben Sitzung, mehr nicht. Danach ist es
+      // Sache des Wiederholungssystems — niemand soll festhängen.
+      task.attempts = 1;
+      session.retried.add(session.queue.length);
+      session.queue.push(task);
+    } else {
+      task.attempts = 2;
+    }
+    const key = keyOf(task);
+    if (key) schedule(key, correct);
+    bumpMastery(task.concepts, correct);
+    save();
+    showSheet(correct, Object.assign({ parked: task.attempts === 2 }, detail));
+  }
+
+  function showSheet(correct, detail) {
+    const sheet = el(`
+      <div class="sheet">
+        <div class="verdict ${correct ? 'good' : 'bad'}">
+          <span class="mark">${correct ? '✓' : '✕'}</span>
+          <span>${correct
+            ? (detail.grade && detail.grade.variant ? 'Richtig — andere Wortwahl, gleiche Aussage' : 'pona!')
+            : 'Noch nicht'}</span>
+        </div>
+      </div>`);
+
+    if (detail.grade && detail.grade.violations && detail.grade.violations.length) {
+      const violation = detail.grade.violations[0];
+      sheet.append(el(`
+        <div class="violation">
+          ${escape(violation.message)}
+          ${violation.correction ? `<br><code>→ ${escape(violation.correction)}</code>` : ''}
+        </div>`));
+    } else if (detail.grade && detail.grade.missing) {
+      sheet.append(el(`<p class="reason">Satzbau stimmt, aber es fehlt:
+        <code>${detail.grade.missing.map(escape).join(', ')}</code></p>`));
+    } else if (detail.reason) {
+      sheet.append(el(`<p class="reason">${detail.reason}</p>`));
+    }
+
+    if (!correct || (detail.grade && detail.grade.variant)) {
+      sheet.append(el(`<p class="reason">Musterlösung: <span class="solution">${escape(detail.solution)}</span></p>`));
+    }
+    if (!correct && detail.parked) {
+      sheet.append(el('<p class="hint">Kommt in einer der nächsten Wiederholungen zurück.</p>'));
+    }
+
+    if (detail.xray) {
+      const spans = TP.xray(TP.parse(detail.xray).utterance);
+      if (spans.length) {
+        sheet.append(el(`<div class="xray">${spans.map((span) => `
+          <span class="span" data-role="${escape(span.role)}">
+            <b>${escape(span.text)}</b><i>${escape(span.role)}</i>
+          </span>`).join('')}</div>`));
+      }
+    }
+
+    const next = el(`<button class="primary">${correct ? 'Weiter' : 'Verstanden'}</button>`);
+    next.onclick = () => { session.index += 1; render(); };
+    sheet.append(next);
+    app.append(sheet);
+    next.focus();
+  }
+
+  function renderDone() {
+    const lesson = session.lesson;
+    const review = Boolean(session.review);
+    if (lesson) {
+      state.done[lesson.number] = true;
+      lesson.words.forEach((word) => { state.seenWords[word] = true; });
+    }
+    save();
+
+    const screen = el(`
+      <div class="screen done">
+        <div class="burst">pona!</div>
+        <h2>${escape(review ? 'Wiederholung geschafft' : lesson.title)}</h2>
+        <p>${escape(review
+          ? 'Die Karten kommen wieder, wenn es Zeit dafür ist.'
+          : lesson.note.replace(/<[^>]+>/g, ''))}</p>
+        <div class="tally">
+          <div><b>+${session.xp}</b><span>xp</span></div>
+          <div><b>${session.correct}</b><span>richtig</span></div>
+          <div><b>${review ? session.queue.length : lesson.words.length}</b><span>${review ? 'karten' : 'wörter'}</span></div>
+        </div>
+        <div class="actions">
+          <button class="primary">Weiter</button>
+          ${review ? '' : '<button class="ghost">Nochmal üben</button>'}
+        </div>
+      </div>`);
+
+    screen.querySelector('.primary').onclick = () => { session = null; tab = 'pfad'; render(); };
+    if (!review) {
+      screen.querySelector('.ghost').onclick = () => { session = buildSession(lesson); render(); };
+    }
+    app.append(topbar());
+    app.append(screen);
+  }
+
+  // ------------------------------------------------------------ Wörter
+
+  function wordScreen() {
+    const screen = screenWith(`
+      <input class="search" placeholder="Wort oder Bedeutung suchen …" aria-label="Suche">
+      <div class="words"></div>`);
+    const list = screen.querySelector('.words');
+    const input = screen.querySelector('.search');
+
+    const draw = (query) => {
+      list.innerHTML = '';
+      const term = query.trim().toLowerCase();
+      Object.keys(TP.lexicon).sort().forEach((word) => {
+        const entry = TP.lexicon[word];
+        const text = entry.glosses.join(', ');
+        if (term && !word.includes(term) && !text.toLowerCase().includes(term)) return;
+        list.append(el(`
+          <div class="word">
+            <b>${escape(word)}</b>
+            <span>${escape(text)}</span>
+            <em>${entry.book === 'pu' ? 'pu' : 'ku'}${state.seenWords[word] ? ' ✓' : ''}</em>
+          </div>`));
+      });
+    };
+    input.oninput = () => draw(input.value);
+    draw('');
+    return screen;
+  }
+
+  // ------------------------------------------------------------ Sandkasten
+
+  function sandboxScreen() {
+    const screen = screenWith(`
+      <div class="hello">
+        <h1>o toki!</h1>
+        <p>Schreib irgendetwas auf toki pona. Der Parser zerlegt es und sagt dir,
+           was er sieht — oder was nicht stimmt.</p>
+      </div>
+      <input class="typed" autocomplete="off" autocapitalize="off" spellcheck="false"
+             value="jan suli li pana e lipu tawa mi." aria-label="Satz">
+      <div class="result"></div>`);
+
+    const input = screen.querySelector('.typed');
+    const result = screen.querySelector('.result');
+
+    const draw = () => {
+      result.innerHTML = '';
+      const text = input.value.trim();
+      if (!text) return;
+      TP.splitUtterances(text).forEach((utterance) => {
+        const parsed = TP.parse(utterance);
+        const card = el('<div class="card" style="margin-top:0.8rem"></div>');
+        const spans = TP.xray(parsed.utterance);
+        if (spans.length) {
+          card.append(el(`<div class="xray">${spans.map((span) => `
+            <span class="span" data-role="${escape(span.role)}">
+              <b>${escape(span.text)}</b><i>${escape(span.role)}</i>
+            </span>`).join('')}</div>`));
+        }
+        if (parsed.isValid) {
+          card.append(el(`<p class="reason" style="margin-top:0.7rem;color:var(--accent)">
+            ✓ Satzbau in Ordnung${parsed.utterance && parsed.utterance.isQuestion ? ' — eine Frage' : ''}</p>`));
+        } else {
+          parsed.violations.forEach((violation) => {
+            card.append(el(`
+              <div class="violation" style="margin-top:0.7rem">
+                ${escape(violation.message)}
+                ${violation.correction ? `<br><code>→ ${escape(violation.correction)}</code>` : ''}
+                ${violation.concept ? `<br><code>${escape(CONCEPT_LABELS[violation.concept] || violation.concept)}</code>` : ''}
+              </div>`));
+          });
+        }
+        result.append(card);
+      });
+    };
+
+    input.oninput = draw;
+    draw();
+
+    screen.append(el(`
+      <p class="foot" style="padding-top:1rem">
+        Probier: <code>mi li moku.</code> · <code>jan pi pona li lape.</code> ·
+        <code>soweli moku e kili.</code> · <code>jan Claude li pona.</code>
+      </p>`));
+    return screen;
+  }
+
+  render();
+})(TOKIPONA_DATA, TokiPona);
+
+</script>
+
+<script>
+// Nur auf der gehosteten Seite: dort macht der Service Worker die App
+// offline verfügbar. In einer eingebetteten Vorschau bleibt er aus.
+if ('serviceWorker' in navigator && window.self === window.top
+    && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
