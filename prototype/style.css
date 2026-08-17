@@ -238,6 +238,35 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 .concept .bar i { display: block; height: 100%; background: var(--accent); transition: width 0.5s ease; }
 .concept code { font-family: var(--mono); font-size: 0.75rem; color: var(--ink-faint); }
 
+.row { display: flex; gap: 0.5rem; margin-top: 0.7rem; }
+.row .ghost { flex: 1; }
+
+.drawer { display: flex; flex-direction: column; gap: 0.5rem; }
+.drawer:not(:empty) { margin-top: 0.6rem; }
+.drawer .hint.good { color: var(--accent); }
+.drawer .hint.bad { color: var(--wrong); }
+.drawer .preview { display: flex; flex-direction: column; gap: 0.5rem; }
+.drawer .preview:not(:empty) { margin-top: 0.6rem; }
+
+/* Der eigene Knopf statt „Choose File“ — die Beschriftung des Browsers
+   lässt sich nicht übersetzen. */
+.pickwrap { display: block; text-align: center; }
+.pick { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.pickwrap:focus-within { outline: 2px dashed var(--accent); outline-offset: 3px; }
+
+.paste {
+  width: 100%;
+  margin-top: 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 0.5rem;
+  background: var(--ground);
+  color: var(--ink);
+  resize: vertical;
+}
+
 /* ---------------- Übung ---------------- */
 
 .exbar {
