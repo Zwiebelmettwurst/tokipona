@@ -6,6 +6,7 @@
 Die Artefakt-Umgebung erlaubt keine externen Dateien, deshalb landen Stil,
 Daten, Parser und Anwendung inline in docs/prototype.html.
 """
+import base64
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -23,6 +24,7 @@ TEMPLATE = """<title>o toki!</title>
 <meta name="apple-mobile-web-app-title" content="o toki!">
 
 <style>
+/*__FONT__*/
 /*__STYLE__*/
 </style>
 
@@ -51,6 +53,15 @@ if ('serviceWorker' in navigator && window.self === window.top
 """
 
 
+FONT = """/* linja pimeja 1.9 — jan Inkepa, CC0. Siehe prototype/SCHRIFT.md.
+   Eingebettet, weil die Artefakt-Umgebung keine externen Dateien lädt. */
+@font-face {
+  font-family: 'linja pimeja';
+  src: url(data:font/woff2;base64,__BASE64__) format('woff2');
+  font-display: swap;
+}"""
+
+
 def main():
     data = (HERE / "data.js").read_text()
     parser = (HERE / "tokipona.js").read_text()
@@ -66,8 +77,11 @@ def main():
         "})(typeof TOKIPONA_DATA !== 'undefined' ? TOKIPONA_DATA : require('./data.js'));",
         "})(TOKIPONA_DATA);")
 
+    font = FONT.replace("__BASE64__",
+                        base64.b64encode((HERE / "linja-pimeja-1.9.woff2").read_bytes()).decode())
+
     page = TEMPLATE
-    for marker, payload in (("/*__STYLE__*/", style), ("/*__DATA__*/", data),
+    for marker, payload in (("/*__FONT__*/", font), ("/*__STYLE__*/", style), ("/*__DATA__*/", data),
                             ("/*__PARSER__*/", parser), ("/*__APP__*/", app)):
         page = page.replace(marker, payload)
 
