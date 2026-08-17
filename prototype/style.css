@@ -530,6 +530,31 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 .tally b { font-family: var(--mono); font-size: 1.5rem; font-variant-numeric: tabular-nums; }
 .tally span { font-family: var(--mono); font-size: 0.625rem; letter-spacing: 0.1em; color: var(--ink-faint); }
 
+/* ---------------- sitelen pona ---------------- */
+
+/* Die Schrift bildet Wörter über Ligaturen ab; im Text steht weiterhin
+   lateinisch, was Kopieren und Vorlesen erhält. */
+.sp { font-family: 'linja pimeja', var(--mono); font-feature-settings: 'liga' 1, 'clig' 1; }
+
+.glyph {
+  font-size: 5.5rem;
+  line-height: 1.1;
+  color: var(--accent);
+  text-align: center;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.glyph-inline { font-size: 1.5rem; line-height: 1; color: var(--accent); }
+
+.glyph-row {
+  font-size: 2rem;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+  word-spacing: 0.25em;
+}
+
+.word .glyph-inline { min-width: 1.8rem; text-align: center; }
+
 /* ---------------- Wörter & Sandkasten ---------------- */
 
 .search {

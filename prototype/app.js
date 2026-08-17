@@ -50,6 +50,7 @@
 
   const blank = {
     xp: 0, streak: 0, lastDay: null, dayXp: 0, done: {}, mastery: {}, seenWords: {}, srs: {},
+    sitelen: false,
   };
 
   // Lernschritte wie in bewährten Karteikartensystemen: erst zehn Minuten,
@@ -121,6 +122,10 @@
       const lesson = DATA.lessons.find((l) => l.words.includes(rest)) || DATA.lessons[0];
       return TP.lexicon[rest] ? { type: 'word', word: rest, lesson, concepts: [] } : null;
     }
+    if (kind === 'g') {
+      const lesson = DATA.lessons.find((l) => l.words.includes(rest)) || DATA.lessons[0];
+      return TP.lexicon[rest] ? { type: 'glyph', word: rest, lesson, concepts: [] } : null;
+    }
     if (kind === 'c') {
       const compound = COMPOUNDS[Number(rest)];
       return compound ? { type: 'compound', compound, lesson: DATA.lessons[0], concepts: [] } : null;
@@ -136,6 +141,7 @@
   }
 
   function keyOf(task) {
+    if (task.type === 'glyph') return 'g:' + task.word;
     if (task.type === 'word') return 'w:' + task.word;
     if (task.type === 'compound') return 'c:' + COMPOUNDS.indexOf(task.compound);
     if (task.item) return 's:' + task.item.id;
@@ -181,6 +187,8 @@
 
     const compound = availableCompounds(lesson)[0];
     if (compound) tasks.push({ type: 'compound', compound, lesson, concepts: [] });
+
+    if (state.sitelen && words[2]) tasks.push({ type: 'glyph', word: words[2], lesson, concepts: [] });
 
     if (builds[3]) tasks.push({ type: 'free', item: builds[3], lesson, concepts: lessonConcepts(lesson) });
 
@@ -373,6 +381,7 @@
       screen.append(card);
     }
 
+    screen.append(sitelenCard());
     screen.append(backupCard());
 
     screen.append(el(`
@@ -381,6 +390,28 @@
         (MIT, © 2020 /dev/urandom und Mitwirkende), geprüft von TokiPonaKit.
       </p>`));
     return screen;
+  }
+
+  function sitelenCard() {
+    const card = el(`
+      <div class="card">
+        <h2>sitelen pona</h2>
+        <div class="glyph-row sp">toki pona li pona</div>
+        <p class="hint">Die Zeichenschrift: ein Zeichen je Wort. Angeschaltet kommt in
+          jeder Lektion eine Zeichenaufgabe dazu, und die Zeichen wandern in die
+          Wiederholung. Der Kurs selbst bleibt unverändert.</p>
+        <div class="row"><button class="ghost"></button></div>
+      </div>`);
+
+    const button = card.querySelector('.ghost');
+    const label = () => { button.textContent = state.sitelen ? 'Zeichen abschalten' : 'Zeichen dazulernen'; };
+    label();
+    button.onclick = () => {
+      state.sitelen = !state.sitelen;
+      save();
+      render();
+    };
+    return card;
   }
 
   // ------------------------------------------------------------ Sicherung
@@ -540,6 +571,7 @@
     else if (task.type === 'choose') app.append(chooseTask(task));
     else if (task.type === 'fix') app.append(fixTask(task));
     else if (task.type === 'compound') app.append(compoundTask(task));
+    else if (task.type === 'glyph') app.append(glyphTask(task));
     else app.append(freeTask(task));
   }
 
@@ -651,6 +683,43 @@
         solution: task.flawed.correct,
         xray: task.flawed.correct,
         reason: escape(task.flawed.violation.message),
+      });
+    };
+    return screen;
+  }
+
+  // sitelen pona: ein Zeichen je Wort. Die Schrift bildet das über Ligaturen
+  // ab — im Text steht weiterhin das lateinische Wort.
+  function glyphTask(task) {
+    const options = shuffle([task.word, ...distractorWords(task.lesson, [task.word], 3)]);
+
+    const screen = screenWith(`
+      <p class="prompt">welches wort ist das?</p>
+      <div class="glyph sp">${escape(task.word)}</div>
+      <div class="choices"></div>
+      <div class="actions"><button class="primary" disabled>Prüfen</button></div>`);
+
+    let picked = null;
+    const list = screen.querySelector('.choices');
+    const button = screen.querySelector('.primary');
+    options.forEach((option) => {
+      const choice = el(`<button class="choice tp">${escape(option)}</button>`);
+      choice.onclick = () => {
+        picked = option;
+        list.querySelectorAll('.choice').forEach((c) => { c.dataset.picked = 'false'; });
+        choice.dataset.picked = 'true';
+        button.disabled = false;
+      };
+      list.append(choice);
+    });
+
+    button.onclick = () => {
+      const entry = TP.lexicon[task.word];
+      finish(task, picked === task.word, {
+        solution: task.word,
+        xray: null,
+        reason: `<span class="sp glyph-inline">${escape(task.word)}</span> ist `
+          + `<b>${escape(task.word)}</b> — ${escape(entry.glosses.slice(0, 3).join(', '))}.`,
       });
     };
     return screen;
@@ -1059,6 +1128,7 @@
         if (term && !word.includes(term) && !text.toLowerCase().includes(term)) return;
         list.append(el(`
           <div class="word">
+            <span class="sp glyph-inline" aria-hidden="true">${escape(word)}</span>
             <b>${escape(word)}</b>
             <span>${escape(text)}</span>
             <em>${entry.book === 'pu' ? 'pu' : 'ku'}${state.seenWords[word] ? ' ✓' : ''}</em>
