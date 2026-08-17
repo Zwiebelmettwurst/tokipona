@@ -556,23 +556,31 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 .sp { font-family: 'linja pimeja', var(--mono); font-feature-settings: 'liga' 1, 'clig' 1; }
 
 .glyph {
-  font-size: 5.5rem;
-  line-height: 1.1;
+  font-size: 7rem;
+  line-height: 1.05;
   color: var(--accent);
   text-align: center;
   margin: 1.5rem 0 0.5rem;
 }
 
-.glyph-inline { font-size: 1.5rem; line-height: 1; color: var(--accent); }
+.glyph-inline { font-size: 2rem; line-height: 1; color: var(--accent); }
 
 .glyph-row {
-  font-size: 2rem;
+  font-size: 2.75rem;
   color: var(--accent);
   margin-bottom: 0.5rem;
   word-spacing: 0.25em;
 }
 
-.word .glyph-inline { min-width: 1.8rem; text-align: center; }
+.glyph-inline.empty { display: inline-block; }
+
+.word .glyph-inline {
+  font-size: 2.5rem;
+  min-width: 2.9rem;
+  text-align: center;
+  flex: none;
+  color: var(--accent);
+}
 
 /* ---------------- Wörter & Sandkasten ---------------- */
 
@@ -589,13 +597,27 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 .words { display: flex; flex-direction: column; gap: 0; }
 .word {
   display: flex;
-  gap: 0.8rem;
-  padding: 0.6rem 0.2rem;
+  gap: 0.7rem;
+  padding: 0.55rem 0.2rem;
   border-bottom: 1px solid var(--rule);
-  align-items: baseline;
+  align-items: center;
 }
-.word b { font-family: var(--mono); font-weight: 500; min-width: 6.5rem; }
-.word span { color: var(--ink-dim); font-size: 0.875rem; flex: 1; }
+.word b {
+  font-family: var(--mono);
+  font-weight: 500;
+  min-width: 5.5rem;
+  overflow-wrap: anywhere;   /* kijetesantakalu passt in keine Spalte */
+}
+
+/* min-width: 0 erlaubt dem Flex-Kind, unter seine Inhaltsbreite zu schrumpfen —
+   ohne das schiebt eine lange Bedeutung die ganze Zeile aus dem Bild. */
+.word span:not(.glyph-inline) {
+  color: var(--ink-dim);
+  font-size: 0.875rem;
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;   /* „geschlechtsnonkonform“ passt sonst nirgends */
+}
 .word em {
   font-family: var(--mono);
   font-style: normal;
@@ -1608,6 +1630,30 @@ const TokiPona = (function (data) {
   const conceptLabel = (id) => (CONCEPT_LABELS[state.lang] || CONCEPT_LABELS.de)[id] || id;
   const say = (violation) => TP.describe(violation, state.lang);
 
+  // Nicht jedes Wort hat in der Schrift ein Zeichen — die 2020er Fassung kennt
+  // mehrere nimi ku suli noch nicht. Fällt die Ligatur aus, stünde das
+  // lateinische Wort in Zeichengröße da. Also einmal messen statt raten:
+  // ein echtes Zeichen ist etwa quadratisch, ein ausgeschriebenes Wort viel breiter.
+  let GLYPHS = {};
+  const hasGlyph = (word) => Boolean(GLYPHS[word]);
+
+  async function probeGlyphs() {
+    if (!document.fonts || !document.fonts.ready) return;
+    await document.fonts.ready;
+    const probe = document.createElement('span');
+    probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;'
+      + "font-size:40px;font-family:'linja pimeja'";
+    document.body.append(probe);
+    const found = {};
+    for (const word of Object.keys(TP.lexicon)) {
+      probe.textContent = word;
+      found[word] = probe.getBoundingClientRect().width <= 64;
+    }
+    probe.remove();
+    GLYPHS = found;
+    render();
+  }
+
   let state = load();
   let session = null;
   let tab = 'pfad';
@@ -1672,7 +1718,8 @@ const TokiPona = (function (data) {
     }
     if (kind === 'g') {
       const lesson = lessons().find((l) => l.words.includes(rest)) || lessons()[0];
-      return TP.lexicon[rest] ? { type: 'glyph', word: rest, lesson, concepts: [] } : null;
+      return TP.lexicon[rest] && hasGlyph(rest)
+        ? { type: 'glyph', word: rest, lesson, concepts: [] } : null;
     }
     if (kind === 'c') {
       const compound = COMPOUNDS[Number(rest)];
@@ -1736,7 +1783,10 @@ const TokiPona = (function (data) {
     const compound = availableCompounds(lesson)[0];
     if (compound) tasks.push({ type: 'compound', compound, lesson, concepts: [] });
 
-    if (state.sitelen && words[2]) tasks.push({ type: 'glyph', word: words[2], lesson, concepts: [] });
+    const glyphWord = words.find(hasGlyph);
+    if (state.sitelen && glyphWord) {
+      tasks.push({ type: 'glyph', word: glyphWord, lesson, concepts: [] });
+    }
 
     if (builds[3]) tasks.push({ type: 'free', item: builds[3], lesson, concepts: lessonConcepts(lesson) });
 
@@ -2683,7 +2733,8 @@ const TokiPona = (function (data) {
         if (term && !word.includes(term) && !text.toLowerCase().includes(term)) return;
         list.append(el(`
           <div class="word">
-            <span class="sp glyph-inline" aria-hidden="true">${escape(word)}</span>
+            <span class="${hasGlyph(word) ? 'sp glyph-inline' : 'glyph-inline empty'}"
+              aria-hidden="true">${hasGlyph(word) ? escape(word) : ''}</span>
             <b>${escape(word)}</b>
             <span>${escape(text)}</span>
             <em>${entry.book === 'pu' ? 'pu' : 'ku'}${state.seenWords[word] ? ' ✓' : ''}</em>
@@ -2754,6 +2805,7 @@ const TokiPona = (function (data) {
   }
 
   render();
+  probeGlyphs();
 })(TOKIPONA_DATA, TokiPona);
 
 </script>
