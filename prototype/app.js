@@ -232,6 +232,30 @@
   const conceptLabel = (id) => (CONCEPT_LABELS[state.lang] || CONCEPT_LABELS.de)[id] || id;
   const say = (violation) => TP.describe(violation, state.lang);
 
+  // Nicht jedes Wort hat in der Schrift ein Zeichen — die 2020er Fassung kennt
+  // mehrere nimi ku suli noch nicht. Fällt die Ligatur aus, stünde das
+  // lateinische Wort in Zeichengröße da. Also einmal messen statt raten:
+  // ein echtes Zeichen ist etwa quadratisch, ein ausgeschriebenes Wort viel breiter.
+  let GLYPHS = {};
+  const hasGlyph = (word) => Boolean(GLYPHS[word]);
+
+  async function probeGlyphs() {
+    if (!document.fonts || !document.fonts.ready) return;
+    await document.fonts.ready;
+    const probe = document.createElement('span');
+    probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;'
+      + "font-size:40px;font-family:'linja pimeja'";
+    document.body.append(probe);
+    const found = {};
+    for (const word of Object.keys(TP.lexicon)) {
+      probe.textContent = word;
+      found[word] = probe.getBoundingClientRect().width <= 64;
+    }
+    probe.remove();
+    GLYPHS = found;
+    render();
+  }
+
   let state = load();
   let session = null;
   let tab = 'pfad';
@@ -296,7 +320,8 @@
     }
     if (kind === 'g') {
       const lesson = lessons().find((l) => l.words.includes(rest)) || lessons()[0];
-      return TP.lexicon[rest] ? { type: 'glyph', word: rest, lesson, concepts: [] } : null;
+      return TP.lexicon[rest] && hasGlyph(rest)
+        ? { type: 'glyph', word: rest, lesson, concepts: [] } : null;
     }
     if (kind === 'c') {
       const compound = COMPOUNDS[Number(rest)];
@@ -360,7 +385,10 @@
     const compound = availableCompounds(lesson)[0];
     if (compound) tasks.push({ type: 'compound', compound, lesson, concepts: [] });
 
-    if (state.sitelen && words[2]) tasks.push({ type: 'glyph', word: words[2], lesson, concepts: [] });
+    const glyphWord = words.find(hasGlyph);
+    if (state.sitelen && glyphWord) {
+      tasks.push({ type: 'glyph', word: glyphWord, lesson, concepts: [] });
+    }
 
     if (builds[3]) tasks.push({ type: 'free', item: builds[3], lesson, concepts: lessonConcepts(lesson) });
 
@@ -1307,7 +1335,8 @@
         if (term && !word.includes(term) && !text.toLowerCase().includes(term)) return;
         list.append(el(`
           <div class="word">
-            <span class="sp glyph-inline" aria-hidden="true">${escape(word)}</span>
+            <span class="${hasGlyph(word) ? 'sp glyph-inline' : 'glyph-inline empty'}"
+              aria-hidden="true">${hasGlyph(word) ? escape(word) : ''}</span>
             <b>${escape(word)}</b>
             <span>${escape(text)}</span>
             <em>${entry.book === 'pu' ? 'pu' : 'ku'}${state.seenWords[word] ? ' ✓' : ''}</em>
@@ -1378,4 +1407,5 @@
   }
 
   render();
+  probeGlyphs();
 })(TOKIPONA_DATA, TokiPona);
