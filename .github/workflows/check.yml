@@ -1,0 +1,42 @@
+name: Prototyp prüfen
+
+# Pages wird direkt aus dem Zweig veröffentlicht (Settings → Pages →
+# Deploy from a branch, Ordner /docs). Dieser Workflow veröffentlicht also
+# nicht, sondern stellt nur sicher, dass docs/ zum Quellstand passt.
+on:
+  push:
+    branches:
+      - main
+      - claude/toki-pona-ios-app-n4bg0v
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Prototyp neu bauen
+        run: |
+          python3 prototype/make_icons.py
+          python3 prototype/build.py
+
+      - name: Parser gegen die Korpora prüfen
+        run: node prototype/test.js
+
+      - name: docs/ muss dem Bauergebnis entsprechen
+        run: |
+          if ! git diff --quiet -- docs/; then
+            echo "::error::docs/ weicht vom Bauergebnis ab. Bitte prototype/build.py laufen lassen und einchecken."
+            git diff --stat -- docs/
+            exit 1
+          fi
+          echo "docs/ ist deckungsgleich."

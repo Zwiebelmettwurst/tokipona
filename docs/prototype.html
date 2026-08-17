@@ -93,6 +93,7 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 #app {
   max-width: 30rem;
   min-height: 100vh;
+  min-height: 100dvh;   /* Safari: vh ignoriert die Werkzeugleiste, dvh nicht */
   margin: 0 auto;
   background: var(--ground);
   display: flex;
@@ -345,7 +346,14 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 
 .hint { font-size: 0.8125rem; color: var(--ink-faint); margin: 0; }
 
-.actions { margin-top: auto; padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.actions {
+  margin-top: auto;
+  padding-top: 1rem;
+  padding-bottom: max(env(safe-area-inset-bottom), 0.25rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 
 .primary {
   width: 100%;
@@ -385,7 +393,7 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   bottom: 0;
   border-top: 1px solid var(--rule-strong);
   background: var(--surface);
-  padding: 0.9rem 1.1rem 1.1rem;
+  padding: 0.9rem 1.1rem calc(1.1rem + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
