@@ -265,14 +265,25 @@
   const escape = (text) => String(text).replace(/[&<>"]/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+  // Beim Austausch des Baums kann Safari den Fokus auf ein frisches Element
+  // legen. Der Fokusring sieht aus wie eine getroffene Auswahl — auf einem
+  // Bildschirm, den noch niemand berührt hat, gehört er nirgendwo hin.
+  function clearStrayFocus() {
+    const active = document.activeElement;
+    if (active && active !== document.body && app.contains(active) && active.blur) {
+      active.blur();
+    }
+  }
+
   function render() {
     app.innerHTML = '';
-    if (session) { renderSession(); return; }
+    if (session) { renderSession(); clearStrayFocus(); return; }
     app.append(topbar());
     if (tab === 'pfad') app.append(pathScreen());
     else if (tab === 'nimi') app.append(wordScreen());
     else app.append(sandboxScreen());
     app.append(tabs());
+    clearStrayFocus();
   }
 
   function topbar() {
