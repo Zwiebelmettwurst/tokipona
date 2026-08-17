@@ -179,7 +179,6 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 
 .lesson[data-state="locked"] { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
 .lesson[data-state="current"] { border-color: var(--accent); }
-.lesson:not([data-state="locked"]):hover { border-color: var(--accent); }
 
 .lesson .badge {
   width: 2.2rem;
@@ -298,7 +297,6 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   background: var(--surface);
   box-shadow: var(--shadow);
 }
-.tile:hover { border-color: var(--accent); }
 .tile.used { opacity: 0.25; pointer-events: none; }
 .tile.placed { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 
@@ -313,7 +311,6 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   font-size: 0.9375rem;
   box-shadow: var(--shadow);
 }
-.choice:hover { border-color: var(--accent); }
 .choice[data-picked="true"] { border-color: var(--accent); background: var(--accent-soft); }
 .choice.tp { font-family: var(--mono); }
 
@@ -379,6 +376,18 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 
 .lesson.review .badge { background: var(--gold-soft); color: var(--gold); font-size: 1rem; }
 .lesson.review { border-color: var(--gold); }
+
+/* Zeigergeräte bekommen eine Hover-Rückmeldung. Auf Tippgeräten bliebe sie
+   nach der Berührung kleben und sähe aus wie eine getroffene Auswahl. */
+@media (hover: hover) and (pointer: fine) {
+  .lesson:not([data-state="locked"]):hover { border-color: var(--accent); }
+  .tile:hover { border-color: var(--accent); }
+  .choice:hover { border-color: var(--accent); }
+}
+
+/* Stattdessen quittiert die Berührung selbst. */
+.tile:active, .choice:active, .lesson:not([data-state="locked"]):active { transform: scale(0.985); }
+.primary:active, .ghost:active { transform: scale(0.99); }
 
 /* ---------------- Rückmeldung ---------------- */
 
