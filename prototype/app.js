@@ -5,45 +5,200 @@
 (function (DATA, TP) {
   const KEY = 'o-toki-fortschritt-v1';
   const GOAL = 40;
+
+  // Alles, was die Oberfläche sagt, steht hier — die Lektionen selbst kommen
+  // aus den Kursdaten, die in derselben Sprache vorliegen.
+  const T = {
+    de: {
+      level: 'Stufe', xpToday: (a, b) => `${a}/${b} XP heute`, days: 'Tage',
+      greeting: 'o kama pona!',
+      introFirst: 'Zwölf Lektionen. Du baust Sätze, statt Vokabeln abzuhaken.',
+      introBack: (title) => `Weiter bei „${title}“.`,
+      dueCards: (n) => `${n} ${n === 1 ? 'Karte' : 'Karten'} fällig`,
+      dueSub: 'wörter, sätze und umschreibungen von vorher',
+      concepts: 'konzepte',
+      askWord: 'was heißt das wort?', askMeaning: 'was bedeutet der satz?',
+      askBuild: 'bau den satz', askFix: 'hier stimmt ein wort nicht — tipp es an',
+      askCompound: 'dafür gibt es kein wort — wie sagst du es?',
+      askGlyph: 'welches wort ist das?', askFree: 'schreib es selbst — freie eingabe',
+      hintFix: 'Ein Wort steht zu viel oder fehlt an dieser Stelle.',
+      hintBuild: 'Antippen nimmt ein Wort zurück, Ziehen sortiert um.',
+      hintFree: 'Der Parser prüft den Satzbau, während du tippst. Andere Wortwahl als '
+        + 'die Musterlösung ist in Ordnung, solange die Grammatik stimmt.',
+      check: 'Prüfen', next: 'Weiter', understood: 'Verstanden', again: 'Nochmal üben',
+      good: 'pona!', notYet: 'Noch nicht',
+      variantRight: 'Richtig — andere Wortwahl, gleiche Aussage',
+      model: 'Musterlösung:', comesBack: 'Kommt in einer der nächsten Wiederholungen zurück.',
+      structureOk: '✓ Satzbau in Ordnung', structureLive: '✓ Satzbau in Ordnung',
+      missing: (words) => `Satzbau stimmt, aber es fehlt: ${words}`,
+      covers: (word, list) => `<b>${word}</b> deckt: ${list}.`,
+      literally: (tp, literal) => `<b>${tp}</b> — wörtlich: ${literal}.`,
+      glyphIs: (word, list) => `ist <b>${word}</b> — ${list}.`,
+      reviewDone: 'Wiederholung geschafft',
+      reviewNote: 'Die Karten kommen wieder, wenn es Zeit dafür ist.',
+      cards: 'karten', words: 'wörter', correct: 'richtig', xp: 'xp',
+      search: 'Wort oder Bedeutung suchen …',
+      sandboxTitle: 'o toki!',
+      sandboxIntro: 'Schreib irgendetwas auf toki pona. Der Parser zerlegt es und sagt dir, '
+        + 'was er sieht — oder was nicht stimmt.',
+      sandboxQuestion: ' — eine Frage', sandboxTry: 'Probier:',
+      sitelenHint: 'Die Zeichenschrift: ein Zeichen je Wort. Angeschaltet kommt in '
+        + 'jeder Lektion eine Zeichenaufgabe dazu, und die Zeichen wandern in die '
+        + 'Wiederholung. Der Kurs selbst bleibt unverändert.',
+      sitelenOn: 'Zeichen dazulernen', sitelenOff: 'Zeichen abschalten',
+      backupTitle: 'fortschritt sichern',
+      backupState: (summary) => `Dein Stand liegt nur auf diesem Gerät: ${summary}. `
+        + 'Safari räumt ihn nach sieben Tagen ohne Besuch weg — als Homescreen-App nicht.',
+      backupSave: 'Sichern', backupLoad: 'Wiederherstellen',
+      backupFile: 'Als Datei sichern oder teilen', backupCopy: 'Code in die Zwischenablage',
+      backupCopied: 'Kopiert. Sicher ihn dir irgendwo, wo er nicht verlorengeht.',
+      backupCopyFailed: 'Kopieren ging nicht — nimm die Datei.',
+      backupPick: 'Sicherungsdatei wählen', backupPaste: '… oder Code hier einfügen',
+      backupUnreadable: 'Das ist kein lesbarer Sicherungstext.',
+      backupForeign: 'Darin steckt kein Fortschritt dieser App.',
+      backupUnreadableFile: 'Datei ließ sich nicht lesen.',
+      backupFound: (found, exported, now) => `Gefunden: ${found}`
+        + `${exported ? ` · gesichert am ${exported}` : ''}.<br>Ersetzt deinen jetzigen Stand: ${now}.`,
+      backupApply: 'Diesen Stand übernehmen',
+      summary: (lvl, lessons, cards, xp) => `Stufe ${lvl}, ${lessons} Lektionen, ${cards} Karten, ${xp} XP`,
+      langLabel: 'sprache', langOther: 'English',
+      credit: (link) => `Prototyp. Übungssätze aus ${link} (MIT, © 2020 /dev/urandom `
+        + 'und Mitwirkende), geprüft von TokiPonaKit.',
+    },
+    en: {
+      level: 'Level', xpToday: (a, b) => `${a}/${b} XP today`, days: 'days',
+      greeting: 'o kama pona!',
+      introFirst: 'Twelve lessons. You build sentences instead of ticking off words.',
+      introBack: (title) => `Continue with “${title}”.`,
+      dueCards: (n) => `${n} ${n === 1 ? 'card' : 'cards'} due`,
+      dueSub: 'words, sentences and paraphrases from before',
+      concepts: 'concepts',
+      askWord: 'what does this word mean?', askMeaning: 'what does this sentence mean?',
+      askBuild: 'build the sentence', askFix: 'one word is wrong — tap it',
+      askCompound: 'there is no word for this — how do you say it?',
+      askGlyph: 'which word is this?', askFree: 'write it yourself — free input',
+      hintFix: 'One word is too many or wrong in this spot.',
+      hintBuild: 'Tap to take a word back, drag to reorder.',
+      hintFree: 'The parser checks the structure as you type. A different word choice than '
+        + 'the model answer is fine, as long as the grammar holds.',
+      check: 'Check', next: 'Continue', understood: 'Got it', again: 'Practise again',
+      good: 'pona!', notYet: 'Not yet',
+      variantRight: 'Correct — different words, same meaning',
+      model: 'Model answer:', comesBack: 'This will come back in one of the next reviews.',
+      structureOk: '✓ structure is sound', structureLive: '✓ structure is sound',
+      missing: (words) => `The structure holds, but this is missing: ${words}`,
+      covers: (word, list) => `<b>${word}</b> covers: ${list}.`,
+      literally: (tp, literal) => `<b>${tp}</b> — literally: ${literal}.`,
+      glyphIs: (word, list) => `is <b>${word}</b> — ${list}.`,
+      reviewDone: 'Review done',
+      reviewNote: 'The cards return when it is time for them.',
+      cards: 'cards', words: 'words', correct: 'correct', xp: 'xp',
+      search: 'Search word or meaning …',
+      sandboxTitle: 'o toki!',
+      sandboxIntro: 'Write anything in toki pona. The parser takes it apart and tells you '
+        + 'what it sees — or what does not hold.',
+      sandboxQuestion: ' — a question', sandboxTry: 'Try:',
+      sitelenHint: 'The writing system: one glyph per word. Switched on, every lesson gains '
+        + 'a glyph exercise and the glyphs join the review queue. The course itself stays '
+        + 'the same.',
+      sitelenOn: 'Learn the glyphs', sitelenOff: 'Turn glyphs off',
+      backupTitle: 'back up progress',
+      backupState: (summary) => `Your progress lives on this device only: ${summary}. `
+        + 'Safari clears it after seven days without a visit — not as a home screen app.',
+      backupSave: 'Back up', backupLoad: 'Restore',
+      backupFile: 'Save or share as a file', backupCopy: 'Copy code to clipboard',
+      backupCopied: 'Copied. Keep it somewhere it will not get lost.',
+      backupCopyFailed: 'Copying failed — use the file instead.',
+      backupPick: 'Choose backup file', backupPaste: '… or paste the code here',
+      backupUnreadable: 'That is not readable backup text.',
+      backupForeign: 'There is no progress from this app in there.',
+      backupUnreadableFile: 'The file could not be read.',
+      backupFound: (found, exported, now) => `Found: ${found}`
+        + `${exported ? ` · backed up on ${exported}` : ''}.<br>Replaces your current progress: ${now}.`,
+      backupApply: 'Use this progress',
+      summary: (lvl, lessons, cards, xp) => `level ${lvl}, ${lessons} lessons, ${cards} cards, ${xp} XP`,
+      langLabel: 'language', langOther: 'Deutsch',
+      credit: (link) => `Prototype. Exercise sentences from ${link} (MIT, © 2020 /dev/urandom `
+        + 'and contributors), checked by TokiPonaKit.',
+    },
+  };
+
   const CONCEPT_LABELS = {
-    c_mi_sina: 'mi und sina ohne li',
-    c_li: 'li vor dem Prädikat',
-    c_modifikator: 'Beifügung folgt dem Kopf',
-    c_e_objekt: 'e vor dem Objekt',
-    c_pi: 'pi gruppiert um',
-    c_la: 'la stellt Kontext voran',
-    c_praeposition: 'Präpositionen',
-    c_praeverb: 'Präverben',
-    c_frage: 'Fragen',
-    c_o: 'o für Anrede und Befehl',
-    c_namen: 'Namen',
-    c_ni: 'ni zeigt auf etwas',
-    c_en: 'en verbindet Subjekte',
-    c_zahlen: 'Zahlen',
+    de: {
+      c_mi_sina: 'mi und sina ohne li',
+      c_li: 'li vor dem Prädikat',
+      c_modifikator: 'Beifügung folgt dem Kopf',
+      c_e_objekt: 'e vor dem Objekt',
+      c_pi: 'pi gruppiert um',
+      c_la: 'la stellt Kontext voran',
+      c_praeposition: 'Präpositionen',
+      c_praeverb: 'Präverben',
+      c_frage: 'Fragen',
+      c_o: 'o für Anrede und Befehl',
+      c_namen: 'Namen',
+      c_ni: 'ni zeigt auf etwas',
+      c_en: 'en verbindet Subjekte',
+      c_zahlen: 'Zahlen',
+    },
+    en: {
+      c_mi_sina: 'mi and sina without li',
+      c_li: 'li before the predicate',
+      c_modifikator: 'modifier follows the head',
+      c_e_objekt: 'e before the object',
+      c_pi: 'pi regroups',
+      c_la: 'la fronts the context',
+      c_praeposition: 'prepositions',
+      c_praeverb: 'preverbs',
+      c_frage: 'questions',
+      c_o: 'o for address and command',
+      c_namen: 'names',
+      c_ni: 'ni points at something',
+      c_en: 'en joins subjects',
+      c_zahlen: 'numbers',
+    },
   };
 
   // Die Kernfertigkeit von toki pona: ausdrücken, wofür es kein Wort gibt.
   // Jede Umschreibung ist beim Bauen durch den Parser gelaufen.
   const COMPOUNDS = [
-    { de: 'Auto', tp: 'tomo tawa', literal: 'sich bewegendes Haus' },
-    { de: 'Kaffee', tp: 'telo pimeja wawa', literal: 'dunkles starkes Wasser' },
-    { de: 'Computer', tp: 'ilo sona', literal: 'Wissens-Gerät' },
-    { de: 'Telefon', tp: 'ilo toki', literal: 'Sprech-Gerät' },
-    { de: 'Uhr', tp: 'ilo tenpo', literal: 'Zeit-Gerät' },
-    { de: 'Fahrrad', tp: 'ilo tawa', literal: 'Bewegungs-Gerät' },
-    { de: 'Brille', tp: 'len lukin', literal: 'Seh-Kleidung' },
-    { de: 'Bibliothek', tp: 'tomo lipu', literal: 'Dokumenten-Haus' },
-    { de: 'Restaurant', tp: 'tomo moku', literal: 'Essens-Haus' },
-    { de: 'Schule', tp: 'tomo sona', literal: 'Wissens-Haus' },
-    { de: 'Kino', tp: 'tomo pi sitelen tawa', literal: 'Haus der bewegten Bilder' },
-    { de: 'Musik', tp: 'kalama musi', literal: 'unterhaltsamer Klang' },
-    { de: 'Regen', tp: 'telo tan sewi', literal: 'Wasser von oben' },
-    { de: 'Bier', tp: 'telo nasa', literal: 'seltsames Wasser' },
-    { de: 'Suppe', tp: 'telo moku', literal: 'Ess-Wasser' },
-    { de: 'Arzt', tp: 'jan pi pona sijelo', literal: 'Mensch der Körper-Güte' },
-    { de: 'Lehrerin', tp: 'jan pi pana sona', literal: 'Mensch, der Wissen gibt' },
-    { de: 'Freund', tp: 'jan pona', literal: 'guter Mensch' },
+    { name: { de: 'Auto', en: 'Car' }, tp: 'tomo tawa',
+      literal: { de: 'sich bewegendes Haus', en: 'moving house' } },
+    { name: { de: 'Kaffee', en: 'Coffee' }, tp: 'telo pimeja wawa',
+      literal: { de: 'dunkles starkes Wasser', en: 'dark strong water' } },
+    { name: { de: 'Computer', en: 'Computer' }, tp: 'ilo sona',
+      literal: { de: 'Wissens-Gerät', en: 'knowledge tool' } },
+    { name: { de: 'Telefon', en: 'Phone' }, tp: 'ilo toki',
+      literal: { de: 'Sprech-Gerät', en: 'talking tool' } },
+    { name: { de: 'Uhr', en: 'Clock' }, tp: 'ilo tenpo',
+      literal: { de: 'Zeit-Gerät', en: 'time tool' } },
+    { name: { de: 'Fahrrad', en: 'Bicycle' }, tp: 'ilo tawa',
+      literal: { de: 'Bewegungs-Gerät', en: 'moving tool' } },
+    { name: { de: 'Brille', en: 'Glasses' }, tp: 'len lukin',
+      literal: { de: 'Seh-Kleidung', en: 'seeing cloth' } },
+    { name: { de: 'Bibliothek', en: 'Library' }, tp: 'tomo lipu',
+      literal: { de: 'Dokumenten-Haus', en: 'document house' } },
+    { name: { de: 'Restaurant', en: 'Restaurant' }, tp: 'tomo moku',
+      literal: { de: 'Essens-Haus', en: 'food house' } },
+    { name: { de: 'Schule', en: 'School' }, tp: 'tomo sona',
+      literal: { de: 'Wissens-Haus', en: 'knowledge house' } },
+    { name: { de: 'Kino', en: 'Cinema' }, tp: 'tomo pi sitelen tawa',
+      literal: { de: 'Haus der bewegten Bilder', en: 'house of moving pictures' } },
+    { name: { de: 'Musik', en: 'Music' }, tp: 'kalama musi',
+      literal: { de: 'unterhaltsamer Klang', en: 'entertaining sound' } },
+    { name: { de: 'Regen', en: 'Rain' }, tp: 'telo tan sewi',
+      literal: { de: 'Wasser von oben', en: 'water from above' } },
+    { name: { de: 'Bier', en: 'Beer' }, tp: 'telo nasa',
+      literal: { de: 'seltsames Wasser', en: 'strange water' } },
+    { name: { de: 'Suppe', en: 'Soup' }, tp: 'telo moku',
+      literal: { de: 'Ess-Wasser', en: 'food water' } },
+    { name: { de: 'Arzt', en: 'Doctor' }, tp: 'jan pi pona sijelo',
+      literal: { de: 'Mensch der Körper-Güte', en: 'person of body goodness' } },
+    { name: { de: 'Lehrerin', en: 'Teacher' }, tp: 'jan pi pana sona',
+      literal: { de: 'Mensch, der Wissen gibt', en: 'person who gives knowledge' } },
+    { name: { de: 'Freund', en: 'Friend' }, tp: 'jan pona',
+      literal: { de: 'guter Mensch', en: 'good person' } },
   ];
+
 
   const app = document.getElementById('app');
   const today = () => new Date().toISOString().slice(0, 10);
@@ -51,6 +206,7 @@
   const blank = {
     xp: 0, streak: 0, lastDay: null, dayXp: 0, done: {}, mastery: {}, seenWords: {}, srs: {},
     sitelen: false,
+    lang: (navigator.language || 'de').toLowerCase().startsWith('de') ? 'de' : 'en',
   };
 
   // Lernschritte wie in bewährten Karteikartensystemen: erst zehn Minuten,
@@ -59,6 +215,22 @@
   const MINUTE = 60000;
   const DAY = 86400000;
   const STEPS = [10 * MINUTE, DAY, 3 * DAY, 7 * DAY];
+
+  // Übersetzung nachschlagen; fehlt ein Eintrag, greift Deutsch.
+  const t = (key, ...args) => {
+    const table = T[state.lang] || T.de;
+    const value = table[key] !== undefined ? table[key] : T.de[key];
+    return typeof value === 'function' ? value(...args) : value;
+  };
+
+  const lessons = () => (DATA.languages[state.lang] || DATA.languages.de).lessons;
+  const glossesOf = (word) => {
+    const entry = TP.lexicon[word];
+    if (!entry) return [];
+    return entry.glosses[state.lang] || entry.glosses.de;
+  };
+  const conceptLabel = (id) => (CONCEPT_LABELS[state.lang] || CONCEPT_LABELS.de)[id] || id;
+  const say = (violation) => TP.describe(violation, state.lang);
 
   let state = load();
   let session = null;
@@ -119,18 +291,18 @@
   function taskFromKey(key) {
     const [kind, rest] = [key.slice(0, 1), key.slice(2)];
     if (kind === 'w') {
-      const lesson = DATA.lessons.find((l) => l.words.includes(rest)) || DATA.lessons[0];
+      const lesson = lessons().find((l) => l.words.includes(rest)) || lessons()[0];
       return TP.lexicon[rest] ? { type: 'word', word: rest, lesson, concepts: [] } : null;
     }
     if (kind === 'g') {
-      const lesson = DATA.lessons.find((l) => l.words.includes(rest)) || DATA.lessons[0];
+      const lesson = lessons().find((l) => l.words.includes(rest)) || lessons()[0];
       return TP.lexicon[rest] ? { type: 'glyph', word: rest, lesson, concepts: [] } : null;
     }
     if (kind === 'c') {
       const compound = COMPOUNDS[Number(rest)];
-      return compound ? { type: 'compound', compound, lesson: DATA.lessons[0], concepts: [] } : null;
+      return compound ? { type: 'compound', compound, lesson: lessons()[0], concepts: [] } : null;
     }
-    for (const lesson of DATA.lessons) {
+    for (const lesson of lessons()) {
       const item = lesson.items.find((i) => i.id === rest);
       if (item) {
         return { type: item.direction === 'de_tp' ? 'build' : 'choose', item, lesson,
@@ -155,9 +327,9 @@
     }
   }
 
-  const lessonOf = (number) => DATA.lessons.find((l) => l.number === number);
-  const unlocked = (number) => number === DATA.lessons[0].number
-    || Boolean(state.done[DATA.lessons[DATA.lessons.findIndex((l) => l.number === number) - 1].number]);
+  const lessonOf = (number) => lessons().find((l) => l.number === number);
+  const unlocked = (number) => number === lessons()[0].number
+    || Boolean(state.done[lessons()[lessons().findIndex((l) => l.number === number) - 1].number]);
 
   // ------------------------------------------------------------ Aufgabenbau
 
@@ -213,7 +385,7 @@
 
   // Umschreibungen, deren Wörter die Lernende schon kennt.
   function availableCompounds(lesson) {
-    const known = new Set(DATA.lessons.filter((l) => l.number <= lesson.number).flatMap((l) => l.words));
+    const known = new Set(lessons().filter((l) => l.number <= lesson.number).flatMap((l) => l.words));
     return shuffle(COMPOUNDS.filter((compound) =>
       TP.tokenize(compound.tp).every((token) => token.text === 'pi' || known.has(token.text))));
   }
@@ -256,7 +428,7 @@
   }
 
   function distractorWords(lesson, exclude, count) {
-    const pool = DATA.lessons
+    const pool = lessons()
       .filter((l) => l.number <= lesson.number)
       .flatMap((l) => l.words)
       .filter((w) => !exclude.includes(w) && TP.lexicon[w]);
@@ -298,9 +470,9 @@
     const bar = el(`
       <div>
         <div class="topbar">
-          <div class="level"><div class="ring">${level()}</div><span>Stufe</span></div>
-          <div class="metric spacer gold"><b>${state.dayXp}</b>/${GOAL} XP heute</div>
-          <div class="metric"><b>${state.streak}</b> Tage</div>
+          <div class="level"><div class="ring">${level()}</div><span>${escape(t('level'))}</span></div>
+          <div class="metric spacer gold">${escape(t('xpToday', state.dayXp, GOAL))}</div>
+          <div class="metric"><b>${state.streak}</b> ${escape(t('days'))}</div>
         </div>
         <div class="goalbar"><span style="width:${Math.min(100, (state.dayXp / GOAL) * 100)}%"></span></div>
       </div>`);
@@ -322,13 +494,12 @@
   }
 
   function pathScreen() {
-    const next = DATA.lessons.find((l) => !state.done[l.number]) || DATA.lessons[DATA.lessons.length - 1];
+    const next = lessons().find((l) => !state.done[l.number]) || lessons()[lessons().length - 1];
     const screen = el(`
       <div class="screen">
         <div class="hello">
-          <h1>o kama pona!</h1>
-          <p>${state.xp ? `Weiter bei „${escape(next.title)}“.`
-                        : 'Zwölf Lektionen. Du baust Sätze, statt Vokabeln abzuhaken.'}</p>
+          <h1>${escape(t('greeting'))}</h1>
+          <p>${state.xp ? escape(t('introBack', next.title)) : escape(t('introFirst'))}</p>
         </div>
         <div class="path"></div>
       </div>`);
@@ -339,8 +510,8 @@
         <button class="lesson review" data-state="current">
           <span class="badge">↻</span>
           <span class="body">
-            <b>${due} ${due === 1 ? 'Karte' : 'Karten'} fällig</b>
-            <span>wörter, sätze und umschreibungen von vorher</span>
+            <b>${escape(t('dueCards', due))}</b>
+            <span>${escape(t('dueSub'))}</span>
           </span>
         </button>`);
       card.onclick = () => { session = buildReviewSession(); render(); };
@@ -348,7 +519,7 @@
     }
 
     const path = screen.querySelector('.path');
-    DATA.lessons.forEach((lesson) => {
+    lessons().forEach((lesson) => {
       const open = unlocked(lesson.number);
       const done = Boolean(state.done[lesson.number]);
       const stateName = done ? 'done' : (open ? (lesson.number === next.number ? 'current' : 'open') : 'locked');
@@ -369,27 +540,41 @@
 
     const active = Object.keys(state.mastery);
     if (active.length) {
-      const card = el('<div class="card"><h2>konzepte</h2><div class="concepts"></div></div>');
+      const card = el(`<div class="card"><h2>${escape(t('concepts'))}</h2>`
+        + '<div class="concepts"></div></div>');
       const list = card.querySelector('.concepts');
       active.sort((a, b) => state.mastery[b] - state.mastery[a]).forEach((concept) => {
         list.append(el(`
           <div class="concept">
-            <span>${escape(CONCEPT_LABELS[concept] || concept)}</span>
+            <span>${escape(conceptLabel(concept))}</span>
             <span class="bar"><i style="width:${Math.round(state.mastery[concept] * 100)}%"></i></span>
           </div>`));
       });
       screen.append(card);
     }
 
+    screen.append(languageCard());
     screen.append(sitelenCard());
     screen.append(backupCard());
 
     screen.append(el(`
-      <p class="foot">
-        Prototyp. Übungssätze aus <a href="https://lipu-sona.pona.la/de/">lipu sona pona</a>
-        (MIT, © 2020 /dev/urandom und Mitwirkende), geprüft von TokiPonaKit.
-      </p>`));
+      <p class="foot">${t('credit',
+        `<a href="https://lipu-sona.pona.la/${state.lang}/">lipu sona pona</a>`)}</p>`));
     return screen;
+  }
+
+  function languageCard() {
+    const card = el(`
+      <div class="card">
+        <h2>${escape(t('langLabel'))}</h2>
+        <div class="row"><button class="ghost">${escape(t('langOther'))}</button></div>
+      </div>`);
+    card.querySelector('.ghost').onclick = () => {
+      state.lang = state.lang === 'de' ? 'en' : 'de';
+      save();
+      render();
+    };
+    return card;
   }
 
   function sitelenCard() {
@@ -397,14 +582,12 @@
       <div class="card">
         <h2>sitelen pona</h2>
         <div class="glyph-row sp">toki pona li pona</div>
-        <p class="hint">Die Zeichenschrift: ein Zeichen je Wort. Angeschaltet kommt in
-          jeder Lektion eine Zeichenaufgabe dazu, und die Zeichen wandern in die
-          Wiederholung. Der Kurs selbst bleibt unverändert.</p>
+        <p class="hint">${escape(t('sitelenHint'))}</p>
         <div class="row"><button class="ghost"></button></div>
       </div>`);
 
     const button = card.querySelector('.ghost');
-    const label = () => { button.textContent = state.sitelen ? 'Zeichen abschalten' : 'Zeichen dazulernen'; };
+    const label = () => { button.textContent = t(state.sitelen ? 'sitelenOff' : 'sitelenOn'); };
     label();
     button.onclick = () => {
       state.sitelen = !state.sitelen;
@@ -428,11 +611,11 @@
     try {
       payload = JSON.parse(text.trim());
     } catch (error) {
-      throw new Error('Das ist kein lesbarer Sicherungstext.');
+      throw new Error(t('backupUnreadable'));
     }
     const found = payload && payload.state ? payload.state : payload;
     if (!found || typeof found !== 'object' || ['xp', 'done', 'srs'].some((f) => !(f in found))) {
-      throw new Error('Darin steckt kein Fortschritt dieser App.');
+      throw new Error(t('backupForeign'));
     }
     return {
       state: Object.assign({}, blank, found),
@@ -440,19 +623,17 @@
     };
   }
 
-  const summarise = (value) => `Stufe ${Math.floor((value.xp || 0) / 100) + 1}, `
-    + `${Object.keys(value.done || {}).length} Lektionen, `
-    + `${Object.keys(value.srs || {}).length} Karten, ${value.xp || 0} XP`;
+  const summarise = (value) => t('summary', Math.floor((value.xp || 0) / 100) + 1,
+    Object.keys(value.done || {}).length, Object.keys(value.srs || {}).length, value.xp || 0);
 
   function backupCard() {
     const card = el(`
       <div class="card">
-        <h2>fortschritt sichern</h2>
-        <p class="hint">Dein Stand liegt nur auf diesem Gerät: ${escape(summarise(state))}.
-          Safari räumt ihn nach sieben Tagen ohne Besuch weg — als Homescreen-App nicht.</p>
+        <h2>${escape(t('backupTitle'))}</h2>
+        <p class="hint">${escape(t('backupState', summarise(state)))}</p>
         <div class="row">
-          <button class="ghost" data-do="save">Sichern</button>
-          <button class="ghost" data-do="load">Wiederherstellen</button>
+          <button class="ghost" data-do="save">${escape(t('backupSave'))}</button>
+          <button class="ghost" data-do="load">${escape(t('backupLoad'))}</button>
         </div>
         <div class="drawer"></div>
       </div>`);
@@ -468,7 +649,7 @@
       const text = backupText();
       const name = `o-toki-fortschritt-${stamp()}.json`;
 
-      const share = el('<button class="ghost">Als Datei sichern oder teilen</button>');
+      const share = el(`<button class="ghost">${escape(t('backupFile'))}</button>`);
       share.onclick = async () => {
         const file = new File([text], name, { type: 'application/json' });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -485,13 +666,13 @@
         setTimeout(() => URL.revokeObjectURL(url), 1000);
       };
 
-      const copy = el('<button class="ghost">Code in die Zwischenablage</button>');
+      const copy = el(`<button class="ghost">${escape(t('backupCopy'))}</button>`);
       copy.onclick = async () => {
         try {
           await navigator.clipboard.writeText(text);
-          note('Kopiert. Sicher ihn dir irgendwo, wo er nicht verlorengeht.');
+          note(t('backupCopied'));
         } catch (error) {
-          note('Kopieren ging nicht — nimm die Datei.', true);
+          note(t('backupCopyFailed'), true);
         }
       };
 
@@ -502,10 +683,11 @@
       drawer.innerHTML = '';
       const form = el(`
         <div>
-          <label class="ghost pickwrap">Sicherungsdatei wählen
+          <label class="ghost pickwrap">${escape(t('backupPick'))}
             <input class="pick" type="file" accept="application/json,.json,text/plain">
           </label>
-          <textarea class="paste" rows="3" placeholder="… oder Code hier einfügen" aria-label="Sicherungscode"></textarea>
+          <textarea class="paste" rows="3" placeholder="${escape(t('backupPaste'))}"
+            aria-label="${escape(t('backupPaste'))}"></textarea>
           <div class="preview"></div>
         </div>`);
       const preview = form.querySelector('.preview');
@@ -519,10 +701,9 @@
           preview.append(el(`<p class="hint bad">${escape(error.message)}</p>`));
           return;
         }
-        preview.append(el(`<p class="hint">Gefunden: ${escape(summarise(backup.state))}`
-          + `${backup.exported ? ` · gesichert am ${escape(backup.exported)}` : ''}.<br>`
-          + `Ersetzt deinen jetzigen Stand: ${escape(summarise(state))}.</p>`));
-        const confirm = el('<button class="primary">Diesen Stand übernehmen</button>');
+        preview.append(el(`<p class="hint">${t('backupFound', escape(summarise(backup.state)),
+          backup.exported ? escape(backup.exported) : null, escape(summarise(state)))}</p>`));
+        const confirm = el(`<button class="primary">${escape(t('backupApply'))}</button>`);
         confirm.onclick = () => {
           state = backup.state;
           save();
@@ -541,7 +722,7 @@
         if (!file) return;
         const reader = new FileReader();
         reader.onload = () => offer(String(reader.result));
-        reader.onerror = () => preview.append(el('<p class="hint bad">Datei ließ sich nicht lesen.</p>'));
+        reader.onerror = () => preview.append(el(`<p class="hint bad">${escape(t('backupUnreadableFile'))}</p>`));
         reader.readAsText(file);
       };
 
@@ -581,15 +762,15 @@
 
   function wordTask(task) {
     const entry = TP.lexicon[task.word];
-    const right = entry.glosses.slice(0, 3).join(', ');
+    const right = glossesOf(task.word).slice(0, 3).join(', ');
     const options = shuffle([right, ...distractorWords(task.lesson, [task.word], 3)
-      .map((w) => TP.lexicon[w].glosses.slice(0, 3).join(', '))]);
+      .map((w) => (TP.lexicon[w].glosses[state.lang] || TP.lexicon[w].glosses.de).slice(0, 3).join(', '))]);
 
     const screen = screenWith(`
-      <p class="prompt">was heißt das wort?</p>
+      <p class="prompt">${escape(t('askWord'))}</p>
       <h2 class="question tp">${escape(task.word)}</h2>
       <div class="choices"></div>
-      <div class="actions"><button class="primary" disabled>Prüfen</button></div>`);
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
 
     let picked = null;
     const list = screen.querySelector('.choices');
@@ -611,25 +792,25 @@
         solution: `${task.word} — ${right}`,
         xray: null,                     // eine Wortbedeutung hat keinen Satzbau
         reason: picked === right ? null
-          : `<b>${escape(task.word)}</b> deckt: ${escape(entry.glosses.join(', '))}.`,
+          : t('covers', escape(task.word), escape(glossesOf(task.word).join(', '))),
       });
     };
     return screen;
   }
 
   function chooseTask(task) {
-    const right = task.item.de[0];
+    const right = task.item.target[0];
     const pool = task.lesson.items
       .filter((i) => i.id !== task.item.id)
-      .flatMap((i) => i.de)
+      .flatMap((i) => i.target)
       .filter((text) => text !== right);
     const options = shuffle([right, ...shuffle(pool).slice(0, 2)]);
 
     const screen = screenWith(`
-      <p class="prompt">was bedeutet der satz?</p>
+      <p class="prompt">${escape(t('askMeaning'))}</p>
       <h2 class="question tp">${escape(task.item.tp)}</h2>
       <div class="choices"></div>
-      <div class="actions"><button class="primary" disabled>Prüfen</button></div>`);
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
 
     let picked = null;
     const list = screen.querySelector('.choices');
@@ -656,10 +837,10 @@
   // nicht aus einer Handliste — deshalb stimmt sie immer.
   function fixTask(task) {
     const screen = screenWith(`
-      <p class="prompt">hier stimmt ein wort nicht — tipp es an</p>
+      <p class="prompt">${escape(t('askFix'))}</p>
       <div class="pickline"></div>
-      <p class="hint">Ein Wort steht zu viel oder fehlt an dieser Stelle.</p>
-      <div class="actions"><button class="primary" disabled>Prüfen</button></div>`);
+      <p class="hint">${escape(t('hintFix'))}</p>
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
 
     const line = screen.querySelector('.pickline');
     const button = screen.querySelector('.primary');
@@ -694,10 +875,10 @@
     const options = shuffle([task.word, ...distractorWords(task.lesson, [task.word], 3)]);
 
     const screen = screenWith(`
-      <p class="prompt">welches wort ist das?</p>
+      <p class="prompt">${escape(t('askGlyph'))}</p>
       <div class="glyph sp">${escape(task.word)}</div>
       <div class="choices"></div>
-      <div class="actions"><button class="primary" disabled>Prüfen</button></div>`);
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
 
     let picked = null;
     const list = screen.querySelector('.choices');
@@ -718,8 +899,8 @@
       finish(task, picked === task.word, {
         solution: task.word,
         xray: null,
-        reason: `<span class="sp glyph-inline">${escape(task.word)}</span> ist `
-          + `<b>${escape(task.word)}</b> — ${escape(entry.glosses.slice(0, 3).join(', '))}.`,
+        reason: `<span class="sp glyph-inline">${escape(task.word)}</span> `
+          + t('glyphIs', escape(task.word), escape(glossesOf(task.word).slice(0, 3).join(', '))),
       });
     };
     return screen;
@@ -732,10 +913,10 @@
     const options = shuffle([right, ...shuffle(COMPOUNDS.filter((c) => c !== right)).slice(0, 2)]);
 
     const screen = screenWith(`
-      <p class="prompt">dafür gibt es kein wort — wie sagst du es?</p>
-      <h2 class="question">${escape(right.de)}</h2>
+      <p class="prompt">${escape(t('askCompound'))}</p>
+      <h2 class="question">${escape(right.name[state.lang] || right.name.de)}</h2>
       <div class="choices"></div>
-      <div class="actions"><button class="primary" disabled>Prüfen</button></div>`);
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
 
     let picked = null;
     const list = screen.querySelector('.choices');
@@ -754,7 +935,7 @@
     button.onclick = () => finish(task, picked === right, {
       solution: right.tp,
       xray: right.tp,
-      reason: `<b>${escape(right.tp)}</b> — wörtlich: ${escape(right.literal)}.`,
+      reason: t('literally', escape(right.tp), escape(right.literal[state.lang] || right.literal.de)),
     });
     return screen;
   }
@@ -765,12 +946,12 @@
     const bank = shuffle(solution.concat(extras));
 
     const screen = screenWith(`
-      <p class="prompt">bau den satz</p>
-      <h2 class="question">${escape(task.item.de[0])}</h2>
+      <p class="prompt">${escape(t('askBuild'))}</p>
+      <h2 class="question">${escape(task.item.target[0])}</h2>
       <div class="slot"></div>
-      <p class="hint">Antippen nimmt ein Wort zurück, Ziehen sortiert um.</p>
+      <p class="hint">${escape(t('hintBuild'))}</p>
       <div class="bank"></div>
-      <div class="actions"><button class="primary" disabled>Prüfen</button></div>`);
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
 
     const slot = screen.querySelector('.slot');
     const bankRow = screen.querySelector('.bank');
@@ -920,14 +1101,13 @@
 
   function freeTask(task) {
     const screen = screenWith(`
-      <p class="prompt">schreib es selbst — freie eingabe</p>
-      <h2 class="question">${escape(task.item.de[0])}</h2>
+      <p class="prompt">${escape(t('askFree'))}</p>
+      <h2 class="question">${escape(task.item.target[0])}</h2>
       <input class="typed" autocomplete="off" autocapitalize="off" spellcheck="false"
-             placeholder="toki pona …" aria-label="Deine Antwort">
+             placeholder="toki pona …" aria-label="toki pona">
       <p class="live"></p>
-      <p class="hint">Der Parser prüft den Satzbau, während du tippst. Andere Wortwahl als
-        die Musterlösung ist in Ordnung, solange die Grammatik stimmt.</p>
-      <div class="actions"><button class="primary" disabled>Prüfen</button></div>`);
+      <p class="hint">${escape(t('hintFree'))}</p>
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
 
     const input = screen.querySelector('.typed');
     const live = screen.querySelector('.live');
@@ -939,10 +1119,10 @@
       if (!text) { live.textContent = ''; live.className = 'live'; return; }
       const result = TP.parse(text);
       if (result.isValid) {
-        live.textContent = '✓ Satzbau in Ordnung';
+        live.textContent = t('structureLive');
         live.className = 'live good';
       } else {
-        live.textContent = '• ' + result.violations[0].message;
+        live.textContent = '• ' + say(result.violations[0]);
         live.className = 'live bad';
       }
     };
@@ -1031,9 +1211,9 @@
       <div class="sheet">
         <div class="verdict ${correct ? 'good' : 'bad'}">
           <span class="mark">${correct ? '✓' : '✕'}</span>
-          <span>${correct
-            ? (detail.grade && detail.grade.variant ? 'Richtig — andere Wortwahl, gleiche Aussage' : 'pona!')
-            : 'Noch nicht'}</span>
+          <span>${escape(correct
+            ? (detail.grade && detail.grade.variant ? t('variantRight') : t('good'))
+            : t('notYet'))}</span>
         </div>
       </div>`);
 
@@ -1041,21 +1221,22 @@
       const violation = detail.grade.violations[0];
       sheet.append(el(`
         <div class="violation">
-          ${escape(violation.message)}
+          ${escape(say(violation))}
           ${violation.correction ? `<br><code>→ ${escape(violation.correction)}</code>` : ''}
         </div>`));
     } else if (detail.grade && detail.grade.missing) {
-      sheet.append(el(`<p class="reason">Satzbau stimmt, aber es fehlt:
-        <code>${detail.grade.missing.map(escape).join(', ')}</code></p>`));
+      sheet.append(el(`<p class="reason">${escape(t('missing',
+        detail.grade.missing.join(', ')))}</p>`));
     } else if (detail.reason) {
       sheet.append(el(`<p class="reason">${detail.reason}</p>`));
     }
 
     if (!correct || (detail.grade && detail.grade.variant)) {
-      sheet.append(el(`<p class="reason">Musterlösung: <span class="solution">${escape(detail.solution)}</span></p>`));
+      sheet.append(el(`<p class="reason">${escape(t('model'))} `
+        + `<span class="solution">${escape(detail.solution)}</span></p>`));
     }
     if (!correct && detail.parked) {
-      sheet.append(el('<p class="hint">Kommt in einer der nächsten Wiederholungen zurück.</p>'));
+      sheet.append(el(`<p class="hint">${escape(t('comesBack'))}</p>`));
     }
 
     if (detail.xray) {
@@ -1063,12 +1244,12 @@
       if (spans.length) {
         sheet.append(el(`<div class="xray">${spans.map((span) => `
           <span class="span" data-role="${escape(span.role)}">
-            <b>${escape(span.text)}</b><i>${escape(span.role)}</i>
+            <b>${escape(span.text)}</b><i>${escape(TP.roleLabel(span.role, state.lang))}</i>
           </span>`).join('')}</div>`));
       }
     }
 
-    const next = el(`<button class="primary">${correct ? 'Weiter' : 'Verstanden'}</button>`);
+    const next = el(`<button class="primary">${escape(t(correct ? 'next' : 'understood'))}</button>`);
     next.onclick = () => { session.index += 1; render(); };
     sheet.append(next);
     app.append(sheet);
@@ -1087,18 +1268,16 @@
     const screen = el(`
       <div class="screen done">
         <div class="burst">pona!</div>
-        <h2>${escape(review ? 'Wiederholung geschafft' : lesson.title)}</h2>
-        <p>${escape(review
-          ? 'Die Karten kommen wieder, wenn es Zeit dafür ist.'
-          : lesson.note.replace(/<[^>]+>/g, ''))}</p>
+        <h2>${escape(review ? t('reviewDone') : lesson.title)}</h2>
+        <p>${escape(review ? t('reviewNote') : lesson.note.replace(/<[^>]+>/g, ''))}</p>
         <div class="tally">
-          <div><b>+${session.xp}</b><span>xp</span></div>
-          <div><b>${session.correct}</b><span>richtig</span></div>
-          <div><b>${review ? session.queue.length : lesson.words.length}</b><span>${review ? 'karten' : 'wörter'}</span></div>
+          <div><b>+${session.xp}</b><span>${escape(t('xp'))}</span></div>
+          <div><b>${session.correct}</b><span>${escape(t('correct'))}</span></div>
+          <div><b>${review ? session.queue.length : lesson.words.length}</b><span>${escape(t(review ? 'cards' : 'words'))}</span></div>
         </div>
         <div class="actions">
-          <button class="primary">Weiter</button>
-          ${review ? '' : '<button class="ghost">Nochmal üben</button>'}
+          <button class="primary">${escape(t('next'))}</button>
+          ${review ? '' : `<button class="ghost">${escape(t('again'))}</button>`}
         </div>
       </div>`);
 
@@ -1114,7 +1293,7 @@
 
   function wordScreen() {
     const screen = screenWith(`
-      <input class="search" placeholder="Wort oder Bedeutung suchen …" aria-label="Suche">
+      <input class="search" placeholder="${escape(t('search'))}" aria-label="${escape(t('search'))}">
       <div class="words"></div>`);
     const list = screen.querySelector('.words');
     const input = screen.querySelector('.search');
@@ -1124,7 +1303,7 @@
       const term = query.trim().toLowerCase();
       Object.keys(TP.lexicon).sort().forEach((word) => {
         const entry = TP.lexicon[word];
-        const text = entry.glosses.join(', ');
+        const text = glossesOf(word).join(', ');
         if (term && !word.includes(term) && !text.toLowerCase().includes(term)) return;
         list.append(el(`
           <div class="word">
@@ -1145,9 +1324,8 @@
   function sandboxScreen() {
     const screen = screenWith(`
       <div class="hello">
-        <h1>o toki!</h1>
-        <p>Schreib irgendetwas auf toki pona. Der Parser zerlegt es und sagt dir,
-           was er sieht — oder was nicht stimmt.</p>
+        <h1>${escape(t('sandboxTitle'))}</h1>
+        <p>${escape(t('sandboxIntro'))}</p>
       </div>
       <input class="typed" autocomplete="off" autocapitalize="off" spellcheck="false"
              value="jan suli li pana e lipu tawa mi." aria-label="Satz">
@@ -1167,19 +1345,20 @@
         if (spans.length) {
           card.append(el(`<div class="xray">${spans.map((span) => `
             <span class="span" data-role="${escape(span.role)}">
-              <b>${escape(span.text)}</b><i>${escape(span.role)}</i>
+              <b>${escape(span.text)}</b><i>${escape(TP.roleLabel(span.role, state.lang))}</i>
             </span>`).join('')}</div>`));
         }
         if (parsed.isValid) {
-          card.append(el(`<p class="reason" style="margin-top:0.7rem;color:var(--accent)">
-            ✓ Satzbau in Ordnung${parsed.utterance && parsed.utterance.isQuestion ? ' — eine Frage' : ''}</p>`));
+          card.append(el(`<p class="reason" style="margin-top:0.7rem;color:var(--accent)">`
+            + `${escape(t('structureOk'))}`
+            + `${parsed.utterance && parsed.utterance.isQuestion ? escape(t('sandboxQuestion')) : ''}</p>`));
         } else {
           parsed.violations.forEach((violation) => {
             card.append(el(`
               <div class="violation" style="margin-top:0.7rem">
-                ${escape(violation.message)}
+                ${escape(say(violation))}
                 ${violation.correction ? `<br><code>→ ${escape(violation.correction)}</code>` : ''}
-                ${violation.concept ? `<br><code>${escape(CONCEPT_LABELS[violation.concept] || violation.concept)}</code>` : ''}
+                ${violation.concept ? `<br><code>${escape(conceptLabel(violation.concept))}</code>` : ''}
               </div>`));
           });
         }
@@ -1192,7 +1371,7 @@
 
     screen.append(el(`
       <p class="foot" style="padding-top:1rem">
-        Probier: <code>mi li moku.</code> · <code>jan pi pona li lape.</code> ·
+        ${escape(t('sandboxTry'))} <code>mi li moku.</code> · <code>jan pi pona li lape.</code> ·
         <code>soweli moku e kili.</code> · <code>jan Claude li pona.</code>
       </p>`));
     return screen;

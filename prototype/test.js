@@ -30,28 +30,64 @@ for (const sentence of data.corpus.external) {
   else check(false, `KURS  ${sentence} → ${result.violations.map((v) => v.rule).join(', ')}`);
 }
 
-// 4. Alle importierten Musterlösungen müssen gültig sein
+// 4. Alle importierten Musterlösungen müssen gültig sein — in jeder Sprache
 let items = 0;
-for (const lesson of data.lessons) {
-  for (const item of lesson.items) {
-    for (const solution of [item.tp, ...item.also]) {
-      items += 1;
-      const violations = TokiPona.splitUtterances(solution)
-        .flatMap((u) => TokiPona.parse(u).violations);
-      check(!violations.length,
-        `IMPORT ${item.id}  ${solution} → ${violations.map((v) => v.rule).join(', ')}`);
+for (const [lang, pack] of Object.entries(data.languages)) {
+  for (const lesson of pack.lessons) {
+    for (const item of lesson.items) {
+      check(item.target && item.target.length, `IMPORT ${lang} ${item.id}: keine Übersetzung`);
+      for (const solution of [item.tp, ...item.also]) {
+        items += 1;
+        const violations = TokiPona.splitUtterances(solution)
+          .flatMap((u) => TokiPona.parse(u).violations);
+        check(!violations.length,
+          `IMPORT ${lang} ${item.id}  ${solution} → ${violations.map((v) => v.rule).join(', ')}`);
+      }
     }
   }
 }
 
-// 5. Satzröntgen
+// 5. Jedes Wort braucht in jeder Sprache eine Bedeutung
+for (const [word, entry] of Object.entries(data.lexicon)) {
+  for (const lang of Object.keys(data.languages)) {
+    check(entry.glosses[lang] && entry.glosses[lang].length,
+      `LEXIKON ${word}: keine Bedeutung für ${lang}`);
+  }
+}
+
+// 6. Meldungen müssen in beiden Sprachen greifen
+for (const [sentence] of data.corpus.invalid) {
+  for (const lang of Object.keys(data.languages)) {
+    for (const violation of TokiPona.parse(sentence).violations) {
+      const text = TokiPona.describe(violation, lang);
+      check(text && text !== violation.key,
+        `MELDUNG ${lang}/${violation.key}: keine Übersetzung`);
+    }
+  }
+}
+
+// 7. Satzröntgen
 const spans = TokiPona.xray(TokiPona.parse('jan suli li pana e lipu tawa mi.').utterance);
 check(JSON.stringify(spans.map((s) => s.role))
-      === JSON.stringify(['Subjekt', 'Prädikat', 'Verb', 'Objekt', 'Präposition', 'Ergänzung']),
+      === JSON.stringify(['subject', 'predicateMarker', 'verb', 'object', 'preposition', 'complement']),
       'Satzröntgen: ' + spans.map((s) => `${s.text}=${s.role}`).join(' '));
+
+// 8. Rollennamen: in jeder Sprache vorhanden, und wirklich übersetzt.
+// Auf Englisch ist die Beschriftung mit dem Schlüssel identisch — das ist
+// kein Fehler, deshalb prüft der Vergleich gegen die deutsche Fassung.
+for (const span of spans) {
+  for (const lang of Object.keys(data.languages)) {
+    const label = TokiPona.roleLabel(span.role, lang);
+    check(typeof label === 'string' && label.length > 0, `ROLLE ${lang}/${span.role}: leer`);
+  }
+}
+check(TokiPona.roleLabel('subject', 'de') === 'Subjekt'
+      && TokiPona.roleLabel('predicateMarker', 'de') === 'Prädikat',
+      'deutsche Rollennamen fehlen');
+check(TokiPona.roleLabel('predicateMarker', 'en') === 'predicate', 'englische Rollennamen fehlen');
 
 console.log(`Golden:  ${data.corpus.valid.length} gültige, ${data.corpus.invalid.length} fehlerhafte`);
 console.log(`Kurs:    ${externalOk}/${data.corpus.external.length} fehlerfrei`);
-console.log(`Import:  ${items} Musterlösungen geprüft`);
+console.log(`Import:  ${items} Musterlösungen in ${Object.keys(data.languages).length} Sprachen geprüft`);
 console.log(failures ? `\n✗ ${failures} Abweichung(en)` : '\n✓ alle Prüfungen bestanden');
 process.exit(failures ? 1 : 0);

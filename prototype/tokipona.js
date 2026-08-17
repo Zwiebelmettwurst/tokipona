@@ -51,14 +51,6 @@ const TokiPona = (function (data) {
     return null;
   }
 
-  const PHONO_MESSAGE = {
-    emptyString: () => 'Leere Zeichenkette.',
-    foreignLetter: (c) => `„${c}“ gehört nicht zu den 14 Buchstaben von toki pona.`,
-    forbiddenSyllable: (s) => `Die Silbe „${s}“ ist in toki pona nicht erlaubt.`,
-    missingVowel: () => 'Jede Silbe braucht einen Vokal.',
-    danglingConsonant: () => 'Nach dem letzten Vokal ist nur „n“ erlaubt.',
-  };
-
   // ---------------------------------------------------------------- Tokenizer
 
   function editDistance(a, b) {
@@ -151,6 +143,88 @@ const TokiPona = (function (data) {
 
   // ---------------------------------------------------------------- Parser
 
+  // Verstöße tragen Schlüssel und Werte, keinen fertigen Satz. Übersetzt wird
+  // erst bei der Anzeige — sonst wäre die Sprache im Parser eingebrannt.
+  const MESSAGES = {
+    de: {
+      emptyUtterance: () => 'Der Satz ist leer.',
+      emptyContext: () => 'Vor „la“ fehlt der Kontext.',
+      contextWithoutClause: () => 'Nach „la“ fehlt der Hauptsatz.',
+      unknownWord: (p) => `„${p.word}“ steht nicht im Wortschatz.`,
+      unknownWordSuggest: (p) => `„${p.word}“ steht nicht im Wortschatz. Meintest du „${p.suggestion}“?`,
+      unknownWordKu: (p) => `„${p.word}“ gehört zu den nimi ku suli, nicht zu pu.`,
+      properNameNotTokiponized: (p, table) => `„${p.word}“ ist kein toki-pona-Name: `
+        + table[PHONO_KEY[p.kind]](p),
+      missingSubject: () => 'Vor „li“ fehlt das Satzsubjekt.',
+      liAfterMiSina: (p) => `Nach „${p.word}“ als alleinigem Subjekt entfällt „li“.`,
+      missingLi: () => 'Vor dem Prädikat fehlt „li“.',
+      vocativeWithoutContent: () => '„o“ braucht eine Anrede davor oder einen Befehl danach.',
+      repeatedParticle: (p) => `„${p.word}“ steht doppelt.`,
+      missingPredicate: (p) => (p.word ? `Nach „${p.word}“ fehlt das Prädikat.` : 'Dem Satz fehlt das Prädikat.'),
+      objectWithoutNoun: () => 'Nach „e“ fehlt das Objekt.',
+      unexpectedToken: (p) => `„${p.word}“ passt an dieser Stelle nicht in den Satzbau.`,
+      particleInPhrasePosition: (p) => `„${p.word}“ ist ein Partikel und kann keine Phrase anführen.`,
+      properNameAsHead: () => 'Namen stehen als Beifügung hinter einem Wort wie jan, ma oder toki.',
+      piWithoutContent: () => 'Nach „pi“ fehlt die Wortgruppe.',
+      piWithSingleWord: () => '„pi“ gruppiert nur mehrwortige Beifügungen um; vor einem einzelnen Wort entfällt es.',
+      phonoEmptyString: () => 'Leere Zeichenkette.',
+      phonoForeignLetter: (p) => `„${p.detail}“ gehört nicht zu den 14 Buchstaben von toki pona.`,
+      phonoForbiddenSyllable: (p) => `Die Silbe „${p.detail}“ ist in toki pona nicht erlaubt.`,
+      phonoMissingVowel: () => 'Jede Silbe braucht einen Vokal.',
+      phonoDanglingConsonant: () => 'Nach dem letzten Vokal ist nur „n“ erlaubt.',
+    },
+    en: {
+      emptyUtterance: () => 'The sentence is empty.',
+      emptyContext: () => 'There is no context before “la”.',
+      contextWithoutClause: () => 'There is no main clause after “la”.',
+      unknownWord: (p) => `“${p.word}” is not in the vocabulary.`,
+      unknownWordSuggest: (p) => `“${p.word}” is not in the vocabulary. Did you mean “${p.suggestion}”?`,
+      unknownWordKu: (p) => `“${p.word}” is one of the nimi ku suli, not from pu.`,
+      properNameNotTokiponized: (p, table) => `“${p.word}” is not a toki pona name: `
+        + table[PHONO_KEY[p.kind]](p),
+      missingSubject: () => 'There is no subject before “li”.',
+      liAfterMiSina: (p) => `After “${p.word}” alone as the subject, “li” is dropped.`,
+      missingLi: () => '“li” is missing before the predicate.',
+      vocativeWithoutContent: () => '“o” needs someone addressed before it or a command after it.',
+      repeatedParticle: (p) => `“${p.word}” appears twice.`,
+      missingPredicate: (p) => (p.word ? `There is no predicate after “${p.word}”.` : 'The sentence has no predicate.'),
+      objectWithoutNoun: () => 'There is no object after “e”.',
+      unexpectedToken: (p) => `“${p.word}” does not fit the sentence structure here.`,
+      particleInPhrasePosition: (p) => `“${p.word}” is a particle and cannot head a phrase.`,
+      properNameAsHead: () => 'Names follow a head word such as jan, ma or toki.',
+      piWithoutContent: () => 'There is no word group after “pi”.',
+      piWithSingleWord: () => '“pi” only regroups modifiers of two or more words; before a single word it is dropped.',
+      phonoEmptyString: () => 'Empty string.',
+      phonoForeignLetter: (p) => `“${p.detail}” is not one of the 14 letters of toki pona.`,
+      phonoForbiddenSyllable: (p) => `The syllable “${p.detail}” is not allowed in toki pona.`,
+      phonoMissingVowel: () => 'Every syllable needs a vowel.',
+      phonoDanglingConsonant: () => 'Only “n” may follow the last vowel.',
+    },
+  };
+
+  const PHONO_KEY = {
+    emptyString: 'phonoEmptyString', foreignLetter: 'phonoForeignLetter',
+    forbiddenSyllable: 'phonoForbiddenSyllable', missingVowel: 'phonoMissingVowel',
+    danglingConsonant: 'phonoDanglingConsonant',
+  };
+
+  const ROLES = {
+    de: { context: 'Kontext', particle: 'Partikel', vocative: 'Anrede', subject: 'Subjekt',
+          predicateMarker: 'Prädikat', directive: 'Befehl', preverb: 'Präverb', verb: 'Verb',
+          complement: 'Ergänzung', object: 'Objekt', preposition: 'Präposition' },
+    en: { context: 'context', particle: 'particle', vocative: 'address', subject: 'subject',
+          predicateMarker: 'predicate', directive: 'command', preverb: 'preverb', verb: 'verb',
+          complement: 'complement', object: 'object', preposition: 'preposition' },
+  };
+
+  const roleLabel = (role, lang) => (ROLES[lang] || ROLES.de)[role] || role;
+
+  function describe(violation, lang) {
+    const table = MESSAGES[lang] || MESSAGES.de;
+    const make = table[violation.key] || MESSAGES.de[violation.key];
+    return make ? make(violation.params || {}, table) : violation.key;
+  }
+
   const CONCEPT_OF_RULE = {
     liAfterMiSina: 'c_mi_sina',
     missingLi: 'c_li', missingSubject: 'c_li', missingPredicate: 'c_li', repeatedParticle: 'c_li',
@@ -170,17 +244,17 @@ const TokiPona = (function (data) {
       this.suppress = false;
     }
 
-    report(rule, tokens, message, correction = null) {
+    report(rule, tokens, key, params = {}, correction = null) {
       if (this.suppress && (rule === 'unknownWord' || rule === 'properNameNotTokiponized')) return;
       this.violations.push({
-        rule, message, correction,
+        rule, key, params, correction,
         concept: CONCEPT_OF_RULE[rule] || null,
         tokenIndices: tokens.map((t) => t.index),
       });
     }
 
     run() {
-      if (!this.tokens.length) { this.report('emptyUtterance', [], 'Der Satz ist leer.'); return null; }
+      if (!this.tokens.length) { this.report('emptyUtterance', [], 'emptyUtterance'); return null; }
       this.reportLexicalIssues();
 
       let start = 0, end = this.tokens.length;
@@ -220,7 +294,7 @@ const TokiPona = (function (data) {
         const la = this.indexOfTopLevel('la', segment, end);
         if (la === null) break;
         if (la === segment) {
-          this.report('emptyContext', [this.tokens[la]], 'Vor „la“ fehlt der Kontext.');
+          this.report('emptyContext', [this.tokens[la]], 'emptyContext');
         } else {
           const clause = this.parseClause(segment, la);
           if (clause) {
@@ -233,7 +307,7 @@ const TokiPona = (function (data) {
       }
 
       if (segment >= end) {
-        this.report('contextWithoutClause', [this.tokens[end - 1]], 'Nach „la“ fehlt der Hauptsatz.');
+        this.report('contextWithoutClause', [this.tokens[end - 1]], 'contextWithoutClause');
         return { contexts, clause: null, finalParticles: finals, isQuestion: question };
       }
 
@@ -246,14 +320,12 @@ const TokiPona = (function (data) {
       for (const token of this.tokens) {
         if (token.kind === 'unknown') {
           this.report('unknownWord', [token],
-            token.suggestion
-              ? `„${token.original}“ steht nicht im Wortschatz. Meintest du „${token.suggestion}“?`
-              : `„${token.original}“ steht nicht im Wortschatz.`,
+            token.suggestion ? 'unknownWordSuggest' : 'unknownWord',
+            { word: token.original, suggestion: token.suggestion },
             token.suggestion);
         } else if (token.kind === 'malformedName') {
-          const message = PHONO_MESSAGE[token.problem.kind](token.problem.detail);
-          this.report('properNameNotTokiponized', [token],
-            `„${token.original}“ ist kein toki-pona-Name: ${message}`);
+          this.report('properNameNotTokiponized', [token], 'properNameNotTokiponized',
+            { word: token.original, kind: token.problem.kind, detail: token.problem.detail });
         }
       }
     }
@@ -267,11 +339,11 @@ const TokiPona = (function (data) {
       const liIndex = this.indexOfTopLevel('li', from, to);
 
       if (liIndex === from) {
-        this.report('missingSubject', [this.tokens[liIndex]], 'Vor „li“ fehlt das Satzsubjekt.');
+        this.report('missingSubject', [this.tokens[liIndex]], 'missingSubject');
       }
       if (liIndex === from + 1 && this.isBarePronoun(this.tokens[from])) {
-        this.report('liAfterMiSina', [this.tokens[liIndex]],
-          `Nach „${this.tokens[from].text}“ als alleinigem Subjekt entfällt „li“.`,
+        this.report('liAfterMiSina', [this.tokens[liIndex]], 'liAfterMiSina',
+          { word: this.tokens[from].text },
           this.tokens[from].text + ' ' + this.tokens.slice(from + 2, to).map((t) => t.text).join(' '));
       }
 
@@ -299,7 +371,7 @@ const TokiPona = (function (data) {
         subjects = this.parseSubjectChain();
         if (this.pos < to) {
           if (isParticle(this.tokens[this.pos], 'e')) {
-            this.report('missingLi', [this.tokens[this.pos]], 'Vor dem Prädikat fehlt „li“.',
+            this.report('missingLi', [this.tokens[this.pos]], 'missingLi', {},
               this.correctionWithLi(from, to));
             this.pos = to;
             return { kind: 'declarative', subjects, predicates: [] };
@@ -327,8 +399,7 @@ const TokiPona = (function (data) {
         predicates = predicates.concat(this.parsePredicateChain());
       }
       if (!subjects.length && !predicates.length) {
-        this.report('vocativeWithoutContent', [marker],
-          '„o“ braucht eine Anrede davor oder einen Befehl danach.');
+        this.report('vocativeWithoutContent', [marker], 'vocativeWithoutContent');
       }
       return { kind: predicates.length ? 'imperative' : 'vocative', subjects, predicates };
     }
@@ -358,7 +429,7 @@ const TokiPona = (function (data) {
         const marker = this.tokens[this.pos];
         this.pos += 1;
         if (this.pos < this.limit && isParticle(this.tokens[this.pos], 'li')) {
-          this.report('repeatedParticle', [this.tokens[this.pos]], '„li“ steht doppelt.');
+          this.report('repeatedParticle', [this.tokens[this.pos]], 'repeatedParticle', { word: 'li' });
           continue;
         }
         predicates.push(this.parsePredicate(marker));
@@ -402,8 +473,8 @@ const TokiPona = (function (data) {
         const phrase = this.parseNounPhrase();
         if (phrase) core = { kind: 'phrase', phrase };
       } else {
-        this.report('missingPredicate', marker ? [marker] : [],
-          marker ? `Nach „${marker.text}“ fehlt das Prädikat.` : 'Dem Satz fehlt das Prädikat.');
+        this.report('missingPredicate', marker ? [marker] : [], 'missingPredicate',
+          { word: marker ? marker.text : null });
       }
 
       if (core.kind === 'phrase') {
@@ -423,7 +494,7 @@ const TokiPona = (function (data) {
         if (isParticle(token, 'e')) {
           this.pos += 1;
           if (this.pos < this.limit && isParticle(this.tokens[this.pos], 'e')) {
-            this.report('repeatedParticle', [this.tokens[this.pos]], '„e“ steht doppelt.');
+            this.report('repeatedParticle', [this.tokens[this.pos]], 'repeatedParticle', { word: 'e' });
             continue;
           }
           const object = this.parseNounPhrase();
@@ -436,7 +507,7 @@ const TokiPona = (function (data) {
               objects.push(further);
             }
           } else {
-            this.report('objectWithoutNoun', [token], 'Nach „e“ fehlt das Objekt.');
+            this.report('objectWithoutNoun', [token], 'objectWithoutNoun');
           }
         } else if (isPreposition(token)) {
           const phrase = this.parsePrepositionalPhrase();
@@ -449,8 +520,8 @@ const TokiPona = (function (data) {
       }
 
       if (this.pos < this.limit && !this.chainsPredicate(this.tokens[this.pos])) {
-        this.report('unexpectedToken', [this.tokens[this.pos]],
-          `„${this.tokens[this.pos].original}“ passt an dieser Stelle nicht in den Satzbau.`);
+        this.report('unexpectedToken', [this.tokens[this.pos]], 'unexpectedToken',
+          { word: this.tokens[this.pos].original });
         while (this.pos < this.limit && !this.chainsPredicate(this.tokens[this.pos])) this.pos += 1;
       }
 
@@ -473,14 +544,11 @@ const TokiPona = (function (data) {
       const head = this.tokens[this.pos];
 
       if (isBoundary(head) || isParticle(head, 'pi')) {
-        this.report('particleInPhrasePosition', [head],
-          `„${head.text}“ ist ein Partikel und kann keine Phrase anführen.`);
+        this.report('particleInPhrasePosition', [head], 'particleInPhrasePosition', { word: head.text });
         return null;
       }
       if (isProperName(head)) {
-        this.report('properNameAsHead', [head],
-          'Namen stehen als Beifügung hinter einem Wort wie jan, ma oder toki.',
-          `jan ${head.original}`);
+        this.report('properNameAsHead', [head], 'properNameAsHead', {}, `jan ${head.original}`);
       }
 
       this.pos += 1;
@@ -504,10 +572,9 @@ const TokiPona = (function (data) {
             this.pos += 1;
           }
           if (!group.length) {
-            this.report('piWithoutContent', [token], 'Nach „pi“ fehlt die Wortgruppe.');
+            this.report('piWithoutContent', [token], 'piWithoutContent');
           } else if (group.length === 1) {
-            this.report('piWithSingleWord', [token, group[0]],
-              '„pi“ gruppiert nur mehrwortige Beifügungen um; vor einem einzelnen Wort entfällt es.',
+            this.report('piWithSingleWord', [token, group[0]], 'piWithSingleWord', {},
               `${head.text} ${group[0].text}`);
             modifiers.push({ kind: 'simple', token: group[0] });
           } else {
@@ -556,8 +623,8 @@ const TokiPona = (function (data) {
 
     reportLeftovers(bound) {
       if (this.pos >= bound) return;
-      this.report('unexpectedToken', [this.tokens[this.pos]],
-        `„${this.tokens[this.pos].original}“ passt an dieser Stelle nicht in den Satzbau.`);
+      this.report('unexpectedToken', [this.tokens[this.pos]], 'unexpectedToken',
+        { word: this.tokens[this.pos].original });
       this.pos = bound;
     }
 
@@ -598,11 +665,11 @@ const TokiPona = (function (data) {
     });
 
     for (const context of utterance.contexts) {
-      if (context.kind === 'phrase') push(phraseTokens(context.phrase), 'Kontext');
+      if (context.kind === 'phrase') push(phraseTokens(context.phrase), 'context');
       else spans.push(...clauseSpans(context.clause, true));
     }
     if (utterance.clause) spans.push(...clauseSpans(utterance.clause, false));
-    for (const particle of utterance.finalParticles) push([particle], 'Partikel');
+    for (const particle of utterance.finalParticles) push([particle], 'particle');
     return spans;
 
     function clauseSpans(clause, contextual) {
@@ -612,28 +679,28 @@ const TokiPona = (function (data) {
       });
       const vocative = clause.kind === 'vocative' || clause.kind === 'imperative';
       for (const subject of clause.subjects) {
-        add(phraseTokens(subject), vocative ? 'Anrede' : (contextual ? 'Kontext' : 'Subjekt'));
+        add(phraseTokens(subject), vocative ? 'vocative' : (contextual ? 'context' : 'subject'));
         if (subject.embedded) out.push(...xray(subject.embedded));
       }
       for (const predicate of clause.predicates) {
         if (predicate.marker) {
-          add([predicate.marker], predicate.marker.text === 'o' ? 'Befehl' : 'Prädikat');
+          add([predicate.marker], predicate.marker.text === 'o' ? 'directive' : 'predicateMarker');
         }
-        for (const preverb of predicate.preverbs) add([preverb.token], 'Präverb');
+        for (const preverb of predicate.preverbs) add([preverb.token], 'preverb');
         if (predicate.core.kind === 'phrase') {
-          add(phraseTokens(predicate.core.phrase), 'Verb');
+          add(phraseTokens(predicate.core.phrase), 'verb');
           if (predicate.core.phrase.embedded) out.push(...xray(predicate.core.phrase.embedded));
         } else if (predicate.core.kind === 'prepositional') {
-          add([predicate.core.phrase.preposition], 'Verb');
-          if (predicate.core.phrase.object) add(phraseTokens(predicate.core.phrase.object), 'Ergänzung');
+          add([predicate.core.phrase.preposition], 'verb');
+          if (predicate.core.phrase.object) add(phraseTokens(predicate.core.phrase.object), 'complement');
         }
         for (const object of predicate.objects) {
-          add(phraseTokens(object), 'Objekt');
+          add(phraseTokens(object), 'object');
           if (object.embedded) out.push(...xray(object.embedded));
         }
         for (const prepositional of predicate.prepositions) {
-          add([prepositional.preposition], 'Präposition');
-          if (prepositional.object) add(phraseTokens(prepositional.object), 'Ergänzung');
+          add([prepositional.preposition], 'preposition');
+          if (prepositional.object) add(phraseTokens(prepositional.object), 'complement');
         }
       }
       return out;
@@ -641,7 +708,7 @@ const TokiPona = (function (data) {
   }
 
   return {
-    parse, tokenize, splitUtterances, xray, phonoCheck, suggest, editDistance,
+    parse, tokenize, splitUtterances, xray, phonoCheck, suggest, editDistance, describe, roleLabel,
     lookup, phraseText, lexicon: LEX,
   };
 })(typeof TOKIPONA_DATA !== 'undefined' ? TOKIPONA_DATA : require('./data.js'));

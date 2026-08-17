@@ -15,6 +15,38 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 from tokipona_check import WORDS, VARIANTS, split_utterances, is_toki_pona  # noqa: E402
 
+LESSON_TITLES_EN = {
+    1: "Simple sentences", 2: "Modifiers", 3: "Verbs and objects",
+    4: "More vocabulary", 5: "This and that", 6: "Prepositions and places",
+    7: "Interjections, questions, commands, names", 8: "Colours", 9: "pi and la",
+    10: "Preverbs and time", 11: "Numbers", 12: "The rest of pu",
+    13: "nimi ku suli",
+}
+
+LESSON_NOTES_EN = {
+    1: ("After <b>mi</b> and <b>sina</b> alone there is no <b>li</b>. "
+        "With every other subject there is: <i>ona li pona.</i>"),
+    2: ("The modifier goes <b>after</b> the head word: "
+        "<i>jan pona</i> is a good person; <i>pona jan</i> does not exist."),
+    3: ("<b>e</b> announces the object: <i>mi lukin e sina.</i> "
+        "Without <b>e</b> there is no object."),
+    4: "More words, same building blocks. Keep an eye on <b>li</b> and <b>e</b>.",
+    5: ("<b>ni</b> points at something: <i>ni li pona.</i> "
+        "<b>en</b> joins two subjects: <i>mi en sina li pona.</i>"),
+    6: ("Prepositions can be the predicate themselves: <i>mi lon tomo.</i> "
+        "And they can modify: <i>tomo tawa mi</i> is a car."),
+    7: ("<b>o</b> is address and command, <b>seme</b> asks for something, "
+        "and <b>X ala X</b> is the yes-no question."),
+    8: "Colour words are modifiers like any other: <i>kili loje</i>.",
+    9: ("<b>pi</b> regroups modifiers of two or more words: <i>jan pi toki pona</i>. "
+        "Never before a single word. <b>la</b> puts the context up front."),
+    10: ("Preverbs go before the verb: <i>mi wile moku.</i> "
+         "Time is expressed with <b>tenpo … la</b>, not with endings."),
+    11: "<b>wan tu mute ale</b> — and <b>nanpa</b> for ordinals.",
+    12: "The last words from <i>pu</i>.",
+    13: "The 17 <i>nimi ku suli</i> — widespread, but not in the first book.",
+}
+
 LESSON_TITLES = {
     1: "Einfache Sätze", 2: "Beifügungen", 3: "Verben und Objekte",
     4: "Mehr Wortschatz", 5: "Dies und das", 6: "Präpositionen und Orte",
@@ -49,42 +81,70 @@ LESSON_NOTES = {
 }
 
 
-def main():
-    course = Path(sys.argv[1] if len(sys.argv) > 1 else "/workspace/pona-la/lipu-sona")
-    imported = json.loads((ROOT / "Content/lipu-sona-import.json").read_text())
+TITLES = {"de": LESSON_TITLES, "en": LESSON_TITLES_EN}
+NOTES = {"de": LESSON_NOTES, "en": LESSON_NOTES_EN}
 
-    glosses = {word: data["glosses"] for word, data in WORDS.items()}
-    lexicon = {
-        word: {
-            "book": data["book"],
-            "roles": sorted(data["roles"]),
-            "glosses": glosses[word],
-        }
-        for word, data in WORDS.items()
-    }
 
-    course_words = {}
-    for lesson in imported["lessons"]:
-        for entry in lesson["words"]:
-            course_words.setdefault(entry["word"], lesson["lesson"])
-
-    lessons = []
+def lessons_for(lang):
+    """Lektionen einer Sprache aus dem Import."""
+    imported = json.loads((ROOT / f"Content/lipu-sona-import-{lang}.json").read_text())
+    out = []
     for lesson in imported["lessons"]:
         number = lesson["lesson"]
         items = [i for i in imported["items"] if i["lesson"] == number]
         if not items:
             continue
-        lessons.append({
+        out.append({
             "number": number,
-            "title": LESSON_TITLES.get(number, lesson["title"]),
-            "note": LESSON_NOTES.get(number, ""),
+            "title": TITLES[lang].get(number, lesson["title"]),
+            "note": NOTES[lang].get(number, ""),
             "words": [w["word"] for w in lesson["words"]],
             "items": [
                 {"id": i["id"], "direction": i["direction"], "tp": i["tp"],
-                 "also": i["alsoAccepted"], "de": i["de"]}
+                 "also": i["alsoAccepted"], "target": i["de"]}
                 for i in items
             ],
         })
+    return out, imported["attribution"]
+
+
+def course_glosses(course: Path, lang: str):
+    """Wortbedeutungen aus den Kursseiten einer Sprache."""
+    pages = course / "pages" / lang
+    found = {}
+    for number in range(1, 14):
+        page = pages / f"{number}.md"
+        if not page.is_file():
+            continue
+        for word, gloss in re.findall(r"^\|\s*([a-z]+(?:/[a-z]+)?)\s*\|\s*([^|]+?)\s*\|",
+                                      page.read_text(), re.M):
+            key = word.split("/")[0]
+            if key in ("wort", "word") or key not in WORDS:
+                continue
+            parts = [g.strip() for g in re.split(r"[,/]", gloss) if g.strip()]
+            found.setdefault(key, parts[:4])
+    return found
+
+
+def main():
+    course = Path(sys.argv[1] if len(sys.argv) > 1 else "/workspace/pona-la/lipu-sona")
+
+    english = course_glosses(course, "en")
+    lexicon = {
+        word: {
+            "book": data["book"],
+            "roles": sorted(data["roles"]),
+            # Deutsch stammt aus dem Swift-Lexikon, Englisch aus den Kursseiten.
+            "glosses": {"de": data["glosses"], "en": english.get(word, data["glosses"])},
+        }
+        for word, data in WORDS.items()
+    }
+
+    languages = {}
+    attribution = None
+    for lang in ("de", "en"):
+        lessons, attribution = lessons_for(lang)
+        languages[lang] = {"lessons": lessons}
 
     # Prüfkorpora für den Node-Test
     golden = re.findall(
@@ -117,8 +177,8 @@ def main():
     data = {
         "lexicon": lexicon,
         "variants": VARIANTS,
-        "lessons": lessons,
-        "attribution": imported["attribution"],
+        "languages": languages,
+        "attribution": attribution,
         "corpus": {"valid": golden, "invalid": [list(x) for x in invalid], "external": external},
     }
 
@@ -128,9 +188,14 @@ def main():
         "const TOKIPONA_DATA = " + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + ";\n"
         "if (typeof module !== 'undefined') { module.exports = TOKIPONA_DATA; }\n"
     )
-    print(f"{out.relative_to(ROOT)}: {len(lexicon)} Wörter, {len(lessons)} Lektionen, "
-          f"{sum(len(l['items']) for l in lessons)} Aufgaben, "
-          f"{len(golden)}+{len(invalid)}+{len(external)} Prüfsätze")
+    missing = [w for w in WORDS if w not in english]
+    print(f"{out.relative_to(ROOT)}: {len(lexicon)} Wörter, "
+          + ", ".join(f"{lang}: {len(v['lessons'])} Lektionen/"
+                      f"{sum(len(l['items']) for l in v['lessons'])} Aufgaben"
+                      for lang, v in languages.items())
+          + f", {len(golden)}+{len(invalid)}+{len(external)} Prüfsätze")
+    if missing:
+        print(f"  ohne englische Bedeutung: {' '.join(missing)}")
 
 
 if __name__ == "__main__":

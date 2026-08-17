@@ -7,10 +7,11 @@
     "copyright": "© 2020 /dev/urandom und Mitwirkende",
     "note": "Übungssätze und Übersetzungen übernommen und bearbeitet; Erklärtexte der App sind eigenständig formuliert."
   },
+  "language": "en",
   "lessons": [
     {
       "lesson": 1,
-      "title": "Einfache Sätze",
+      "title": "basic sentences",
       "stage": 1,
       "concepts": [
         "c_mi_sina",
@@ -19,50 +20,50 @@
       "words": [
         {
           "word": "mi",
-          "courseGloss": "ich, wir"
+          "courseGloss": "I, me, us"
         },
         {
           "word": "sina",
-          "courseGloss": "du, Sie, ihr"
+          "courseGloss": "you"
         },
         {
           "word": "ona",
-          "courseGloss": "er, sie, es, sie"
+          "courseGloss": "he, she, they, it"
         },
         {
           "word": "li",
-          "courseGloss": "(zw. Subjekt und Verb/Adjektiv)"
+          "courseGloss": "(between subj. and verb/adj.)"
         },
         {
           "word": "pona",
-          "courseGloss": "gut, einfach, Verbessern, reparieren"
+          "courseGloss": "good, simple, to improve, to fix"
         },
         {
           "word": "ike",
-          "courseGloss": "schlecht, böse, komplex, unnötig"
+          "courseGloss": "bad, evil, complex, unnecessary"
         },
         {
           "word": "suli",
-          "courseGloss": "groß, großartig, wichtig, wachsen"
+          "courseGloss": "big, great, important, to grow"
         },
         {
           "word": "lili",
-          "courseGloss": "klein, wenig, jung, schrumpfen"
+          "courseGloss": "small, few, young, to shrink"
         },
         {
           "word": "kili",
-          "courseGloss": "Frucht, Gemüse, Pilz"
+          "courseGloss": "fruit, vegetable, mushroom"
         },
         {
           "word": "soweli",
-          "courseGloss": "Landsäugetier, Tier"
+          "courseGloss": "land mammal, animal"
         }
       ],
       "exercises": 5
     },
     {
       "lesson": 2,
-      "title": "Adjektive",
+      "title": "adjectives",
       "stage": 2,
       "concepts": [
         "c_modifikator"
@@ -70,50 +71,50 @@
       "words": [
         {
           "word": "ala",
-          "courseGloss": "nein, nicht, Null"
+          "courseGloss": "no, not, zero"
         },
         {
           "word": "ale",
-          "courseGloss": "alle, alles, Universum"
+          "courseGloss": "all, everything, universe"
         },
         {
           "word": "utala",
-          "courseGloss": "Kampf, streiten, Wettstreit"
+          "courseGloss": "fight, battle, challenge"
         },
         {
           "word": "wawa",
-          "courseGloss": "stark, energetisch, mächtig"
+          "courseGloss": "strong, powerful"
         },
         {
           "word": "suwi",
-          "courseGloss": "süß, niedlich"
+          "courseGloss": "sweet, cute, adorable"
         },
         {
           "word": "jan",
-          "courseGloss": "Person, Leute, Volk, Menschheit"
+          "courseGloss": "person, people, humanity"
         },
         {
           "word": "mama",
-          "courseGloss": "Elternteil, Vorfahre, Erschaffer, Ursprung"
+          "courseGloss": "parent, ancestor, creator, origin"
         },
         {
           "word": "meli",
-          "courseGloss": "Frau, weiblich, Ehefrau"
+          "courseGloss": "woman, female, feminine, wife"
         },
         {
           "word": "mije",
-          "courseGloss": "Mann, männlich, Ehemann"
+          "courseGloss": "man, male, masculine, husband"
         },
         {
           "word": "moku",
-          "courseGloss": "Nahrung, esssen"
+          "courseGloss": "food, to eat"
         }
       ],
       "exercises": 10
     },
     {
       "lesson": 3,
-      "title": "Verben und Objekte",
+      "title": "verbs and objects",
       "stage": 4,
       "concepts": [
         "c_e_objekt"
@@ -121,50 +122,50 @@
       "words": [
         {
           "word": "e",
-          "courseGloss": "(gibt ein Objekt an)"
+          "courseGloss": "(specifies an object)"
         },
         {
           "word": "ijo",
-          "courseGloss": "Ding, Objekt"
+          "courseGloss": "thing, object"
         },
         {
           "word": "ilo",
-          "courseGloss": "Werkzeug, Maschine, Gerät"
+          "courseGloss": "tool, machine, device"
         },
         {
           "word": "lipu",
-          "courseGloss": "Buch, Dokument, Papier"
+          "courseGloss": "book, document, paper"
         },
         {
           "word": "lukin",
-          "courseGloss": "Auge, sehen, schauen, suchen"
+          "courseGloss": "eye, to look, to see, to seek to"
         },
         {
           "word": "olin",
-          "courseGloss": "Liebe, Mitgefühl, Zuneigung"
+          "courseGloss": "love, compassion, affection"
         },
         {
           "word": "pali",
-          "courseGloss": "tun, machen, arbeiten, schaffen"
+          "courseGloss": "to do, to work, to make, labor"
         },
         {
           "word": "pana",
-          "courseGloss": "geben, senden, abgeben, absondern"
+          "courseGloss": "to give, to send, to emit"
         },
         {
           "word": "telo",
-          "courseGloss": "Wasser, Flüssigkeit, bewässern, waschen"
+          "courseGloss": "water, fluid, to water, to clean"
         },
         {
           "word": "tomo",
-          "courseGloss": "Wohnung, Heim, Raum, Zimmer, Gebäude"
+          "courseGloss": "home, room, structure"
         }
       ],
       "exercises": 11
     },
     {
       "lesson": 4,
-      "title": "Oh nein! Mehr Vokabeln",
+      "title": "oh no! more vocabulary",
       "stage": 4,
       "concepts": [
         "c_e_objekt"
@@ -172,50 +173,50 @@
       "words": [
         {
           "word": "jo",
-          "courseGloss": "haben/beinhalten/halten/tragen"
+          "courseGloss": "to have/carry/contain/hold"
         },
         {
           "word": "kala",
-          "courseGloss": "Fisch, Wassertier, Meeresgetier"
+          "courseGloss": "fish, marine animal, sea creature"
         },
         {
           "word": "kasi",
-          "courseGloss": "Pflanze, Gras, Kraut, Blatt"
+          "courseGloss": "plant, grass, herb, leaf"
         },
         {
           "word": "pipi",
-          "courseGloss": "Insekt, Käfer"
+          "courseGloss": "insect, bug"
         },
         {
           "word": "sitelen",
-          "courseGloss": "Symbol, Bild, Schrift, zeichnen"
+          "courseGloss": "symbol, image, writing, to draw"
         },
         {
           "word": "toki",
-          "courseGloss": "Rede, sprechen, Sprache"
+          "courseGloss": "speech, to talk, language"
         },
         {
           "word": "waso",
-          "courseGloss": "Vogel, fliegende Kreatur"
+          "courseGloss": "bird, flying creature"
         },
         {
           "word": "ma",
-          "courseGloss": "Erde, Land, draußen, Gebiet"
+          "courseGloss": "earth, land, outdoors, territory"
         },
         {
           "word": "kiwen",
-          "courseGloss": "harter Gegenstand, Metall, Stein, fest"
+          "courseGloss": "hard object, metal, stone, solid"
         },
         {
           "word": "ko",
-          "courseGloss": "Pulver, Puder, Paste, halbfest"
+          "courseGloss": "powder, clay, semi-solid"
         }
       ],
       "exercises": 10
     },
     {
       "lesson": 5,
-      "title": "Dies und das",
+      "title": "this and that",
       "stage": 11,
       "concepts": [
         "c_ni",
@@ -224,50 +225,50 @@
       "words": [
         {
           "word": "ante",
-          "courseGloss": "anders, verändert, ändern"
+          "courseGloss": "different, changed, to change"
         },
         {
           "word": "awen",
-          "courseGloss": "bleiben, währen, fortführen, beschützen, fortdauern"
+          "courseGloss": "keep, stay, endure, protect, continue"
         },
         {
           "word": "en",
-          "courseGloss": "und (verbindet Subjekte)"
+          "courseGloss": "and (combines subjects)"
         },
         {
           "word": "kalama",
-          "courseGloss": "Geräusch, Krach, Töne machen"
+          "courseGloss": "sound, noise, to read/make sound"
         },
         {
           "word": "kulupu",
-          "courseGloss": "Gruppe, Gemeinschaft, Gesellschaft"
+          "courseGloss": "group, community, society"
         },
         {
           "word": "lape",
-          "courseGloss": "Schlaf, Pause, ruhen"
+          "courseGloss": "sleep, rest"
         },
         {
           "word": "mute",
-          "courseGloss": "viel, viele, mehr, Menge, sehr"
+          "courseGloss": "many, more, quantity, very"
         },
         {
           "word": "ni",
-          "courseGloss": "dies, das"
+          "courseGloss": "this, that"
         },
         {
           "word": "pakala",
-          "courseGloss": "Bruch, Fehler, kaputt, (allgemeiner Fluch)"
+          "courseGloss": "break, mistake, (generic curse)"
         },
         {
           "word": "seli",
-          "courseGloss": "Feuer, Hitze, Wärme, chemische Reaktion"
+          "courseGloss": "fire, heat, warmth, chemical reaction"
         }
       ],
       "exercises": 10
     },
     {
       "lesson": 6,
-      "title": "Präpositionen und Orte",
+      "title": "prepositions and locations",
       "stage": 6,
       "concepts": [
         "c_praeposition"
@@ -275,50 +276,50 @@
       "words": [
         {
           "word": "kepeken",
-          "courseGloss": "benutzen, benutzend, mithilfe von"
+          "courseGloss": "to use, using, with the help of"
         },
         {
           "word": "lon",
-          "courseGloss": "in, an, auf, wahr, anwesend, existierend"
+          "courseGloss": "in, at, on, true, present, exist"
         },
         {
           "word": "sama",
-          "courseGloss": "gleich wie, ähnlich, wie, Geschwister"
+          "courseGloss": "same as, similar, like, sibling"
         },
         {
           "word": "tan",
-          "courseGloss": "von, wegen, Grund, Ursache"
+          "courseGloss": "from, because of, cause, reason"
         },
         {
           "word": "tawa",
-          "courseGloss": "zu, für, bewegen, aus der Perspektive von"
+          "courseGloss": "to, for, moving, from persp. of"
         },
         {
           "word": "sewi",
-          "courseGloss": "hoch, oben, Himmel, heilig, göttlich"
+          "courseGloss": "up, above, sky, divine, sacred"
         },
         {
           "word": "noka",
-          "courseGloss": "Fuß, Bein, unten, unter"
+          "courseGloss": "foot, leg, bottom, under"
         },
         {
           "word": "poka",
-          "courseGloss": "Hüfte, Seite, neben, in der Nähe"
+          "courseGloss": "hip, side, next to, nearby"
         },
         {
           "word": "monsi",
-          "courseGloss": "hinten, hinter, Hintern"
+          "courseGloss": "back, behind, rear, butt"
         },
         {
           "word": "sinpin",
-          "courseGloss": "Gesicht, vorne, Wand"
+          "courseGloss": "face, foremost, front, wall"
         }
       ],
       "exercises": 10
     },
     {
       "lesson": 7,
-      "title": "Ausrufe, Fragen, Befehle und Namen",
+      "title": "interjections, questions, commands and names",
       "stage": 7,
       "concepts": [
         "c_frage",
@@ -328,50 +329,50 @@
       "words": [
         {
           "word": "a",
-          "courseGloss": "(emotionaler Ausruf)"
+          "courseGloss": "(emotional interjection)"
         },
         {
           "word": "anu",
-          "courseGloss": "oder"
+          "courseGloss": "or"
         },
         {
           "word": "mu",
-          "courseGloss": "(Tiergeräusch)"
+          "courseGloss": "(any animal sound)"
         },
         {
           "word": "o",
-          "courseGloss": "(Anrede, Befehle)"
+          "courseGloss": "(addressing people, commands)"
         },
         {
           "word": "seme",
-          "courseGloss": "was? (für Fragen)"
+          "courseGloss": "what? (for questions)"
         },
         {
           "word": "kute",
-          "courseGloss": "hören, gehorchen, Ohr"
+          "courseGloss": "listen, hear, obey, ear"
         },
         {
           "word": "nimi",
-          "courseGloss": "Wort, Name"
+          "courseGloss": "word, name"
         },
         {
           "word": "lawa",
-          "courseGloss": "Kopf, Kontrolle, Regel, Haupt-..."
+          "courseGloss": "head, control, own, rule, main"
         },
         {
           "word": "anpa",
-          "courseGloss": "nieder, bescheiden, abhängig, bezwingen/besiegen, sich beugen"
+          "courseGloss": "lowly, humble, dependent, to conquer/defeat, to bow down"
         },
         {
           "word": "insa",
-          "courseGloss": "innen, Inhalte, Mitte, Magen"
+          "courseGloss": "inside, contents, center, stomach"
         }
       ],
       "exercises": 10
     },
     {
       "lesson": 8,
-      "title": "Bunte Sprache",
+      "title": "colorful language",
       "stage": 2,
       "concepts": [
         "c_modifikator"
@@ -379,50 +380,50 @@
       "words": [
         {
           "word": "kule",
-          "courseGloss": "Farbe, bunt"
+          "courseGloss": "color, colorful"
         },
         {
           "word": "jelo",
-          "courseGloss": "gelb (und Schattierungen)"
+          "courseGloss": "yellow (and its shades)"
         },
         {
           "word": "laso",
-          "courseGloss": "blau, grün (und Schattierungen)"
+          "courseGloss": "blue, green (and its shades)"
         },
         {
           "word": "loje",
-          "courseGloss": "rot (und Schattierungen)"
+          "courseGloss": "red (and its shades)"
         },
         {
           "word": "pimeja",
-          "courseGloss": "schwarz, dunkel"
+          "courseGloss": "black, dark"
         },
         {
           "word": "walo",
-          "courseGloss": "weiß, hell"
+          "courseGloss": "white, bright/light"
         },
         {
           "word": "nasa",
-          "courseGloss": "ungewöhnlich, merkwürdig, verrükt, betrunken"
+          "courseGloss": "unusual, strange, silly, intoxicated"
         },
         {
           "word": "jaki",
-          "courseGloss": "schmutzig, eklig, giftig"
+          "courseGloss": "dirty, disgusting, toxic"
         },
         {
           "word": "moli",
-          "courseGloss": "Tod, sterben"
+          "courseGloss": "death, dying"
         },
         {
           "word": "unpa",
-          "courseGloss": "Sex"
+          "courseGloss": "sex, sexual"
         }
       ],
       "exercises": 10
     },
     {
       "lesson": 9,
-      "title": "Komplexe Adjektive und Kontext",
+      "title": "complex adjectives and contexts",
       "stage": 9,
       "concepts": [
         "c_pi",
@@ -431,50 +432,50 @@
       "words": [
         {
           "word": "pi",
-          "courseGloss": "(gruppiert Adjektive um)"
+          "courseGloss": "\"of\" (regroups adjectives/adverbs)"
         },
         {
           "word": "la",
-          "courseGloss": "(stellt Kontext voran)"
+          "courseGloss": "\"if/when\" (introduces context)"
         },
         {
           "word": "luka",
-          "courseGloss": "Hand, Arm"
+          "courseGloss": "hand, arm"
         },
         {
           "word": "linja",
-          "courseGloss": "langes biegsames Objekt, Schnur, Haar"
+          "courseGloss": "long flexible object, string, rope, hair"
         },
         {
           "word": "palisa",
-          "courseGloss": "langes hartes Objekt, Stock"
+          "courseGloss": "long solid object, branch, stick"
         },
         {
           "word": "selo",
-          "courseGloss": "äußere Form, Hülle, Haut, Grenze"
+          "courseGloss": "outer form, shell, skin, boundary"
         },
         {
           "word": "sijelo",
-          "courseGloss": "Körper, körperlicher Zustand, Torso"
+          "courseGloss": "body, physical state, torso"
         },
         {
           "word": "len",
-          "courseGloss": "Stoff, Kleidung, Privatsphärenschutz"
+          "courseGloss": "cloth, clothes, layer of privacy"
         },
         {
           "word": "lete",
-          "courseGloss": "kalt, roh"
+          "courseGloss": "cold, raw"
         },
         {
           "word": "musi",
-          "courseGloss": "unterhaltsam, künstlerisch, Spaß, Spiel"
+          "courseGloss": "entertaining, artistic, fun, game"
         }
       ],
       "exercises": 11
     },
     {
       "lesson": 10,
-      "title": "Hilfsverben, Zeit und Ort",
+      "title": "pre-verbs, time and place",
       "stage": 5,
       "concepts": [
         "c_praeverb",
@@ -483,50 +484,50 @@
       "words": [
         {
           "word": "kama",
-          "courseGloss": "kommen, Zukunft, Ereignis"
+          "courseGloss": "coming, future, event"
         },
         {
           "word": "ken",
-          "courseGloss": "können, Fähigkeit, Möglichkeit"
+          "courseGloss": "can, ability, possibility"
         },
         {
           "word": "open",
-          "courseGloss": "Start, anfangen, öffnen"
+          "courseGloss": "start, begin, open"
         },
         {
           "word": "pini",
-          "courseGloss": "Ende, aufhören, schließen"
+          "courseGloss": "end, finish, close"
         },
         {
           "word": "sona",
-          "courseGloss": "Wissen, kennen"
+          "courseGloss": "knowledge, to know (how to)"
         },
         {
           "word": "wile",
-          "courseGloss": "wollen, brauchen, Wunsch, Verlangen"
+          "courseGloss": "want, need, desire"
         },
         {
           "word": "lupa",
-          "courseGloss": "Loch, Tür, Fenster"
+          "courseGloss": "hole, door, window"
         },
         {
           "word": "nasin",
-          "courseGloss": "Weg, Straße, Art und Weise, Lehre"
+          "courseGloss": "path, road, directive, way"
         },
         {
           "word": "nena",
-          "courseGloss": "Hügel, Berg, Knopf, Erhebung, Nase"
+          "courseGloss": "hill, mountain, button, bump, nose"
         },
         {
           "word": "tenpo",
-          "courseGloss": "Zeit, Moment"
+          "courseGloss": "time, moment"
         }
       ],
       "exercises": 12
     },
     {
       "lesson": 11,
-      "title": "Nummern",
+      "title": "numbers",
       "stage": 12,
       "concepts": [
         "c_zahlen"
@@ -534,169 +535,169 @@
       "words": [
         {
           "word": "wan",
-          "courseGloss": "eins, Teil (von etwas), vereint"
+          "courseGloss": "one, part (of smth), united"
         },
         {
           "word": "tu",
-          "courseGloss": "zweit, trennen, getrennt"
+          "courseGloss": "two, divide, divided"
         },
         {
           "word": "sike",
-          "courseGloss": "Kreis, rund, Ball, Jahr"
+          "courseGloss": "circle, round, ball, year"
         },
         {
           "word": "mani",
-          "courseGloss": "Geld, großes domestiziertes Tier"
+          "courseGloss": "money, large domesticated animal"
         },
         {
           "word": "esun",
-          "courseGloss": "Handel, Markt, Laden, Tausch"
+          "courseGloss": "trade, market, shop, exchange"
         },
         {
           "word": "mun",
-          "courseGloss": "Mond, Stern, Nachthimmel-Objetk"
+          "courseGloss": "moon, star, night sky object"
         },
         {
           "word": "nanpa",
-          "courseGloss": "Nummer, (Ordnungsnummer)"
+          "courseGloss": "number, (ordinal indicator)"
         },
         {
           "word": "poki",
-          "courseGloss": "Box, Behälter, Schüssel, Tasse, Schubladen"
+          "courseGloss": "box, container, bowl, cup, drawer"
         },
         {
           "word": "sin",
-          "courseGloss": "neu, zusätzlich, frisch, extra"
+          "courseGloss": "new, additional, fresh, extra"
         },
         {
           "word": "suno",
-          "courseGloss": "Sonne, Licht, Helligkeit, scheinen"
+          "courseGloss": "sun, light, brightness, shine"
         }
       ],
       "exercises": 10
     },
     {
       "lesson": 12,
-      "title": "Abschluss",
+      "title": "the final countdown",
       "stage": 12,
       "concepts": [],
       "words": [
         {
           "word": "akesi",
-          "courseGloss": "\"nicht niedliches\" Tier, Echse"
+          "courseGloss": "\"non-cute\" animal, lizard"
         },
         {
           "word": "alasa",
-          "courseGloss": "jagen, sammeln"
+          "courseGloss": "to hunt, to gather, to seek, to try (doing something)"
         },
         {
           "word": "kon",
-          "courseGloss": "Luft, Essenz, Geist, flüchtig"
+          "courseGloss": "air, essence, spirit, ephemeral"
         },
         {
           "word": "pan",
-          "courseGloss": "Brot, Getreide, Mais, Reis, Pizza"
+          "courseGloss": "bread, grain, corn, rice, pizza"
         },
         {
           "word": "pilin",
-          "courseGloss": "Herz, fühlen, Gefühl, Sinn"
+          "courseGloss": "heart, feeling, touch, sense"
         },
         {
           "word": "pu",
-          "courseGloss": "das offizielle Toki-Pona-Buch, damit interagieren"
+          "courseGloss": "the official toki pona book, interacting with it"
         },
         {
           "word": "supa",
-          "courseGloss": "horizontale Oberfläche"
+          "courseGloss": "horizontal surface"
         },
         {
           "word": "taso",
-          "courseGloss": "aber, jedoch, nur"
+          "courseGloss": "but, however, only"
         },
         {
           "word": "uta",
-          "courseGloss": "Mund, Lippen"
+          "courseGloss": "mouth, lips"
         },
         {
           "word": "weka",
-          "courseGloss": "abwesend, weg, entfernt, entfernen"
+          "courseGloss": "absent, away, remote, get rid of"
         }
       ],
       "exercises": 12
     },
     {
       "lesson": 13,
-      "title": "Wörterbuch-Spezial-Seite",
+      "title": "toki pona page 13: special dictionary edition",
       "stage": 12,
       "concepts": [],
       "words": [
         {
           "word": "namako",
-          "courseGloss": "Gewürz, zusätzlich"
+          "courseGloss": "spice, additional"
         },
         {
           "word": "kin",
-          "courseGloss": "auch, ebenfalls"
+          "courseGloss": "also, too"
         },
         {
           "word": "oko",
-          "courseGloss": "Auge"
+          "courseGloss": "eye"
         },
         {
           "word": "kipisi",
-          "courseGloss": "schneiden, teilen"
+          "courseGloss": "to cut, to divide"
         },
         {
           "word": "leko",
-          "courseGloss": "Quadrat, Block, (Treppen)"
+          "courseGloss": "square, block, (stairs)"
         },
         {
           "word": "monsuta",
-          "courseGloss": "Angst, Monster, gruselig"
+          "courseGloss": "fear, monster, scary"
         },
         {
           "word": "misikeke",
-          "courseGloss": "Medizin, Heilung"
+          "courseGloss": "medicine, cure"
         },
         {
           "word": "tonsi",
-          "courseGloss": "genderqueer, trans, nichtbinär"
+          "courseGloss": "non-binary, gender non-confirming, (transgender)"
         },
         {
           "word": "jasima",
-          "courseGloss": "spiegeln, reflektieren, umkehren, Gegenteil"
+          "courseGloss": "mirror, reflect, reverse, opposite"
         },
         {
           "word": "soko",
-          "courseGloss": "Pilz"
+          "courseGloss": "mushroom, fungus"
         },
         {
           "word": "meso",
-          "courseGloss": "durchschnittlich, mittel"
+          "courseGloss": "average, medium"
         },
         {
           "word": "epiku",
-          "courseGloss": "episch, großartig, fantastisch"
+          "courseGloss": "epic, awesome"
         },
         {
           "word": "kokosila",
-          "courseGloss": "nicht in Toki Pona sprechen, während man in einer Toki-Pona-Gruppe ist"
+          "courseGloss": "to speak not in toki pona while in a toki pona group"
         },
         {
           "word": "lanpan",
-          "courseGloss": "ergreifen, stehlen, nehmen"
+          "courseGloss": "seize, steal, get"
         },
         {
           "word": "n",
-          "courseGloss": "äh..., hmm....."
+          "courseGloss": "um..., hmm....."
         },
         {
           "word": "kijetesantakalu",
-          "courseGloss": "Waschbär oder andere Marderverwandte"
+          "courseGloss": "raccoon or other musteloid"
         },
         {
           "word": "ku",
-          "courseGloss": "(mit dem) Toki-Pona-Wörterbuch (interagieren)"
+          "courseGloss": "(to interact with) the Toki Pona Dictionary"
         }
       ],
       "exercises": 0
@@ -715,7 +716,7 @@
       "tp": "soweli li suli.",
       "alsoAccepted": [],
       "de": [
-        "Tiere sind wichtig."
+        "Animals are important."
       ],
       "rejectedVariants": []
     },
@@ -731,7 +732,7 @@
       "tp": "ona li lili.",
       "alsoAccepted": [],
       "de": [
-        "Er ist klein."
+        "He is little."
       ],
       "rejectedVariants": []
     },
@@ -747,7 +748,7 @@
       "tp": "mi suli.",
       "alsoAccepted": [],
       "de": [
-        "Ich bin großartig."
+        "I am great."
       ],
       "rejectedVariants": []
     },
@@ -763,7 +764,7 @@
       "tp": "ona li soweli.",
       "alsoAccepted": [],
       "de": [
-        "es ist ein Hund."
+        "It is a dog."
       ],
       "rejectedVariants": []
     },
@@ -779,7 +780,7 @@
       "tp": "sina ike.",
       "alsoAccepted": [],
       "de": [
-        "Du bist schlecht."
+        "You are bad."
       ],
       "rejectedVariants": []
     },
@@ -794,7 +795,7 @@
       "tp": "meli mi li pona.",
       "alsoAccepted": [],
       "de": [
-        "Meine Frau ist gut."
+        "My wife is good."
       ],
       "rejectedVariants": []
     },
@@ -809,7 +810,7 @@
       "tp": "mije sina li suli.",
       "alsoAccepted": [],
       "de": [
-        "Dein Mann ist (groß/wichtig)."
+        "Your husband is (big/important)."
       ],
       "rejectedVariants": []
     },
@@ -824,7 +825,7 @@
       "tp": "mama mije mi li wawa.",
       "alsoAccepted": [],
       "de": [
-        "Mein Vater ist stark."
+        "My dad is strong."
       ],
       "rejectedVariants": []
     },
@@ -839,7 +840,7 @@
       "tp": "soweli ale li pona.",
       "alsoAccepted": [],
       "de": [
-        "Alle Tiere sind gut."
+        "All animals are good."
       ],
       "rejectedVariants": []
     },
@@ -854,7 +855,7 @@
       "tp": "kili li moku suli.",
       "alsoAccepted": [],
       "de": [
-        "Früchte sind wichtige Nahrung."
+        "Fruits are important food."
       ],
       "rejectedVariants": []
     },
@@ -869,7 +870,7 @@
       "tp": "meli mi li suwi.",
       "alsoAccepted": [],
       "de": [
-        "Meine Frau ist niedlich."
+        "My wife is adorable."
       ],
       "rejectedVariants": []
     },
@@ -884,7 +885,7 @@
       "tp": "jan utala ale li ike.",
       "alsoAccepted": [],
       "de": [
-        "Alle Kämpfer sind böse."
+        "All warriors are bad."
       ],
       "rejectedVariants": []
     },
@@ -899,7 +900,7 @@
       "tp": "jan pona mi li jan pona sina.",
       "alsoAccepted": [],
       "de": [
-        "Meine Freunde sind deine Freunde."
+        "My friends are your friends."
       ],
       "rejectedVariants": []
     },
@@ -914,7 +915,7 @@
       "tp": "jan lili mije sina li wawa.",
       "alsoAccepted": [],
       "de": [
-        "Dein Sohn ist stark."
+        "Your son is strong."
       ],
       "rejectedVariants": []
     },
@@ -929,7 +930,7 @@
       "tp": "kili lili li suwi.",
       "alsoAccepted": [],
       "de": [
-        "Die kleine Frucht ist süß."
+        "The small fruit is sweet."
       ],
       "rejectedVariants": []
     },
@@ -944,7 +945,7 @@
       "tp": "jan lili li pana e telo lukin.",
       "alsoAccepted": [],
       "de": [
-        "Ein Kind weint (gibt Augen-Wasser ab)."
+        "A child is crying (emitting eye water)."
       ],
       "rejectedVariants": []
     },
@@ -959,7 +960,7 @@
       "tp": "ona li lukin e lipu.",
       "alsoAccepted": [],
       "de": [
-        "(Er/sie/es) sieht ein Dokument."
+        "(He/she/they) look at a document."
       ],
       "rejectedVariants": []
     },
@@ -974,7 +975,7 @@
       "tp": "soweli ike li utala e meli.",
       "alsoAccepted": [],
       "de": [
-        "Das böse Tier greift eine Frau an."
+        "The bad animal is attacking a woman."
       ],
       "rejectedVariants": []
     },
@@ -989,7 +990,7 @@
       "tp": "jan utala li moku e kili suli.",
       "alsoAccepted": [],
       "de": [
-        "Die Kämpferin isst (eine große Frucht/ein großes Gemüse/einen großen Pilz)."
+        "The warrior is eating a big (fruit/vegetable/mushroom)."
       ],
       "rejectedVariants": []
     },
@@ -1004,7 +1005,7 @@
       "tp": "soweli lili li moku e telo.",
       "alsoAccepted": [],
       "de": [
-        "Kleine Tiere trinken Wasser."
+        "Little animals are drinking water."
       ],
       "rejectedVariants": []
     },
@@ -1019,7 +1020,7 @@
       "tp": "mi telo e ijo suli.",
       "alsoAccepted": [],
       "de": [
-        "Ich (wässere/wasche) etwas Großes."
+        "I am (watering/cleaning) something big."
       ],
       "rejectedVariants": []
     },
@@ -1034,7 +1035,7 @@
       "tp": "ona li olin e jan ale.",
       "alsoAccepted": [],
       "de": [
-        "Sie liebt alle Menschen."
+        "She loves every person."
       ],
       "rejectedVariants": []
     },
@@ -1049,7 +1050,7 @@
       "tp": "tomo telo li pona.",
       "alsoAccepted": [],
       "de": [
-        "Das Badezimmer (\"Wasser-Haus\") ist gut."
+        "The bathroom (\"house of water\") is good."
       ],
       "rejectedVariants": []
     },
@@ -1064,7 +1065,7 @@
       "tp": "mi pana e lipu.",
       "alsoAccepted": [],
       "de": [
-        "Ich händige Dokumente aus."
+        "I hand out documents."
       ],
       "rejectedVariants": []
     },
@@ -1079,7 +1080,7 @@
       "tp": "jan utala ike li lukin e tomo sina.",
       "alsoAccepted": [],
       "de": [
-        "Ein böser Krieger sieht dein Haus."
+        "An evil warrior is looking at your house."
       ],
       "rejectedVariants": []
     },
@@ -1094,7 +1095,7 @@
       "tp": "ilo mi li pali pona.",
       "alsoAccepted": [],
       "de": [
-        "Meine Geräte funktionieren gut."
+        "My tools are working well."
       ],
       "rejectedVariants": []
     },
@@ -1109,7 +1110,7 @@
       "tp": "mi moku ala e soweli.",
       "alsoAccepted": [],
       "de": [
-        "Ich esse keine Tiere (bzw. Fleisch)."
+        "I don't eat animals (i.e. meat)."
       ],
       "rejectedVariants": []
     },
@@ -1124,7 +1125,7 @@
       "tp": "jan pona sina li toki e ma, e telo.",
       "alsoAccepted": [],
       "de": [
-        "Dein Fruend spricht über das Land und das Wasser."
+        "Your friend is talking about the land and the water."
       ],
       "rejectedVariants": []
     },
@@ -1139,7 +1140,7 @@
       "tp": "jan suli li lukin e ma tomo, li sitelen e ijo.",
       "alsoAccepted": [],
       "de": [
-        "Eine wichtige Person sieht die Stadt und schreibt Dinge auf."
+        "An important person is looking at the city and writing things down."
       ],
       "rejectedVariants": []
     },
@@ -1154,7 +1155,7 @@
       "tp": "ma li jo e kasi ike.",
       "alsoAccepted": [],
       "de": [
-        "Das Land hat Unkraut (\"schlechte Pflanzen\")."
+        "The land has weeds (\"bad plants\")."
       ],
       "rejectedVariants": []
     },
@@ -1169,7 +1170,7 @@
       "tp": "pipi lili li suli, li pona.",
       "alsoAccepted": [],
       "de": [
-        "Kleine Käfer sind wichtig und gut."
+        "Small bugs are important and good."
       ],
       "rejectedVariants": []
     },
@@ -1184,7 +1185,7 @@
       "tp": "ma tomo sina li jo ala e jan pali.",
       "alsoAccepted": [],
       "de": [
-        "Deine Stadt hat keine Arbeiter."
+        "Your city doesn't have any workers."
       ],
       "rejectedVariants": []
     },
@@ -1199,7 +1200,7 @@
       "tp": "mije mi li pali ala, li moku, li utala.",
       "alsoAccepted": [],
       "de": [
-        "Mein Mann arbeitet nicht und isst nur und kämpft."
+        "My husband doesn't work, (only) eats and fights."
       ],
       "rejectedVariants": []
     },
@@ -1214,7 +1215,7 @@
       "tp": "ma mama mi li suli.",
       "alsoAccepted": [],
       "de": [
-        "Mein Heimatland (\"ursprüngliches Land\") ist groß."
+        "My homeland (\"original land\") is large."
       ],
       "rejectedVariants": []
     },
@@ -1229,7 +1230,7 @@
       "tp": "sitelen sina li pona lukin.",
       "alsoAccepted": [],
       "de": [
-        "Dein Gemälde sieht gut aus."
+        "Your painting looks good."
       ],
       "rejectedVariants": []
     },
@@ -1244,7 +1245,7 @@
       "tp": "jan pona mi li jo e kala e kili li pali e moku pona.",
       "alsoAccepted": [],
       "de": [
-        "Mein Freund hat Fische und Früchte und macht gutes Essen."
+        "My friend has fish and fruit and makes good food."
       ],
       "rejectedVariants": []
     },
@@ -1260,7 +1261,7 @@
       "tp": "kulupu sina li ante mute.",
       "alsoAccepted": [],
       "de": [
-        "Deine Gemeinschaft ist sehr anders."
+        "Your community is very different."
       ],
       "rejectedVariants": []
     },
@@ -1276,7 +1277,7 @@
       "tp": "jan ike li pakala e ilo mi.",
       "alsoAccepted": [],
       "de": [
-        "Eine schlechte Person zerstört meine Werkzeuge."
+        "A bad person broke my tools."
       ],
       "rejectedVariants": []
     },
@@ -1292,7 +1293,7 @@
       "tp": "mi pali e tomo ni.",
       "alsoAccepted": [],
       "de": [
-        "Ich baue dieses Haus."
+        "I built this house."
       ],
       "rejectedVariants": []
     },
@@ -1308,7 +1309,7 @@
       "tp": "jan utala pona mute li awen e kulupu ni.",
       "alsoAccepted": [],
       "de": [
-        "Der gute Kämpfer schützt diese Gemeinschaft."
+        "The good warriors protect this community."
       ],
       "rejectedVariants": []
     },
@@ -1324,7 +1325,7 @@
       "tp": "kulupu suli li awen, li suli e ona.",
       "alsoAccepted": [],
       "de": [
-        "Die große Gemeinschaft dauert an und vergrößert sich."
+        "The large community endures and grows itself."
       ],
       "rejectedVariants": []
     },
@@ -1340,7 +1341,7 @@
       "tp": "moku seli li pona mute.",
       "alsoAccepted": [],
       "de": [
-        "Warmes Essen ist sehr gut."
+        "Warm food is very good."
       ],
       "rejectedVariants": []
     },
@@ -1356,7 +1357,7 @@
       "tp": "jan lili lape li kalama ala.",
       "alsoAccepted": [],
       "de": [
-        "Schlafende Kinder machen keinen Krach."
+        "Sleeping children don't make noises."
       ],
       "rejectedVariants": []
     },
@@ -1372,7 +1373,7 @@
       "tp": "jan pali mute li toki e ni: ona li wawa, li kiwen.",
       "alsoAccepted": [],
       "de": [
-        "Die Arbeiter sagen, dass sie stark und robust sind."
+        "The workers said that they are strong and tough."
       ],
       "rejectedVariants": []
     },
@@ -1388,7 +1389,7 @@
       "tp": "sina ante lukin.",
       "alsoAccepted": [],
       "de": [
-        "Du siehst anders aus."
+        "You look different."
       ],
       "rejectedVariants": []
     },
@@ -1404,7 +1405,7 @@
       "tp": "tomo ni li awen e seli.",
       "alsoAccepted": [],
       "de": [
-        "Dieses Haus erhält die Hitze."
+        "This house preserves the heat."
       ],
       "rejectedVariants": []
     },
@@ -1419,7 +1420,7 @@
       "tp": "ona li toki tawa mama mije ona kepeken ilo toki.",
       "alsoAccepted": [],
       "de": [
-        "Sie reden mit ihrem Vater mithilfe eines Telefons."
+        "They are speaking to their father on a phone."
       ],
       "rejectedVariants": []
     },
@@ -1434,8 +1435,8 @@
       "tp": "moku suwi li ike tawa mi.",
       "alsoAccepted": [],
       "de": [
-        "Ich mag süßes Essen nicht",
-        "Süßes Essen ist schlecht für mich."
+        "I don't like sweet food",
+        "Sweet food is bad for me."
       ],
       "rejectedVariants": []
     },
@@ -1450,7 +1451,7 @@
       "tp": "ma mama mi li utala e ma poka.",
       "alsoAccepted": [],
       "de": [
-        "Mein Heimatland bekämpft ein Nachbarland."
+        "My homeland is fighting (against) a neighboring country."
       ],
       "rejectedVariants": []
     },
@@ -1465,7 +1466,7 @@
       "tp": "meli sama sina li jan pona mi.",
       "alsoAccepted": [],
       "de": [
-        "Deine Schwester ist mein Freund."
+        "Your sister is my friend."
       ],
       "rejectedVariants": []
     },
@@ -1480,7 +1481,7 @@
       "tp": "pipi lili li lon sinpin sina.",
       "alsoAccepted": [],
       "de": [
-        "Ein kleiner Käfer ist auf deinem Gesicht."
+        "A small bug is on your face."
       ],
       "rejectedVariants": []
     },
@@ -1495,7 +1496,7 @@
       "tp": "sina pakala e tomo tawa mi.",
       "alsoAccepted": [],
       "de": [
-        "Du hast mein Auto kaputtgemacht."
+        "You broke my car."
       ],
       "rejectedVariants": []
     },
@@ -1510,7 +1511,7 @@
       "tp": "(jan) mije li pana e moku tawa jan lili.",
       "alsoAccepted": [],
       "de": [
-        "Der Mann füttert (\"gibt Essen\") die Kinder."
+        "The man feeds (\"gives out food to\") children."
       ],
       "rejectedVariants": []
     },
@@ -1525,7 +1526,7 @@
       "tp": "tomo toki ni li ike tawa mi.",
       "alsoAccepted": [],
       "de": [
-        "Ich mag diesen Chatraum (\"Rede-Haus\") nicht."
+        "I dislike this chat room (\"talking structure\")."
       ],
       "rejectedVariants": []
     },
@@ -1540,7 +1541,7 @@
       "tp": "mi pona e tomo tan sina.",
       "alsoAccepted": [],
       "de": [
-        "Ich habe wegen dir das Haus repariert."
+        "I fixed the house because of you."
       ],
       "rejectedVariants": []
     },
@@ -1555,7 +1556,7 @@
       "tp": "ona li lukin e lipu lon tomo lipu.",
       "alsoAccepted": [],
       "de": [
-        "Sie lesen Bücher in der Bücherei."
+        "They are reading books in the library."
       ],
       "rejectedVariants": []
     },
@@ -1572,7 +1573,7 @@
       "tp": "jan Lisa o, moku ala e kili ni a!",
       "alsoAccepted": [],
       "de": [
-        "Lisa, iss diese Frucht/dieses Gemüse/diesen Pilz nicht!"
+        "Don't eat this fruit/vegetable/mushroom, Lisa!"
       ],
       "rejectedVariants": []
     },
@@ -1589,7 +1590,7 @@
       "tp": "kulupu Kensa li anpa e kulupu ale ante.",
       "alsoAccepted": [],
       "de": [
-        "Die Mannschaft aus Kansas hat alle anderen Mannschaften besiegt."
+        "The Kansas team defeated all other teams."
       ],
       "rejectedVariants": []
     },
@@ -1606,7 +1607,7 @@
       "tp": "o toki insa ala e ni: jan pali li anpa tawa jan lawa.",
       "alsoAccepted": [],
       "de": [
-        "Denke nicht, dass Arbeiter für den Chef gering sind."
+        "Don't think that workers are lowly before the leaders."
       ],
       "rejectedVariants": []
     },
@@ -1623,7 +1624,7 @@
       "tp": "sina pali e ni tan seme?",
       "alsoAccepted": [],
       "de": [
-        "Warum hast du das gemacht?"
+        "Why did you do this?"
       ],
       "rejectedVariants": []
     },
@@ -1640,8 +1641,8 @@
       "tp": "insa mi li pakala. o pona e mi a!",
       "alsoAccepted": [],
       "de": [
-        "(Mein Bauch",
-        "Meine inneren Organe ) sind verletzt. Hilf mir!"
+        "My (stomach",
+        "internal organs) are hurt. Help me!"
       ],
       "rejectedVariants": []
     },
@@ -1658,7 +1659,7 @@
       "tp": "mi toki insa e ni: jan sewi li lon ala.",
       "alsoAccepted": [],
       "de": [
-        "Ich glaube nicht, dass es Götter gibt."
+        "I don't think gods exist."
       ],
       "rejectedVariants": []
     },
@@ -1675,7 +1676,7 @@
       "tp": "o kalama ala lon tomo lipu.",
       "alsoAccepted": [],
       "de": [
-        "Macht in der Bibliothek keinen Krach."
+        "Don't make noise in the library."
       ],
       "rejectedVariants": []
     },
@@ -1692,7 +1693,7 @@
       "tp": "jan lawa mi li toki e ni: o lape ala lon tomo pali.",
       "alsoAccepted": [],
       "de": [
-        "Mein Chef sagt mir, nicht im Büro zu schlafen."
+        "My boss tells me not to sleep in the office."
       ],
       "rejectedVariants": []
     },
@@ -1709,7 +1710,7 @@
       "tp": "jan sama mije sina li sama mute lukin sina.",
       "alsoAccepted": [],
       "de": [
-        "Dein Bruder sieht aus wie du."
+        "Your brother looks just like you."
       ],
       "rejectedVariants": []
     },
@@ -1726,7 +1727,7 @@
       "tp": "o tawa ala lon ma.",
       "alsoAccepted": [],
       "de": [
-        "Gehe nicht nach draußen."
+        "Don't go outside."
       ],
       "rejectedVariants": []
     },
@@ -1741,7 +1742,7 @@
       "tp": "kule loje li pona tawa mi.",
       "alsoAccepted": [],
       "de": [
-        "Ich mag die Farbe rot."
+        "I like the color red."
       ],
       "rejectedVariants": []
     },
@@ -1756,7 +1757,7 @@
       "tp": "o pana e telo kili jelo tawa mi.",
       "alsoAccepted": [],
       "de": [
-        "Gib mir den gelbenen Saft (oder Limonade)."
+        "Give me the yellow juice."
       ],
       "rejectedVariants": []
     },
@@ -1771,7 +1772,7 @@
       "tp": "kasi kule sina li pona lukin tawa mi.",
       "alsoAccepted": [],
       "de": [
-        "Mir gefällt, wie deine Blumen aussehen."
+        "I like how your flowers look."
       ],
       "rejectedVariants": []
     },
@@ -1786,7 +1787,7 @@
       "tp": "mi moku ala e telo nasa.",
       "alsoAccepted": [],
       "de": [
-        "Ich trinke keinen Alkohol."
+        "I don't drink alcohol."
       ],
       "rejectedVariants": []
     },
@@ -1801,7 +1802,7 @@
       "tp": "o moli ala e ona a!",
       "alsoAccepted": [],
       "de": [
-        "Töte sie nicht!"
+        "Don't kill them!"
       ],
       "rejectedVariants": []
     },
@@ -1816,7 +1817,7 @@
       "tp": "tomo sina li suli. tomo mi li lili.",
       "alsoAccepted": [],
       "de": [
-        "Dein Haus ist größer als meins."
+        "Your house is bigger than mine."
       ],
       "rejectedVariants": []
     },
@@ -1831,7 +1832,7 @@
       "tp": "kasi kule laso li pona mute tawa mi. kasi kule loje li pona lili tawa mi.",
       "alsoAccepted": [],
       "de": [
-        "Ich mag blaue Blumen mehr als rote Blumen."
+        "I like blue flowers more than red flowers."
       ],
       "rejectedVariants": []
     },
@@ -1846,7 +1847,7 @@
       "tp": "jaki a! moku ni li ike mute a!",
       "alsoAccepted": [],
       "de": [
-        "Igitt! Dieses Essen ist schrecklich!"
+        "Ew, gross! This food is terrible!"
       ],
       "rejectedVariants": []
     },
@@ -1861,7 +1862,7 @@
       "tp": "mi lon tomo loje.",
       "alsoAccepted": [],
       "de": [
-        "Ich bin im roten Haus."
+        "I'm in the red house."
       ],
       "rejectedVariants": []
     },
@@ -1876,7 +1877,7 @@
       "tp": "jan nasa li kute ala e mi.",
       "alsoAccepted": [],
       "de": [
-        "Die betrunkene Person hört mir nicht zu."
+        "The drunk person doesn't listen to me."
       ],
       "rejectedVariants": []
     },
@@ -1892,7 +1893,7 @@
       "tp": "kulupu pi jan mute li ike tawa mi.",
       "alsoAccepted": [],
       "de": [
-        "Ich mag keine Gemeinschaften mit vielen Menschen."
+        "I don't like communities with lots of people."
       ],
       "rejectedVariants": []
     },
@@ -1908,7 +1909,7 @@
       "tp": "tomo ni la mi toki kepeken toki pona, mi toki kepeken toki Inli.",
       "alsoAccepted": [],
       "de": [
-        "In diesem Haus rede ich Toki Pona und Englisch."
+        "In this house, I speak toki pona and English."
       ],
       "rejectedVariants": []
     },
@@ -1924,7 +1925,7 @@
       "tp": "sina moku e soweli lete la ona li ike tawa sijelo sina.",
       "alsoAccepted": [],
       "de": [
-        "Wenn du rohes Fleisch isst, ist das schlecht für deinen Körper."
+        "If you eat raw meat, it will be bad for your body."
       ],
       "rejectedVariants": []
     },
@@ -1940,7 +1941,7 @@
       "tp": "kalama musi ona li pona mute.",
       "alsoAccepted": [],
       "de": [
-        "Ihre Musik (\"unterhaltsame Geräusche\") ist sehr gut."
+        "Their music (\"entertaining sounds\") is very good."
       ],
       "rejectedVariants": []
     },
@@ -1956,7 +1957,7 @@
       "tp": "sina kepeken ike e ilo la ona li pakala.",
       "alsoAccepted": [],
       "de": [
-        "Wenn du die Geräte misshandelst (\"schlecht benutzen\"), werden sie kaputtgehen (\"kaputt sein\")."
+        "If you misuse (\"use badly\") the tools, they will break (\"be broken\")."
       ],
       "rejectedVariants": []
     },
@@ -1972,7 +1973,7 @@
       "tp": "sewi laso li pona mute tawa mi. sewi pi pimeja walo li pona lili tawa mi.",
       "alsoAccepted": [],
       "de": [
-        "Ich mag blauen Himmel mehr als grauen Himmel."
+        "I like blue sky more than gray sky."
       ],
       "rejectedVariants": []
     },
@@ -1988,7 +1989,7 @@
       "tp": "sewi li pimeja la o awen lon tomo.",
       "alsoAccepted": [],
       "de": [
-        "Falls es draußen dunkel ist, bleib zuhause."
+        "If it's dark outside, stay at home."
       ],
       "rejectedVariants": []
     },
@@ -2004,7 +2005,7 @@
       "tp": "ona li lon tomo pi telo nasa.",
       "alsoAccepted": [],
       "de": [
-        "Er ist in der Bar (\"Haus des merkwürdigen Wassers\")."
+        "He is in the bar (\"house of intoxicating water\")."
       ],
       "rejectedVariants": []
     },
@@ -2020,7 +2021,7 @@
       "tp": "jan pi kalama suli li toki e ijo nasa.",
       "alsoAccepted": [],
       "de": [
-        "Die laute Person (\"Person der großen Geräusche\") sagt merkwürdige Dinge."
+        "The loud person (\"person of large sounds\") says weird things."
       ],
       "rejectedVariants": []
     },
@@ -2036,7 +2037,7 @@
       "tp": "meli ni pi linja walo li pona lukin.",
       "alsoAccepted": [],
       "de": [
-        "Diese Blondine (\"Frau des weißen Haars\") sieht gut aus."
+        "That blonde (\"woman of white hair\") is good-looking."
       ],
       "rejectedVariants": []
     },
@@ -2052,7 +2053,7 @@
       "tp": "sina toki ala tawa jan la sina jo ala e jan pona.",
       "alsoAccepted": [],
       "de": [
-        "Wenn du nicht mit Leuten redest, dann wirst du keine Freunde haben."
+        "If you don't talk to people, you won't have friends."
       ],
       "rejectedVariants": []
     },
@@ -2068,7 +2069,7 @@
       "tp": "o open e lupa.",
       "alsoAccepted": [],
       "de": [
-        "Öffne die Tür."
+        "Open the door."
       ],
       "rejectedVariants": []
     },
@@ -2084,7 +2085,7 @@
       "tp": "tenpo lili la mi kama tawa sina.",
       "alsoAccepted": [],
       "de": [
-        "Gleich komme ich zu dir."
+        "In a moment, I'll head towards you."
       ],
       "rejectedVariants": []
     },
@@ -2100,7 +2101,7 @@
       "tp": "mi wile tawa ma ante.",
       "alsoAccepted": [],
       "de": [
-        "Ich will in andere Länder (reisen)."
+        "I want to go to other countries."
       ],
       "rejectedVariants": []
     },
@@ -2116,7 +2117,7 @@
       "tp": "sina ken ala ken kama tawa tomo mi?",
       "alsoAccepted": [],
       "de": [
-        "Kannst du zu meinem Haus kommen?"
+        "Can you come to my house?"
       ],
       "rejectedVariants": []
     },
@@ -2132,7 +2133,7 @@
       "tp": "sina kama tawa tomo mi la o kepeken e nasin Linkan.",
       "alsoAccepted": [],
       "de": [
-        "Wenn du zu meinem Haus kommst, nimm (benutze) die Lincoln-Straße."
+        "If you're coming to my house, use Lincoln Street."
       ],
       "rejectedVariants": []
     },
@@ -2148,7 +2149,7 @@
       "tp": "sina lon nena la sina ken lukin e ijo mute.",
       "alsoAccepted": [],
       "de": [
-        "Wenn du auf einem Hügel bist, kannst du viele Dinge sehen."
+        "If you're on a hill, you can see many things."
       ],
       "rejectedVariants": []
     },
@@ -2166,7 +2167,7 @@
         "sina sona pali e ona anu seme?"
       ],
       "de": [
-        "Weißt du, wie man es macht?"
+        "Do you know how to do it?"
       ],
       "rejectedVariants": []
     },
@@ -2182,7 +2183,7 @@
       "tp": "ale li ken.",
       "alsoAccepted": [],
       "de": [
-        "Alles ist möglich."
+        "Everything is possible."
       ],
       "rejectedVariants": []
     },
@@ -2200,7 +2201,7 @@
         "sina ken open e lupa anu seme?"
       ],
       "de": [
-        "Kannst du die Tür öffnen?"
+        "Can you open the door?"
       ],
       "rejectedVariants": []
     },
@@ -2216,7 +2217,7 @@
       "tp": "sina kute ala e jan sona la pali sina li ike.",
       "alsoAccepted": [],
       "de": [
-        "Wenn du den Experten (Leute des Wissens) nicht zuhörst, wird deine Arbeit schlecht sein."
+        "If you don't listen to experts (\"people of knowledge\"), your work will be bad."
       ],
       "rejectedVariants": []
     },
@@ -2234,7 +2235,7 @@
         "mi pali e ni lon tenpo suli."
       ],
       "de": [
-        "Ich arbeite lange daran."
+        "I work on this for a long time."
       ],
       "rejectedVariants": []
     },
@@ -2250,7 +2251,7 @@
       "tp": "mi awen kama sona e toki pona.",
       "alsoAccepted": [],
       "de": [
-        "Ich lerne weiterhin Toki Pona."
+        "I'm still learning toki pona."
       ],
       "rejectedVariants": []
     },
@@ -2265,7 +2266,7 @@
       "tp": "mi wile esun e soweli suli tu wan ni.",
       "alsoAccepted": [],
       "de": [
-        "Ich würde gerne einen Handel über diese drei großen Tiere machen."
+        "I would like to trade these three large animals."
       ],
       "rejectedVariants": []
     },
@@ -2280,7 +2281,7 @@
       "tp": "tenpo suno pini la mi lon tomo sona.",
       "alsoAccepted": [],
       "de": [
-        "Gestern war ich in der Schule/Universität (\"Haus des Wissens\")."
+        "Yesterday, I was in school/college/university (\"house of knowledge\")."
       ],
       "rejectedVariants": []
     },
@@ -2295,7 +2296,7 @@
       "tp": "tenpo mun wan pini la lete li lon.",
       "alsoAccepted": [],
       "de": [
-        "Vor einem Monat war es kalt."
+        "One month ago, it was cold."
       ],
       "rejectedVariants": []
     },
@@ -2310,7 +2311,7 @@
       "tp": "sina pona nanpa wan tawa mi.",
       "alsoAccepted": [],
       "de": [
-        "Ich mag dich am meisten."
+        "I like you the most."
       ],
       "rejectedVariants": []
     },
@@ -2325,7 +2326,7 @@
       "tp": "tenpo suno mute mute la telo sewi li awen.",
       "alsoAccepted": [],
       "de": [
-        "Der Regen währte 40 Tage lang."
+        "The rain continued for 40 days."
       ],
       "rejectedVariants": []
     },
@@ -2340,7 +2341,7 @@
       "tp": "mi lon tomo nanpa mute luka tu pi nasin Wasintan.",
       "alsoAccepted": [],
       "de": [
-        "Ich lebe im Haus #27 in der Washington-Straße."
+        "I live in house #27 on Washington Street."
       ],
       "rejectedVariants": []
     },
@@ -2355,7 +2356,7 @@
       "tp": "ilo pi sitelen tawa li toki e ni: tenpo suno kama la suno li lon.",
       "alsoAccepted": [],
       "de": [
-        "Der Fernseher (\"Gerät der bewegten Bilder\") hat gesagt, dass es morgen sonnig ist."
+        "The TV (\"device of moving pictures\") said tomorrow will be sunny."
       ],
       "rejectedVariants": []
     },
@@ -2370,7 +2371,7 @@
       "tp": "tenpo pimeja ni la lete li lon.",
       "alsoAccepted": [],
       "de": [
-        "Heute Nacht wird es kalt."
+        "It will be cold tonight."
       ],
       "rejectedVariants": []
     },
@@ -2388,7 +2389,7 @@
         "suwi)."
       ],
       "de": [
-        "Mai (\"der 5. Monat\") ist schön."
+        "May (\"the 5th month\") is lovely."
       ],
       "rejectedVariants": []
     },
@@ -2403,7 +2404,7 @@
       "tp": "sina jo e ilo mute pi kalama musi a!",
       "alsoAccepted": [],
       "de": [
-        "Du hast viele Musikinstrumente!"
+        "You have a lot of musical instruments!"
       ],
       "rejectedVariants": []
     },
@@ -2416,7 +2417,7 @@
       "tp": "sina wile kama sona e toki pona la pu li nasin pona nanpa wan tawa ni.",
       "alsoAccepted": [],
       "de": [
-        "Wenn du Toki Pona lernen willst, ist das offizielle Buch der beste Weg dafür."
+        "If you want to learn toki pona, the official book is the best way to do so."
       ],
       "rejectedVariants": []
     },
@@ -2429,7 +2430,7 @@
       "tp": "tenpo suno ni la mi pilin pona mute.",
       "alsoAccepted": [],
       "de": [
-        "Heute fühle ich mich gut."
+        "Today I feel very good."
       ],
       "rejectedVariants": []
     },
@@ -2442,7 +2443,7 @@
       "tp": "sina wile ala wile moku e pan sike?",
       "alsoAccepted": [],
       "de": [
-        "Willst du Pizza essen?"
+        "Would you want to eat some pizza?"
       ],
       "rejectedVariants": []
     },
@@ -2455,7 +2456,7 @@
       "tp": "supa lape mi li pakala. mi ken ala lape tan ni.",
       "alsoAccepted": [],
       "de": [
-        "Mein Bett (\"Schlaf-Oberfläche\") ist kaputt. Deswegen kann ich nicht schlafen."
+        "My bed (\"sleeping surface\") is broken. I can't sleep because of it."
       ],
       "rejectedVariants": []
     },
@@ -2468,7 +2469,7 @@
       "tp": "jan Mali Konto li toki e ni: o weka e ijo ike sina.",
       "alsoAccepted": [],
       "de": [
-        "Marie Kondo sagt: Werde unnötige Dinge los."
+        "Marie Kondo says: get rid of unnecessary things."
       ],
       "rejectedVariants": []
     },
@@ -2481,7 +2482,7 @@
       "tp": "kulupu ijo tu wan li lon. ona li kulupu kiwen, li kulupu telo, li kulupu kon.",
       "alsoAccepted": [],
       "de": [
-        "Es gibt drei Kategorien von Materie. Diese sind: Feststoffe, Flüssigkeiten und Gase."
+        "There are three types of matter. These are: solids, liquids and gases."
       ],
       "rejectedVariants": []
     },
@@ -2494,7 +2495,7 @@
       "tp": "taso, meli lili pi jan lawa li lon tomo awen ante.",
       "alsoAccepted": [],
       "de": [
-        "Aber die Prinzessin ist in einem anderen Schloss."
+        "But the princess is in another castle."
       ],
       "rejectedVariants": []
     },
@@ -2507,7 +2508,7 @@
       "tp": "mi lukin e akesi seli laso suli a!",
       "alsoAccepted": [],
       "de": [
-        "Ich habe einen Drachen (große grüne Feuer-Echse) gesehen!"
+        "I saw a dragon (\"big green fire lizard\")!"
       ],
       "rejectedVariants": []
     },
@@ -2520,7 +2521,7 @@
       "tp": "toki! sina pilin seme?",
       "alsoAccepted": [],
       "de": [
-        "Hallo! Wie geht es dir? (\"Wie fühlst du?\")"
+        "Hello! How are you? (\"How do you feel?\")"
       ],
       "rejectedVariants": []
     },
@@ -2533,7 +2534,7 @@
       "tp": "jan alasa li pana e moku soweli mute e kili mute tawa mi mute.",
       "alsoAccepted": [],
       "de": [
-        "Die Jägerin gab uns viel Fleisch und viele Früchte."
+        "The hunter gave us lots of meat and fruit."
       ],
       "rejectedVariants": []
     },
@@ -2546,7 +2547,7 @@
       "tp": "mi lukin e lipu. tenpo lili la ona li pini.",
       "alsoAccepted": [],
       "de": [
-        "Ich lese ein Dokument. Sehr bald (in kurzer Zeit) wird es enden."
+        "I'm reading a document. Very soon (in a short time), it will end."
       ],
       "rejectedVariants": []
     },
@@ -2559,7 +2560,7 @@
       "tp": "mi ken toki pi pona mute kepeken toki pona.",
       "alsoAccepted": [],
       "de": [
-        "Ich spreche gut Toki Pona."
+        "I can speak toki pona very well."
       ],
       "rejectedVariants": []
     }

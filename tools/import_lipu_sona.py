@@ -6,7 +6,10 @@ Quelle: https://github.com/pona-la/lipu-sona — MIT-Lizenz,
 © 2020 /dev/urandom und Mitwirkende. Der Urhebervermerk wandert in die
 Ausgabedatei und muss im Lizenzbildschirm der App erscheinen.
 
-Aufruf:  python3 tools/import_lipu_sona.py <klon-verzeichnis> [ausgabe.json]
+Aufruf:  python3 tools/import_lipu_sona.py <klon-verzeichnis> [sprache] [ausgabe.json]
+
+Der Kurs liegt in mehreren Sprachen vor; die Struktur ist überall dieselbe,
+nur die Abschnittsüberschrift der Übungen unterscheidet sich.
 
 Jede toki-pona-Seite eines Aufgabenpaars wird beim Import geparst; was nicht
 fehlerfrei durchläuft, landet in `rejected` statt stillschweigend im Kurs.
@@ -28,6 +31,11 @@ ATTRIBUTION = {
     "note": "Übungssätze und Übersetzungen übernommen und bearbeitet; "
             "Erklärtexte der App sind eigenständig formuliert.",
 }
+
+# Überschrift des Übungsteils je Sprache.
+EXERCISE_HEADING = {"de": "## Übungen", "en": "## Exercises", "eo": "## Ekzercoj",
+                    "es": "## Ejercicios", "pl": "## Ćwiczenia", "pt": "## Exercícios",
+                    "ru": "## Упражнения", "zh": "## 练习"}
 
 # Stufe des App-Curriculums je Kursseite (Plan, Abschnitt 4).
 STAGE_OF_LESSON = {1: 1, 2: 2, 3: 4, 4: 4, 5: 11, 6: 6, 7: 7, 8: 2,
@@ -76,11 +84,11 @@ def variants(item):
     return [v.strip() for v in item.split(" / ") if v.strip()]
 
 
-def load_lesson_exercises(pages: Path, number: int):
+def load_lesson_exercises(pages: Path, number: int, heading: str):
     text = (pages / f"{number}.md").read_text()
-    if "## Übungen" not in text:
+    if heading not in text:
         return []
-    section = text.split("## Übungen", 1)[1]
+    section = text.split(heading, 1)[1]
     section = section.split("%page-nav%")[0]
     return [[clean(i) for i in block] for block in bullet_blocks(section)]
 
@@ -97,10 +105,14 @@ def load_answers(pages: Path, number: int):
 
 def main():
     root = Path(sys.argv[1] if len(sys.argv) > 1 else "/workspace/pona-la/lipu-sona")
-    out = Path(sys.argv[2] if len(sys.argv) > 2 else "Content/lipu-sona-import.json")
-    pages = root / "pages" / "de"
+    lang = sys.argv[2] if len(sys.argv) > 2 else "de"
+    out = Path(sys.argv[3] if len(sys.argv) > 3 else f"Content/lipu-sona-import-{lang}.json")
+    pages = root / "pages" / lang
     if not pages.is_dir():
         sys.exit(f"Kursseiten nicht gefunden: {pages}")
+    heading = EXERCISE_HEADING.get(lang)
+    if not heading:
+        sys.exit(f"Übungsüberschrift für „{lang}“ unbekannt: {sorted(EXERCISE_HEADING)}")
 
     lessons, items, rejected, mismatches = [], [], [], []
 
@@ -116,7 +128,7 @@ def main():
             if Lexicon.get(key):
                 words.append({"word": key, "courseGloss": gloss.strip()})
 
-        prompts = load_lesson_exercises(pages, number)
+        prompts = load_lesson_exercises(pages, number, heading)
         answers = load_answers(pages, number)
         if len(prompts) != len(answers):
             mismatches.append({"lesson": number, "prompts": len(prompts), "answers": len(answers)})
@@ -172,12 +184,12 @@ def main():
                         "concepts": CONCEPTS_OF_LESSON[number],
                         "words": words, "exercises": count})
 
-    payload = {"attribution": ATTRIBUTION, "lessons": lessons, "items": items,
-               "rejected": rejected, "mismatches": mismatches}
+    payload = {"attribution": ATTRIBUTION, "language": lang, "lessons": lessons,
+               "items": items, "rejected": rejected, "mismatches": mismatches}
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
 
-    print(f"{len(items)} Aufgaben aus {len(lessons)} Lektionen → {out}")
+    print(f"[{lang}] {len(items)} Aufgaben aus {len(lessons)} Lektionen → {out}")
     print(f"  Richtung tp→de: {sum(1 for i in items if i['direction'] == 'tp_de')}")
     print(f"  Richtung de→tp: {sum(1 for i in items if i['direction'] == 'de_tp')}")
     print(f"  Mehrfachlösungen: {sum(1 for i in items if i['alsoAccepted'])}")
