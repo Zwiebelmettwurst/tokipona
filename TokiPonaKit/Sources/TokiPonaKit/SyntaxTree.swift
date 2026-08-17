@@ -38,6 +38,12 @@ public struct NounPhrase: Sendable, Hashable {
 
     public var tokens: [Token] { [head] + modifiers.flatMap(\.tokens) }
     public var text: String { tokens.joinedText }
+
+    /// Hängt eine Beifügung an. Gebraucht, wenn sich erst nachträglich zeigt,
+    /// dass ein Wort keine Präpositionalphrase eröffnet, sondern modifiziert.
+    public func appending(_ modifier: Modifier) -> NounPhrase {
+        NounPhrase(head: head, modifiers: modifiers + [modifier], embedded: embedded)
+    }
 }
 
 /// Präposition mit Ergänzung: `tawa mi`.

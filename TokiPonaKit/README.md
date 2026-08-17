@@ -30,7 +30,7 @@ Parser().parse("jan suli li pana e lipu tawa mi.").utterance?.xray()
 | `Tokenizer.swift` | Zerlegung, Normalisierung, Tippfehlervorschläge (Editierdistanz 1) |
 | `Parser.swift` | Recursive-Descent-Analyse mit Fehlersammlung statt Abbruch |
 | `SyntaxTree.swift` | Satzbaum: Kontexte, Subjekte, Präverben, Kern, Objekte, Präpositionalphrasen |
-| `Violation.swift` | 18 Regeln, jede auf ein Curriculum-Konzept abgebildet |
+| `Violation.swift` | 17 Regeln, jede auf ein Curriculum-Konzept abgebildet |
 | `XRay.swift` | Rollenzerlegung für Erklärung, Übung und Rückmeldung |
 
 ## Abgedeckte Grammatik
@@ -44,22 +44,41 @@ Satzeinbettung nach `ni:`, `en`/`anu`/`taso`, Zahlen und Eigennamen.
 Mit `Parser(options: .pu)` gilt strikt der *pu*-Kanon: *nimi ku suli* werden dann
 gemeldet, erweiterte Präverben abgelehnt.
 
+## Präpositionen sind auch Inhaltswörter
+
+`tomo tawa mi` heißt „mein Auto“, nicht „Haus zu mir“. Der Parser löst das über die
+Position, nicht über eine Wortliste:
+
+- **Im Subjekt** ist keine Präpositionalphrase möglich, also ist `tawa` dort
+  Beifügung: `tomo tawa mi li pona.`
+- **Ohne Ergänzung** ist sie ebenfalls Beifügung: `ona li toki e ijo lon.`
+- **Sonst** eröffnet sie eine Phrase: `mi pana e lipu tawa sina.`
+
+Im Objekt bleibt `e lipu tawa mi` mehrdeutig („das Dokument für mich“ / „gibt mir
+das Dokument“). Der Parser wählt die Phrasenlesart, meldet aber keinen Fehler —
+beide sind zulässig, und Rückmeldung darf nur beanstanden, was sicher falsch ist.
+
 ## Bekannte Grenzen
 
 - **Ohne Doppelpunkt keine Einbettung.** `e ni sina kama` ist strukturell eine
   Nominalphrase und wird deshalb nicht beanstandet. `ni:` ist Konvention, nicht Regel.
-- **Präpositionen beenden eine Nominalphrase.** `jan lon` als Beifügung („die
-  anwesende Person“) wird als Phrasengrenze gelesen. Die Alternative wäre, jede
-  Präposition doppeldeutig zu halten — das erzeugt mehr Fehldiagnosen als es verhindert.
 - **Semantik bleibt außen vor.** `kiwen li moku e telo` ist grammatisch fehlerfrei.
   Die inhaltliche Bewertung gehört in den Grader, der Musterlösungen und
   Pflichtbausteine kennt (Plan, Abschnitt 6) — er kommt als nächstes.
 
 ## Prüfstand
 
-`Tests/TokiPonaKitTests/GoldenCorpus.swift` enthält 66 Sätze über alle zwölf
-Stufen, die fehlerfrei analysierbar sein müssen, und 17 Fehlersätze, die je genau
-eine Regel auslösen sollen. Für v1.0 wächst dieser Bestand laut Plan auf rund 600
+`Tests/TokiPonaKitTests/GoldenCorpus.swift` enthält 71 Sätze über alle zwölf
+Stufen, die fehlerfrei analysierbar sein müssen, und 16 Fehlersätze, die je genau
+eine Regel auslösen sollen.
+
+Zusätzlich wurde der Parser gegen fremdes Material gemessen: die 238 toki-pona-Sätze
+des Kurses [lipu sona pona](https://lipu-sona.pona.la/de/) (MIT-Lizenz,
+© 2020 /dev/urandom und Mitwirkende) — Beispielsätze und Musterlösungen aus zwölf
+Lektionen. Die erste Messung ergab 90 %; die vier Lücken (Präposition als Beifügung
+im Subjekt, Präposition ohne Ergänzung, `anu` zwischen Prädikaten, `X ala X` an
+einem präverbfähigen Hauptverb) sind behoben, seither **238 von 238**. Das Lexikon
+stimmt mit dem Kurs exakt überein: 120 + 17. Für v1.0 wächst dieser Bestand laut Plan auf rund 600
 Sätze; jeder Redaktionssatz kommt hier zuerst an.
 
 ```

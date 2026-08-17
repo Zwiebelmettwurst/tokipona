@@ -18,23 +18,24 @@ public struct Violation: Sendable, Hashable {
         case objectWithoutNoun
         case piWithSingleWord
         case piWithoutContent
-        case prepositionWithoutObject
         case emptyContext
         case contextWithoutClause
         case vocativeWithoutContent
         case unexpectedToken
 
         /// Konzept aus dem Curriculum, das dieser Fehler betrifft.
+        ///
+        /// Bewusst ohne Stufennummer: Die Reihenfolge der Stufen kann sich
+        /// ändern, die Identität des Konzepts nicht.
         public var conceptID: String? {
             switch self {
-            case .liAfterMiSina: return "c01_mi_sina"
-            case .missingLi, .missingSubject, .missingPredicate, .repeatedParticle: return "c03_li"
-            case .objectWithoutNoun: return "c04_e_objekt"
-            case .piWithSingleWord, .piWithoutContent: return "c05_pi"
-            case .prepositionWithoutObject: return "c07_praeposition"
-            case .vocativeWithoutContent: return "c09_o"
-            case .emptyContext, .contextWithoutClause: return "c10_la"
-            case .properNameNotTokiponized, .properNameAsHead: return "c12_namen"
+            case .liAfterMiSina: return "c_mi_sina"
+            case .missingLi, .missingSubject, .missingPredicate, .repeatedParticle: return "c_li"
+            case .objectWithoutNoun: return "c_e_objekt"
+            case .piWithSingleWord, .piWithoutContent: return "c_pi"
+            case .vocativeWithoutContent: return "c_o"
+            case .emptyContext, .contextWithoutClause: return "c_la"
+            case .properNameNotTokiponized, .properNameAsHead: return "c_namen"
             case .unknownWord, .particleInPhrasePosition, .unexpectedToken, .emptyUtterance: return nil
             }
         }

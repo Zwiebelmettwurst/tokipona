@@ -353,11 +353,11 @@ final class ParseEngine {
 
     private func parseSubjectChain() -> [NounPhrase] {
         var phrases: [NounPhrase] = []
-        guard let first = parseNounPhrase() else { return phrases }
+        guard let first = parseNounPhrase(allowPrepositionAsModifier: true) else { return phrases }
         phrases.append(first)
         while pos < limit, tokens[pos].isParticle("en") || tokens[pos].isParticle("anu") {
             pos += 1
-            guard let next = parseNounPhrase() else { break }
+            guard let next = parseNounPhrase(allowPrepositionAsModifier: true) else { break }
             phrases.append(next)
         }
         return phrases
@@ -365,7 +365,7 @@ final class ParseEngine {
 
     private func parsePredicateChain() -> [Predicate] {
         var predicates: [Predicate] = []
-        while pos < limit, tokens[pos].isParticle("li") {
+        while pos < limit, chainsPredicate(tokens[pos]) {
             let marker = tokens[pos]
             pos += 1
             if pos < limit, tokens[pos].isParticle("li") {
@@ -396,7 +396,10 @@ final class ParseEngine {
 
             if next.text == "ala", next.word != nil {
                 if pos + 2 < limit, tokens[pos + 2].text == preverb.text {
-                    // `wile ala wile` — Entscheidungsfrage.
+                    // `wile ala wile` — Entscheidungsfrage. Folgt danach eine
+                    // Phrasengrenze, war das Wort selbst das Verb:
+                    // `ona li sona ala sona e toki pona?`
+                    if pos + 3 >= limit || tokens[pos + 3].isPhraseBoundary { break }
                     isPolarQuestion = true
                     preverbs.append(PreverbUse(token: preverb, isNegated: false))
                     pos += 3
@@ -417,7 +420,7 @@ final class ParseEngine {
 
         var core: PredicateCore = .missing
         if pos < limit, tokens[pos].isPreposition(extended: options.extendedPrepositions) {
-            core = .prepositional(parsePrepositionalPhrase(isCore: true))
+            core = .prepositional(parsePrepositionalPhrase())
         } else if pos < limit, !tokens[pos].isPhraseBoundary {
             if let phrase = parseNounPhrase() {
                 core = .phrase(phrase)
@@ -471,19 +474,32 @@ final class ParseEngine {
                     )
                 }
             } else if token.isPreposition(extended: options.extendedPrepositions) {
-                prepositions.append(parsePrepositionalPhrase(isCore: false))
+                let phrase = parsePrepositionalPhrase()
+                if phrase.object == nil {
+                    // `ona li toki e ijo lon.` — ohne Ergänzung ist die
+                    // Präposition ein gewöhnliches Inhaltswort.
+                    if let last = objects.last {
+                        objects[objects.count - 1] = last.appending(.simple(token))
+                    } else if case .phrase(let corePhrase) = core {
+                        core = .phrase(corePhrase.appending(.simple(token)))
+                    } else {
+                        prepositions.append(phrase)
+                    }
+                } else {
+                    prepositions.append(phrase)
+                }
             } else {
                 break loop
             }
         }
 
-        if pos < limit, !tokens[pos].isParticle("li") {
+        if pos < limit, !chainsPredicate(tokens[pos]) {
             report(
                 .unexpectedToken,
                 tokens: [tokens[pos]],
                 message: "„\(tokens[pos].original)“ passt an dieser Stelle nicht in den Satzbau."
             )
-            while pos < limit, !tokens[pos].isParticle("li") { pos += 1 }
+            while pos < limit, !chainsPredicate(tokens[pos]) { pos += 1 }
         }
 
         return Predicate(
@@ -497,21 +513,13 @@ final class ParseEngine {
         )
     }
 
-    private func parsePrepositionalPhrase(isCore: Bool) -> PrepositionalPhrase {
+    private func parsePrepositionalPhrase() -> PrepositionalPhrase {
         let preposition = tokens[pos]
         pos += 1
 
         var object: NounPhrase?
         if pos < limit, !tokens[pos].isPhraseBoundary, !tokens[pos].isParticle("pi") {
             object = parseNounPhrase()
-        }
-
-        if object == nil && !isCore {
-            report(
-                .prepositionWithoutObject,
-                tokens: [preposition],
-                message: "Nach „\(preposition.text)“ fehlt die Ergänzung."
-            )
         }
 
         return PrepositionalPhrase(preposition: preposition, object: object)
@@ -526,7 +534,7 @@ final class ParseEngine {
         return parseNounPhrase()
     }
 
-    private func parseNounPhrase() -> NounPhrase? {
+    private func parseNounPhrase(allowPrepositionAsModifier: Bool = false) -> NounPhrase? {
         guard pos < limit else { return nil }
         let head = tokens[pos]
 
@@ -592,7 +600,8 @@ final class ParseEngine {
             }
 
             if token.isPhraseBoundary { break }
-            if token.isPreposition(extended: options.extendedPrepositions) { break }
+            if token.isPreposition(extended: options.extendedPrepositions),
+               !allowPrepositionAsModifier { break }
             if !token.canModify { break }
 
             modifiers.append(.simple(token))
@@ -645,6 +654,11 @@ final class ParseEngine {
         var words = tokens[from..<to].map(\.text)
         words.insert("li", at: insertion - from)
         return words.joined(separator: " ")
+    }
+
+    /// `li` und `anu` reihen beide Prädikate aneinander.
+    private func chainsPredicate(_ token: Token) -> Bool {
+        token.isParticle("li") || token.isParticle("anu")
     }
 
     private func isBarePronoun(_ token: Token) -> Bool {

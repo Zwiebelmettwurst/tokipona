@@ -88,6 +88,38 @@ final class ParserGoldenTests: XCTestCase {
         XCTAssertNil(phrase.object)
     }
 
+    /// Präpositionen sind zugleich Inhaltswörter. Im Subjekt ist keine
+    /// Präpositionalphrase möglich, also können sie dort nur Beifügung sein —
+    /// `tomo tawa` (Auto) ist genau deshalb keine Ausnahme, sondern die Regel.
+    func testPrepositionActsAsModifierWhereNoPhraseIsPossible() throws {
+        let subject = parser.parse("tomo tawa mi li pona.")
+        XCTAssertTrue(subject.isValid, subject.violations.map(\.message).joined(separator: " | "))
+        XCTAssertEqual(subject.utterance?.clause?.subjects.first?.text, "tomo tawa mi")
+
+        let dangling = parser.parse("ona li toki e ijo lon.")
+        XCTAssertTrue(dangling.isValid, dangling.violations.map(\.message).joined(separator: " | "))
+        XCTAssertEqual(dangling.utterance?.clause?.predicates.first?.objects.first?.text, "ijo lon")
+        XCTAssertTrue(dangling.utterance?.clause?.predicates.first?.prepositions.isEmpty ?? false)
+    }
+
+    func testAnuChainsAlternativePredicates() throws {
+        let result = parser.parse("ona li pona mute anu ike mute.")
+        XCTAssertTrue(result.isValid, result.violations.map(\.message).joined(separator: " | "))
+        let predicates = try XCTUnwrap(result.utterance?.clause?.predicates)
+        XCTAssertEqual(predicates.count, 2)
+        XCTAssertEqual(predicates.map(\.marker?.text), ["li", "anu"])
+    }
+
+    /// `sona` ist präverbfähig, trägt hier aber selbst das Objekt.
+    func testPolarQuestionOnPreverbCapableMainVerb() throws {
+        let result = parser.parse("ona li sona ala sona e toki pona?")
+        XCTAssertTrue(result.isValid, result.violations.map(\.message).joined(separator: " | "))
+        let predicate = try XCTUnwrap(result.utterance?.clause?.predicates.first)
+        XCTAssertTrue(predicate.preverbs.isEmpty)
+        XCTAssertTrue(predicate.isPolarQuestion)
+        XCTAssertEqual(predicate.objects.map(\.text), ["toki pona"])
+    }
+
     func testNegationAndPolarQuestionAreDistinguished() throws {
         let negated = parser.parse("mi moku ala.")
         XCTAssertTrue(negated.isValid)
