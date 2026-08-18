@@ -90,6 +90,17 @@
       coinThin: 'Ein Wort allein umschreibt noch nichts.',
       unknownWords: (list) => `Kein toki-pona-Wort: ${list}`,
       coinBroken: 'Als Wortgruppe geht das noch nicht auf.',
+      askStyle: 'welcher satz sagt das?',
+      styleTitle: 'nasin ante — mehrere wege',
+      styleHint: 'Beide Sätze sind richtig. Der Unterschied liegt in der Absicht.',
+      askSyllable: 'bau das wort aus silben',
+      syllableBack: (part) => `Silbe ${part} — antippen nimmt sie zurück`,
+      syllableHint: 'Jede Silbe hat die Form (K)V(n) — mehr Formen gibt es nicht.',
+      syllableWord: (word, sense) => `${word} — ${sense}`,
+      netAsHead: 'als Kopfwort', netAsMod: 'als Beifügung',
+      netNone: 'Dazu steht im Korpus noch keine Verbindung.',
+      netHint: 'Wortverbände aus allen Sätzen der App — so wird toki pona '
+        + 'wirklich zusammengesetzt.',
       nameTitle: 'nimi sina — dein name auf toki pona',
       nameHint: 'toki pona kennt vierzehn Buchstaben und nur Silben aus '
         + '(K)V(n). Fremde Namen werden deshalb nicht übersetzt, sondern '
@@ -239,6 +250,17 @@
       coinThin: 'One word alone does not describe anything yet.',
       unknownWords: (list) => `Not a toki pona word: ${list}`,
       coinBroken: 'That does not add up as a phrase yet.',
+      askStyle: 'which sentence says that?',
+      styleTitle: 'nasin ante — more than one way',
+      styleHint: 'Both sentences are correct. The difference is in what you mean.',
+      askSyllable: 'build the word from syllables',
+      syllableBack: (part) => `syllable ${part} — tap to take it back`,
+      syllableHint: 'Every syllable has the shape (C)V(n) — there are no others.',
+      syllableWord: (word, sense) => `${word} — ${sense}`,
+      netAsHead: 'as head word', netAsMod: 'as modifier',
+      netNone: 'No combinations for this one in the corpus yet.',
+      netHint: 'Word partnerships from every sentence in the app — this is how '
+        + 'toki pona is actually put together.',
       nameTitle: 'nimi sina — your name in toki pona',
       nameHint: 'toki pona has fourteen letters and only syllables of the '
         + 'shape (C)V(n). Foreign names are therefore not translated but '
@@ -592,6 +614,14 @@
       return prompt ? { type: 'answer', prompt, lesson: lessonOf(prompt.stage) || lessons()[0],
                         concepts: [] } : null;
     }
+    if (kind === 'v') {
+      const style = OPEN.styles.find((entry) => entry.id === rest);
+      return style ? { type: 'style', style, lesson: lessons()[0], concepts: [] } : null;
+    }
+    if (kind === 'y') {
+      return TP.lexicon[rest] && (TP.syllables(rest) || []).length >= 2
+        ? { type: 'syllable', word: rest, lesson: lessons()[0], concepts: [] } : null;
+    }
     if (kind === 'n') {
       const compound = COMPOUNDS[Number(rest)];
       return compound ? { type: 'coin', compound, lesson: lessons()[0], concepts: [] } : null;
@@ -616,6 +646,8 @@
     if (task.type === 'trace') return 't:' + task.word;
     if (task.type === 'glyph') return 'g:' + task.word;
     if (task.type === 'word') return 'w:' + task.word;
+    if (task.type === 'style') return 'v:' + task.style.id;
+    if (task.type === 'syllable') return 'y:' + task.word;
     if (task.type === 'coin') return 'n:' + COMPOUNDS.indexOf(task.compound);
     if (task.type === 'compound') return 'c:' + COMPOUNDS.indexOf(task.compound);
     if (task.item) return 's:' + task.item.id;
@@ -742,6 +774,16 @@
     const tasks = [];
 
     words.slice(0, 2).forEach((word) => tasks.push({ type: 'word', word, lesson, concepts: [] }));
+    // In jeder zweiten Lektion wird ein Wort nicht abgefragt, sondern gebaut.
+    const longWord = words.find((word) => (TP.syllables(word) || []).length >= 2);
+    if (longWord && lesson.number % 2 === 1) {
+      tasks.push({ type: 'syllable', word: longWord, lesson, concepts: [] });
+    }
+
+    const style = shuffle(OPEN.styles)[0];
+    if (style && lesson.number >= 5) {
+      tasks.push({ type: 'style', style, lesson, concepts: [] });
+    }
     builds.slice(0, 3).forEach((item) =>
       tasks.push({ type: 'build', item, lesson, concepts: lessonConcepts(lesson) }));
     reads.slice(0, 2).forEach((item) =>
@@ -1553,6 +1595,8 @@
     else if (task.type === 'quiz') app.append(quizTask(task));
     else if (task.type === 'trace') app.append(traceTask(task));
     else if (task.type === 'coin') app.append(coinTask(task));
+    else if (task.type === 'style') app.append(styleTask(task));
+    else if (task.type === 'syllable') app.append(syllableTask(task));
     else app.append(freeTask(task));
   }
 
@@ -1860,6 +1904,29 @@
     return screen;
   }
 
+  function styleCard() {
+    const card = el(`
+      <div class="card" style="margin-top:1rem">
+        <h2>${escape(t('styleTitle'))}</h2>
+        <p class="hint">${escape(t('styleHint'))}</p>
+        <div class="stylelist"></div>
+      </div>`);
+    const list = card.querySelector('.stylelist');
+    OPEN.styles.forEach((entry) => {
+      const row = el(`<div class="styleline"><p class="netlabel">`
+        + `${escape(entry.topic[state.lang] || entry.topic.de)}</p></div>`);
+      entry.options.forEach((option) => {
+        const line = el('<p class="tp glossable"></p>');
+        line.append(glossed(option.tp, 'glossline'));
+        withSay(line, option.tp);
+        row.append(line);
+        row.append(el(`<p class="hint">${escape(option.note[state.lang] || option.note.de)}</p>`));
+      });
+      list.append(row);
+    });
+    return card;
+  }
+
   function phraseCard() {
     const card = el(`
       <div class="card" style="margin-top:1rem">
@@ -1988,6 +2055,112 @@
       });
     };
     setTimeout(() => input.focus(), 50);
+    return screen;
+  }
+
+  // Zwei gültige Sätze, ein Unterschied: welcher sagt, was gemeint ist?
+  function styleTask(task) {
+    const entry = task.style;
+    const right = entry.options[entry.right];
+
+    const screen = screenWith(`
+      <p class="prompt">${escape(t('askStyle'))}</p>
+      <h2 class="question ask">${escape(entry.ask[state.lang] || entry.ask.de)}</h2>
+      <div class="choices"></div>
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
+
+    let picked = null;
+    const list = screen.querySelector('.choices');
+    const button = screen.querySelector('.primary');
+    shuffle(entry.options.slice()).forEach((option) => {
+      const choice = el(`<button class="choice tp">${escape(option.tp)}</button>`);
+      choice.onclick = () => {
+        picked = option;
+        list.querySelectorAll('.choice').forEach((c) => { c.dataset.picked = 'false'; });
+        choice.dataset.picked = 'true';
+        button.disabled = false;
+      };
+      list.append(choice);
+    });
+
+    button.onclick = () => finish(task, picked === right, {
+      solution: right.tp,
+      speak: right.tp,
+      xray: right.tp,
+      // Nach der Antwort stehen beide Wege da — darum geht es.
+      reason: entry.options.map((option) =>
+        `<code>${escape(option.tp)}</code> — ${escape(option.note[state.lang] || option.note.de)}`)
+        .join('<br>'),
+    });
+    return screen;
+  }
+
+  // Silben: jedes Wort zerfällt in (K)V(n). Aus den Bausteinen wird es wieder
+  // zusammengesetzt — Lautlehre zum Anfassen.
+  function syllableTask(task) {
+    const parts = TP.syllables(task.word) || [task.word];
+    const others = shuffle(Object.keys(TP.lexicon)
+      .flatMap((word) => TP.syllables(word) || [])
+      .filter((part) => !parts.includes(part)));
+    const tiles = shuffle(parts.concat(others.slice(0, Math.min(2, parts.length))))
+      .map((text, index) => ({ text, id: String(index) }));
+
+    const screen = screenWith(`
+      <p class="prompt">${escape(t('askSyllable'))}</p>
+      <h2 class="question">${escape(glossesOf(task.word).slice(0, 3).join(', '))}</h2>
+      <div class="slot syllables"></div>
+      <p class="hint">${escape(t('syllableHint'))}</p>
+      <div class="bank syllables"></div>
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
+
+    const slot = screen.querySelector('.slot');
+    const bank = screen.querySelector('.bank');
+    const button = screen.querySelector('.primary');
+    const chosen = [];
+
+    const sync = () => {
+      slot.innerHTML = '';
+      chosen.forEach((id) => {
+        const part = tiles.find((chip) => chip.id === id).text;
+        const tile = el(`<button class="tile placed" data-word="${escape(part)}"
+          data-id="${escape(id)}" aria-label="${escape(t('syllableBack', part))}"
+          >${escape(part)}</button>`);
+        tile.onclick = () => {
+          chosen.splice(chosen.indexOf(id), 1);
+          sync();
+        };
+        slot.append(tile);
+      });
+      bank.querySelectorAll('.tile').forEach((tile) => {
+        tile.classList.toggle('used', chosen.includes(tile.dataset.id));
+      });
+      button.disabled = !chosen.length;
+    };
+
+    tiles.forEach((chip) => {
+      const tile = el(`<button class="tile" data-id="${escape(chip.id)}"
+        data-word="${escape(chip.text)}">${escape(chip.text)}</button>`);
+      tile.onclick = () => {
+        if (chosen.includes(chip.id)) return;
+        chosen.push(chip.id);
+        sync();
+      };
+      bank.append(tile);
+    });
+    sync();
+
+    button.onclick = () => {
+      const built = chosen.map((id) => tiles.find((chip) => chip.id === id).text).join('');
+      const correct = built === task.word;
+      state.seenWords[task.word] = true;
+      finish(task, correct, {
+        solution: task.word,
+        speak: task.word,
+        xray: null,
+        reason: t('syllableWord', escape(parts.join(' · ')),
+          escape(glossesOf(task.word).slice(0, 3).join(', '))),
+      });
+    };
     return screen;
   }
 
@@ -2862,6 +3035,71 @@
     return card;
   }
 
+  // Wortverbände: was steht bei diesem Wort? Gelesen aus allem, was die App
+  // an Sätzen mitbringt — Kurs, Lesetexte, Alltagssätze, Spaßmodus.
+  let netCache = null;
+  function wordNet() {
+    if (netCache) return netCache;
+    const pool = [];
+    for (const pack of Object.values(DATA.languages)) {
+      for (const lesson of pack.lessons) {
+        for (const item of lesson.items) pool.push(item.tp, ...item.also);
+      }
+    }
+    pool.push(...DATA.corpus.external, ...DATA.corpus.valid);
+    for (const line of MUSI.lines) pool.push(line.tp);
+    for (const group of OPEN.phrases) for (const line of group.lines) pool.push(line.tp);
+    for (const join of OPEN.joins) pool.push(join.tp);
+    for (const extra of Object.values(OPEN.extras)) pool.push(extra.tp);
+    for (const text of LIPU.texts) for (const line of text.lines) pool.push(line.tp);
+    for (const compound of COMPOUNDS) pool.push(compound.tp);
+
+    const heads = {};
+    const mods = {};
+    for (const sentence of pool) {
+      for (const phrase of TP.phrasesIn(sentence)) {
+        const head = phrase[0];
+        for (const word of phrase.slice(1)) {
+          if (word === head) continue;
+          heads[head] = heads[head] || {};
+          heads[head][word] = (heads[head][word] || 0) + 1;
+          mods[word] = mods[word] || {};
+          mods[word][head] = (mods[word][head] || 0) + 1;
+        }
+      }
+    }
+    netCache = { heads, mods };
+    return netCache;
+  }
+
+  const netTop = (table, word, limit) => Object.entries((table || {})[word] || {})
+    .sort((a, b) => b[1] - a[1]).slice(0, limit);
+
+  function netBox(word) {
+    const net = wordNet();
+    const asHead = netTop(net.heads, word, 6);
+    const asMod = netTop(net.mods, word, 4);
+    const box = el('<div class="net"></div>');
+    if (!asHead.length && !asMod.length) {
+      box.append(el(`<p class="hint">${escape(t('netNone'))}</p>`));
+      return box;
+    }
+    const line = (label, pairs, order) => {
+      if (!pairs.length) return;
+      // div statt span: .word span ist im Wörterbuch schon belegt.
+      const row = el(`<div class="netline"><div class="netlabel">${escape(label)}</div></div>`);
+      pairs.forEach(([other, count]) => {
+        const text = order === 'head' ? `${word} ${other}` : `${other} ${word}`;
+        row.append(el(`<code>${escape(text)}<i>${count}</i></code>`));
+      });
+      box.append(row);
+    };
+    line(t('netAsHead'), asHead, 'head');
+    line(t('netAsMod'), asMod, 'mod');
+    box.append(el(`<p class="hint">${escape(t('netHint'))}</p>`));
+    return box;
+  }
+
   function wordScreen() {
     const screen = screenWith(`
       <input class="search" placeholder="${escape(t('search'))}" aria-label="${escape(t('search'))}">
@@ -2887,6 +3125,13 @@
             <em>${entry.book === 'pu' ? 'pu' : 'ku'}${state.seenWords[word] ? ' ✓' : ''}</em>
           </div>`);
         withSay(row, word);
+        // Antippen öffnet den Wortverband.
+        row.onclick = (event) => {
+          if (event.target.closest('.say')) return;
+          const open = row.dataset.open === 'true';
+          row.dataset.open = String(!open);
+          if (!open && !row.querySelector('.net')) row.append(netBox(word));
+        };
         const example = shown.get(word);
         if (example) {
           row.append(el(`<p class="example"><code>${escape(example.tp)}</code>
@@ -2956,6 +3201,7 @@
         <code>soweli moku e kili.</code> · <code>jan Claude li pona.</code>
       </p>`));
 
+    screen.append(styleCard());
     screen.append(phraseCard());
     OPEN.phrases.forEach((group) => screen.append(phraseGroup(group)));
     return screen;
