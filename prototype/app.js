@@ -1053,7 +1053,10 @@
   function buildTask(task) {
     const solution = TP.tokenize(task.item.tp).map((t) => t.text);
     const extras = distractorWords(task.lesson, solution, Math.min(3, Math.max(2, 6 - solution.length)));
-    const bank = shuffle(solution.concat(extras));
+    // Jede Kachel bekommt eine eigene Nummer. Kommt „li“ dreimal vor, sind das
+    // drei unterscheidbare Kacheln — sonst greift ein Tipp auf die falsche.
+    const bank = shuffle(solution.concat(extras)).map((word, index) => ({ word, id: String(index) }));
+    const wordOf = new Map(bank.map((chip) => [chip.id, chip.word]));
 
     const screen = screenWith(`
       <p class="prompt">${escape(t('askBuild'))}</p>
@@ -1070,14 +1073,13 @@
 
     // Die gelegten Kacheln sind die Wahrheit: nach jedem Ziehen wird die
     // Wortfolge aus der Reihenfolge im Baum neu gelesen.
-    const readOrder = () => Array.from(slot.children).map((node) => node.dataset.word);
+    const readOrder = () => Array.from(slot.children).map((node) => node.dataset.id);
 
     const refreshBank = () => {
       bankRow.querySelectorAll('.tile').forEach((tile) => {
-        // Kommt ein Wort mehrfach im Vorrat vor, sind genau so viele Kacheln
-        // belegt, wie oben liegen — von vorn abgezählt.
-        const used = chosen.filter((w) => w === tile.dataset.word).length;
-        tile.classList.toggle('used', Number(tile.dataset.rank) < used);
+        // Belegt ist genau die Kachel, die oben liegt — nicht irgendeine mit
+        // demselben Wort.
+        tile.classList.toggle('used', chosen.includes(tile.dataset.id));
       });
       button.disabled = chosen.length === 0;
     };
@@ -1167,8 +1169,9 @@
       node.focus();
     }
 
-    const place = (word) => {
-      const tile = el(`<button class="tile placed" data-word="${escape(word)}"
+    const place = (id) => {
+      const word = wordOf.get(id);
+      const tile = el(`<button class="tile placed" data-word="${escape(word)}" data-id="${escape(id)}"
         aria-label="${escape(word)} — antippen entfernt, ziehen oder Pfeiltasten sortieren um"
         >${escape(word)}</button>`);
       tile.addEventListener('pointerdown', (event) => grab(tile, event));
@@ -1189,18 +1192,20 @@
       refreshBank();
     };
 
-    const seen = {};
-    bank.forEach((word) => {
-      const rank = seen[word] || 0;
-      seen[word] = rank + 1;
-      const tile = el(`<button class="tile" data-word="${escape(word)}" data-rank="${rank}">${escape(word)}</button>`);
-      tile.onclick = () => { chosen.push(word); sync(); };
+    bank.forEach(({ word, id }) => {
+      const tile = el(`<button class="tile" data-word="${escape(word)}" data-id="${escape(id)}"
+        >${escape(word)}</button>`);
+      tile.onclick = () => {
+        if (chosen.includes(id)) return;
+        chosen.push(id);
+        sync();
+      };
       bankRow.append(tile);
     });
     sync();
 
     button.onclick = () => {
-      const answer = chosen.join(' ');
+      const answer = chosen.map((id) => wordOf.get(id)).join(' ');
       const accepted = [task.item.tp, ...task.item.also]
         .map((s) => TP.tokenize(s).map((t) => t.text).join(' '));
       const correct = accepted.includes(answer);
@@ -1497,8 +1502,8 @@
   // Der Service Worker meldet sich, sobald eine neue Fassung bereitliegt.
   // Wer gerade nichts löst, bekommt sie sofort; mitten in einer Übung fragt
   // ein schmaler Streifen, statt die halbe Antwort wegzuwerfen.
-  window.otokiUpdateReady = () => {
-    if (!session) { location.reload(); return; }
+  window.otokiUpdateReady = (mayReload) => {
+    if (mayReload && !session) { location.reload(); return; }
     if (document.querySelector('.updatebar')) return;
     const bar = el(`
       <div class="updatebar">
