@@ -84,6 +84,39 @@ def variants(item):
     return [v.strip() for v in item.split(" / ") if v.strip()]
 
 
+def tp_variants(item):
+    """Wie variants, aber für die toki-pona-Seite: dort steht in Klammern
+    entweder eine Auswahl — `(tenpo mun / tenpo sike mun)` — oder ein Wort,
+    das auch wegfallen darf: `(jan) mije li ...`. Beides wird zu eigenen,
+    gleichwertigen Lösungen ausgerollt, statt den Satz zu zerreißen."""
+    forms = [item]
+    while True:
+        expanded, changed = [], False
+        for form in forms:
+            match = re.search(r"\(([^()]*)\)", form)
+            if not match:
+                expanded.append(form)
+                continue
+            changed = True
+            inner = match.group(1)
+            options = ([o.strip() for o in inner.split("/")] if "/" in inner
+                       else [inner.strip(), ""])
+            for option in options:
+                expanded.append(form[:match.start()] + option + form[match.end():])
+        forms = expanded
+        if not changed:
+            break
+
+    out = []
+    for form in forms:
+        for piece in form.split(" / "):
+            text = re.sub(r"\s+", " ", piece).strip()
+            text = re.sub(r"\s+([.!?,])", r"\1", text)
+            if text and text not in out:
+                out.append(text)
+    return out
+
+
 def load_lesson_exercises(pages: Path, number: int, heading: str):
     text = (pages / f"{number}.md").read_text()
     if heading not in text:
@@ -152,7 +185,7 @@ def main():
                 de_side = answer if prompt_is_tp else prompt
 
                 solutions, broken = [], []
-                for candidate in variants(tp_side):
+                for candidate in tp_variants(tp_side):
                     # Musterlösungen bestehen mitunter aus mehreren Sätzen.
                     violations = [v for utterance in split_utterances(candidate)
                                   for v in parse(utterance)[1]]
