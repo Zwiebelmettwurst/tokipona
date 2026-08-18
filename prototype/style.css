@@ -1202,3 +1202,28 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 .maplegend span[data-level="1"] i { background: var(--sunk); }
 .maplegend span[data-level="2"] i { background: var(--accent-soft); border-color: var(--accent); }
 .maplegend span[data-level="3"] i { background: var(--gold-soft); border-color: var(--gold); }
+
+/* Satzkarte */
+.cardrow { justify-content: flex-start; }
+.cardbutton { width: auto; padding: 0.4rem 0.8rem; font-size: 0.8125rem; }
+.cardlink { position: absolute; left: -9999px; }
+
+/* ------------------------------------------------- eigene Aufnahmen */
+.rec {
+  position: relative;
+  flex: none;
+  margin-left: 0.3rem;
+  width: 1.65rem;
+  height: 1.65rem;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink-faint);
+  font-size: 0.6875rem;
+  line-height: 1;
+}
+.rec::after { content: ""; position: absolute; inset: -0.6rem; }
+.rec[data-has="true"] { color: var(--gold); border-color: var(--gold); }
+.rec[data-busy="true"] { color: var(--wrong); border-color: var(--wrong); }
+.word .say[data-own="true"] { color: var(--gold); border-color: var(--gold); }

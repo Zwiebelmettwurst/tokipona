@@ -103,6 +103,20 @@
       syllableBack: (part) => `Silbe ${part} — antippen nimmt sie zurück`,
       syllableHint: 'Jede Silbe hat die Form (K)V(n) — mehr Formen gibt es nicht.',
       syllableWord: (word, sense) => `${word} — ${sense}`,
+      recTitle: 'eigene aufnahmen',
+      recHint: 'Die App spricht mit der Stimme deines Geräts. Nimm ein Wort '
+        + 'selbst auf, und sie nimmt deine — überall dort, wo ♪ steht.',
+      recStart: 'aufnehmen', recStop: 'fertig', recBusy: '● läuft',
+      recCount: (n) => `${n} eigene Aufnahme(n)`,
+      recDrop: 'alle löschen',
+      recDenied: 'Kein Zugriff aufs Mikrofon.',
+      recNone: 'Dieses Gerät nimmt nichts auf.',
+      recSaved: (word) => `„${word}“ aufgenommen`,
+      cardMake: 'Satzkarte', cardShare: 'teilen', cardSave: 'sichern',
+      cardTitle: 'satzkarte',
+      cardHint: 'Aus deinem Satz wird ein Bild — mit Zeichen, Schrift und '
+        + 'Satzbau. Zum Teilen oder Aufheben.',
+      cardFailed: 'Das Bild ließ sich nicht bauen.',
       mapTitle: 'nimi ale — die ganze sprache',
       mapHint: 'Jedes Kästchen ein Wort. Es färbt sich, sobald du es siehst, '
         + 'und wird golden, wenn es sitzt.',
@@ -279,6 +293,20 @@
       syllableBack: (part) => `syllable ${part} — tap to take it back`,
       syllableHint: 'Every syllable has the shape (C)V(n) — there are no others.',
       syllableWord: (word, sense) => `${word} — ${sense}`,
+      recTitle: 'your own recordings',
+      recHint: 'The app speaks with your device voice. Record a word yourself and '
+        + 'it will use yours — everywhere the ♪ appears.',
+      recStart: 'record', recStop: 'done', recBusy: '● recording',
+      recCount: (n) => `${n} recording(s) of your own`,
+      recDrop: 'delete all',
+      recDenied: 'No access to the microphone.',
+      recNone: 'This device cannot record.',
+      recSaved: (word) => `“${word}” recorded`,
+      cardMake: 'sentence card', cardShare: 'share', cardSave: 'save',
+      cardTitle: 'sentence card',
+      cardHint: 'Your sentence as a picture — glyphs, letters and structure. '
+        + 'To share or to keep.',
+      cardFailed: 'The picture could not be built.',
       mapTitle: 'nimi ale — the whole language',
       mapHint: 'One box per word. It takes colour once you have met it and turns '
         + 'gold once it sticks.',
@@ -745,6 +773,266 @@
   const unlocked = (number) => number === lessons()[0].number
     || Boolean(state.done[lessons()[lessons().findIndex((l) => l.number === number) - 1].number]);
 
+  // ------------------------------------------------------- eigene Aufnahmen
+
+  // Echte Aufnahmen kann die App nicht mitbringen — aber sie kann deine
+  // benutzen. Was hier landet, bleibt auf dem Gerät (IndexedDB) und wird
+  // überall statt der Gerätestimme abgespielt.
+  const REC_DB = 'o-toki-kalama';
+  const REC_STORE = 'nimi';
+  const RECORDED = new Map();          // Text → Blob
+  let recorder = null;
+
+  const canRecord = () => Boolean(typeof navigator !== 'undefined'
+    && navigator.mediaDevices && navigator.mediaDevices.getUserMedia
+    && typeof window.MediaRecorder === 'function');
+
+  function withStore(mode, work) {
+    return new Promise((resolve, reject) => {
+      if (!window.indexedDB) { reject(new Error('kein Speicher')); return; }
+      const open = window.indexedDB.open(REC_DB, 1);
+      open.onupgradeneeded = () => {
+        if (!open.result.objectStoreNames.contains(REC_STORE)) open.result.createObjectStore(REC_STORE);
+      };
+      open.onerror = () => reject(open.error);
+      open.onsuccess = () => {
+        const tx = open.result.transaction(REC_STORE, mode);
+        const request = work(tx.objectStore(REC_STORE));
+        tx.oncomplete = () => { open.result.close(); resolve(request && request.result); };
+        tx.onerror = () => { open.result.close(); reject(tx.error); };
+      };
+    });
+  }
+
+  async function loadRecordings() {
+    try {
+      const keys = await withStore('readonly', (store) => store.getAllKeys());
+      const blobs = await withStore('readonly', (store) => store.getAll());
+      (keys || []).forEach((key, index) => RECORDED.set(key, (blobs || [])[index]));
+      if (RECORDED.size && !session) render();
+    } catch (error) { /* ohne Speicher eben ohne Aufnahmen */ }
+  }
+
+  function playRecording(text) {
+    const blob = RECORDED.get(String(text).trim());
+    if (!blob) return false;
+    try {
+      const audio = new Audio(URL.createObjectURL(blob));
+      audio.onended = () => URL.revokeObjectURL(audio.src);
+      audio.play().catch(() => {});
+      return true;
+    } catch (error) { return false; }
+  }
+
+  async function recordFor(text, onState) {
+    if (!canRecord()) { toast(t('recNone')); return false; }
+    if (recorder) { recorder.stop(); return false; }
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (error) { toast(t('recDenied')); return false; }
+
+    return new Promise((resolve) => {
+      const chunks = [];
+      recorder = new window.MediaRecorder(stream);
+      recorder.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data); };
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((track) => track.stop());
+        recorder = null;
+        if (onState) onState(false);
+        const blob = new Blob(chunks, { type: chunks[0] ? chunks[0].type : 'audio/webm' });
+        if (!blob.size) { resolve(false); return; }
+        RECORDED.set(text, blob);
+        try { await withStore('readwrite', (store) => store.put(blob, text)); } catch (error) { /* egal */ }
+        toast(t('recSaved', text));
+        resolve(true);
+      };
+      recorder.start();
+      if (onState) onState(true);
+      // Ein Wort braucht keine drei Sekunden; ein Satz auch nicht viel mehr.
+      setTimeout(() => { if (recorder) recorder.stop(); }, 3000);
+    });
+  }
+
+  async function dropRecordings() {
+    RECORDED.clear();
+    try { await withStore('readwrite', (store) => store.clear()); } catch (error) { /* egal */ }
+    render();
+  }
+
+  function recordButton(text) {
+    if (!canRecord()) return null;
+    const button = el(`<button class="rec" type="button" data-has="${RECORDED.has(text)}"
+      aria-label="${escape(t('recStart'))}">●</button>`);
+    button.onclick = async (event) => {
+      event.stopPropagation();
+      await recordFor(text, (busy) => {
+        button.dataset.busy = String(busy);
+        button.textContent = busy ? '■' : '●';
+      });
+      button.dataset.has = String(RECORDED.has(text));
+    };
+    return button;
+  }
+
+  function recordCard() {
+    const card = el(`
+      <div class="card">
+        <h2>${escape(t('recTitle'))}</h2>
+        <p class="hint">${escape(canRecord() ? t('recHint') : t('recNone'))}</p>
+        <div class="row"></div>
+      </div>`);
+    if (!canRecord()) return card;
+    const row = card.querySelector('.row');
+    row.append(el(`<p class="hint">${escape(t('recCount', RECORDED.size))}</p>`));
+    if (RECORDED.size) {
+      const drop = el(`<button class="ghost">${escape(t('recDrop'))}</button>`);
+      drop.onclick = () => dropRecordings();
+      row.append(drop);
+    }
+    return card;
+  }
+
+  // ------------------------------------------------------------ Satzkarte
+
+  // Ein Satz als Bild: Zeichen groß, Schrift klein, Satzbau darunter. Alles
+  // auf einer Leinwand gezeichnet — kein Netz, kein Dienst, kein Konto.
+  const CARD = { width: 1080, height: 1350, pad: 90 };
+
+  function drawCard(tp, subtitle) {
+    const canvas = document.createElement('canvas');
+    canvas.width = CARD.width;
+    canvas.height = CARD.height;
+    const pen = canvas.getContext('2d');
+    const style = getComputedStyle(document.body);
+    const paper = style.getPropertyValue('--surface').trim() || '#ffffff';
+    const ink = style.getPropertyValue('--ink').trim() || '#14181A';
+    const accent = style.getPropertyValue('--accent').trim() || '#1C6F6A';
+    const faint = style.getPropertyValue('--ink-faint').trim() || '#667069';
+
+    pen.fillStyle = paper;
+    pen.fillRect(0, 0, CARD.width, CARD.height);
+    pen.strokeStyle = accent;
+    pen.lineWidth = 6;
+    pen.strokeRect(30, 30, CARD.width - 60, CARD.height - 60);
+
+    const words = TP.tokenize(tp).map((token) => token.text);
+    const inner = CARD.width - CARD.pad * 2;
+
+    // Zeichen — Wörter ohne Zeichen stehen lateinisch da.
+    const glyphRows = [];
+    let row = [];
+    let rowWidth = 0;
+    pen.font = '150px "linja pimeja", monospace';
+    for (const word of words) {
+      const usable = hasGlyph(word);
+      pen.font = usable ? '150px "linja pimeja", monospace' : '90px ui-monospace, monospace';
+      const width = pen.measureText(word).width + 30;
+      if (rowWidth + width > inner && row.length) { glyphRows.push(row); row = []; rowWidth = 0; }
+      row.push({ word, usable, width });
+      rowWidth += width;
+    }
+    if (row.length) glyphRows.push(row);
+
+    // Der Block aus Zeichen und Schrift steht in der Mitte, nicht oben.
+    const blockHeight = glyphRows.length * 190 + (subtitle ? 190 : 120);
+    let y = Math.max(CARD.pad + 190, (CARD.height - 220 - blockHeight) / 2 + 120);
+    pen.textAlign = 'left';
+    pen.textBaseline = 'middle';
+    for (const line of glyphRows) {
+      const total = line.reduce((sum, chip) => sum + chip.width, 0);
+      let x = (CARD.width - total) / 2;
+      for (const chip of line) {
+        pen.fillStyle = accent;
+        pen.font = chip.usable ? '150px "linja pimeja", monospace' : '90px ui-monospace, monospace';
+        pen.fillText(chip.word, x + 15, y);
+        x += chip.width;
+      }
+      y += 190;
+    }
+
+    // Schrift so weit verkleinern, bis sie passt — abschneiden erst als letzte
+    // Möglichkeit, sonst fehlt am Ende ein halbes Wort.
+    const fitted = (text, size, min, family) => {
+      let current = size;
+      pen.font = `${current}px ${family}`;
+      while (pen.measureText(text).width > inner && current > min) {
+        current -= 2;
+        pen.font = `${current}px ${family}`;
+      }
+      let shown = text;
+      while (pen.measureText(shown).width > inner && shown.length > 4) shown = shown.slice(0, -2);
+      return shown;
+    };
+
+    pen.textAlign = 'center';
+    pen.fillStyle = ink;
+    pen.fillText(fitted(tp, 58, 30, 'ui-monospace, monospace'), CARD.width / 2, y + 40);
+
+    if (subtitle) {
+      pen.fillStyle = faint;
+      pen.fillText(fitted(subtitle, 40, 24, '-apple-system, \"Helvetica Neue\", Arial, sans-serif'),
+        CARD.width / 2, y + 120);
+    }
+
+    // Satzbau als Kette
+    const spans = TP.xray(TP.parse(tp).utterance);
+    if (spans.length) {
+      pen.font = '30px ui-monospace, monospace';
+      const labels = spans.map((span) => `${span.text} · ${TP.roleLabel(span.role, state.lang)}`);
+      let line = '';
+      const lines = [];
+      for (const label of labels) {
+        const next = line ? `${line}   ${label}` : label;
+        if (pen.measureText(next).width > inner) { lines.push(line); line = label; }
+        else line = next;
+      }
+      if (line) lines.push(line);
+      pen.fillStyle = faint;
+      lines.slice(0, 3).forEach((text, index) => {
+        pen.fillText(text, CARD.width / 2, CARD.height - CARD.pad - 150 + index * 44);
+      });
+    }
+
+    pen.fillStyle = accent;
+    pen.font = '34px ui-monospace, monospace';
+    pen.fillText('o toki! · toki pona', CARD.width / 2, CARD.height - CARD.pad + 10);
+    return canvas;
+  }
+
+  async function shareCard(tp, subtitle) {
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const canvas = drawCard(tp, subtitle);
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) { toast(t('cardFailed')); return null; }
+    const name = `o-toki-${tp.replace(/[^a-z ]/gi, '').trim().replace(/\s+/g, '-').slice(0, 40)}.png`;
+    const file = new File([blob], name, { type: 'image/png' });
+    // Teilen, wo das Gerät es kann — sonst bleibt der Weg über die Datei.
+    if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+      try {
+        await navigator.share({ files: [file] });
+        return 'geteilt';
+      } catch (error) { /* abgebrochen — dann eben sichern */ }
+    }
+    const link = el(`<a class="cardlink" download="${escape(name)}">${escape(t('cardSave'))}</a>`);
+    link.href = URL.createObjectURL(blob);
+    document.body.append(link);
+    link.click();
+    setTimeout(() => { URL.revokeObjectURL(link.href); link.remove(); }, 4000);
+    return 'gesichert';
+  }
+
+  // Knopf, der aus einem Satz eine Karte macht.
+  function cardButton(tp, subtitle) {
+    const button = el(`<button class="ghost cardbutton" type="button">${escape(t('cardMake'))}</button>`);
+    button.onclick = async (event) => {
+      event.stopPropagation();
+      button.disabled = true;
+      try { await shareCard(tp, subtitle); } finally { button.disabled = false; }
+    };
+    return button;
+  }
+
   // ------------------------------------------------------------ Aussprache
 
   // toki pona wird gesprochen, wie es dasteht: fünf Vokale, keine Dehnung,
@@ -779,6 +1067,8 @@
   }
 
   function speak(text) {
+    // Die eigene Stimme schlägt die des Geräts.
+    if (playRecording(text)) return true;
     if (!speechAvailable()) return false;
     voice = voice || pickVoice();
     const utterance = utteranceFor(text);
@@ -2734,6 +3024,7 @@
         speak: task.item.tp,
         xray: answer || task.item.tp,
         xrayMine: Boolean(answer),
+        subtitle: task.item.target[0],
         grade: verdict.exact ? null : verdict,
         reason: task.join && correct ? t(task.join.kind === 'pi' ? 'joinPi' : 'joinLa') : null,
       });
@@ -3085,6 +3376,14 @@
       sheet.append(el(`<p class="hint">${escape(t('comesBack'))}</p>`));
     }
 
+    // Ein gelungener Satz darf das Blatt verlassen.
+    const sentence = correct ? (detail.xrayMine ? detail.xray : detail.speak) : null;
+    if (sentence && TP.parse(sentence).isValid) {
+      const row = el('<div class="row cardrow"></div>');
+      row.append(cardButton(sentence, detail.subtitle || null));
+      sheet.append(row);
+    }
+
     const next = el(`<button class="primary">${escape(t(correct ? 'next' : 'understood'))}</button>`);
     next.onclick = () => { session.index += 1; render(); };
     sheet.append(next);
@@ -3429,6 +3728,7 @@
     const screen = screenWith(`
       <input class="search" placeholder="${escape(t('search'))}" aria-label="${escape(t('search'))}">
       <div class="words"></div>`);
+    screen.prepend(recordCard());
     screen.prepend(nameCard());
     screen.prepend(mapCard());
     const list = screen.querySelector('.words');
@@ -3451,6 +3751,8 @@
             <em>${entry.book === 'pu' ? 'pu' : 'ku'}${state.seenWords[word] ? ' ✓' : ''}</em>
           </div>`);
         withSay(row, word);
+        const mic = recordButton(word);
+        if (mic) row.append(mic);
         // Aufklappen geht per Knopf (auch mit der Tastatur) und per Tipp auf
         // die Zeile — eine Zeile allein ist für Tastaturen unerreichbar.
         const toggle = el(`<button class="netopen" type="button"
@@ -3513,6 +3815,9 @@
           card.append(el(`<p class="reason" style="margin-top:0.7rem;color:var(--accent)">`
             + `${escape(t('structureOk'))}`
             + `${parsed.utterance && parsed.utterance.isQuestion ? escape(t('sandboxQuestion')) : ''}</p>`));
+          const row = el('<div class="row cardrow"></div>');
+          row.append(cardButton(utterance, null));
+          card.append(row);
         } else {
           parsed.violations.forEach((violation) => {
             card.append(el(`
@@ -3560,4 +3865,5 @@
 
   render();
   probeGlyphs();
+  loadRecordings();
 })(TOKIPONA_DATA, TOKIPONA_MUSI, TOKIPONA_TOKI, TOKIPONA_LIPU, TokiPona);
