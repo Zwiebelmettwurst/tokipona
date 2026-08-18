@@ -26,7 +26,8 @@
       hintFree: 'Der Parser prüft den Satzbau, während du tippst. Andere Wortwahl als '
         + 'die Musterlösung ist in Ordnung, solange die Grammatik stimmt.',
       check: 'Prüfen', next: 'Weiter', understood: 'Verstanden', again: 'Nochmal üben',
-      good: 'pona!', notYet: 'Noch nicht',
+      good: 'pona!', notYet: 'Nicht ganz', almost: 'Fast',
+      yourSentence: 'dein satz', modelSentence: 'so ist sie gebaut',
       variantRight: 'Richtig — andere Wortwahl, gleiche Aussage',
       orderRight: 'Richtig — Beifügungen darfst du umstellen',
       orderNote: 'Beifügungen wirken der Reihe nach. Üblich ist die Reihenfolge unten — '
@@ -155,7 +156,8 @@
       hintFree: 'The parser checks the structure as you type. A different word choice than '
         + 'the model answer is fine, as long as the grammar holds.',
       check: 'Check', next: 'Continue', understood: 'Got it', again: 'Practise again',
-      good: 'pona!', notYet: 'Not yet',
+      good: 'pona!', notYet: 'Not quite', almost: 'Almost',
+      yourSentence: 'your sentence', modelSentence: 'how it is built',
       variantRight: 'Correct — different words, same meaning',
       orderRight: 'Correct — modifiers may swap places',
       orderNote: 'Modifiers apply one after another. The order below is the usual one — '
@@ -1908,6 +1910,7 @@
         solution: prompt.models[0],
         speak: prompt.models[0],
         xray: verdict.ok ? text : prompt.models[0],
+        xrayMine: verdict.ok,
         open: verdict,
         reason: verdict.ok
           ? `${escape(t('answerAlso'))} <code>${escape(models)}</code>`
@@ -2193,6 +2196,7 @@
         solution: task.item.tp,
         speak: task.item.tp,
         xray: answer || task.item.tp,
+        xrayMine: Boolean(answer),
         grade: verdict.exact ? null : verdict,
         reason: task.join && correct ? t(task.join.kind === 'pi' ? 'joinPi' : 'joinLa') : null,
       });
@@ -2236,6 +2240,7 @@
         solution: task.item.tp,
         speak: task.item.tp,
         xray: answer || task.item.tp,
+        xrayMine: Boolean(answer),
         grade: verdict,
       });
     };
@@ -2364,6 +2369,27 @@
     showSheet(correct, Object.assign({ parked: task.attempts === 2 }, detail));
   }
 
+  // Fast: der Satz ist grammatisch in Ordnung, es hakt nur am Inhalt.
+  function nearMiss(detail) {
+    if (detail.open) return !detail.open.violations;
+    if (!detail.grade) return false;
+    return !(detail.grade.violations && detail.grade.violations.length);
+  }
+
+  // Ein beschriftetes Satzröntgen. Ohne Beschriftung weiß niemand, ob da der
+  // eigene Satz steht oder die Musterlösung.
+  function xrayBlock(text, label) {
+    const spans = TP.xray(TP.parse(text).utterance);
+    if (!spans.length) return null;
+    const box = el('<div class="xraywrap"></div>');
+    if (label) box.append(el(`<p class="xraylabel">${escape(label)}</p>`));
+    box.append(el(`<div class="xray">${spans.map((span) => `
+      <span class="span" data-role="${escape(span.role)}">
+        <b>${escape(span.text)}</b><i>${escape(TP.roleLabel(span.role, state.lang))}</i>
+      </span>`).join('')}</div>`));
+    return box;
+  }
+
   function showSheet(correct, detail) {
     // Die Aufgabe ist beantwortet: „Prüfen“ hat seinen Zweck erfüllt und
     // verschwindet, damit nur noch ein Knopf im Bild ist. Die Antwort bleibt
@@ -2383,7 +2409,7 @@
             ? (detail.open ? t('answerFree')
               : detail.grade && detail.grade.order ? t('orderRight')
               : (detail.grade && detail.grade.variant ? t('variantRight') : t('good')))
-            : t('notYet'))}</span>
+            : t(nearMiss(detail) ? 'almost' : 'notYet'))}</span>
         </div>
       </div>`);
 
@@ -2412,24 +2438,26 @@
       sheet.append(el(`<p class="reason">${detail.reason}</p>`));
     }
 
+    // Der eigene Satz zuerst — er ist der, über den gerade nachgedacht wird.
+    const model = detail.speak && detail.speak !== detail.xray ? detail.speak : null;
+    if (detail.xray) {
+      const block = xrayBlock(detail.xray, detail.xrayMine ? t('yourSentence') : null);
+      if (block) sheet.append(block);
+    }
+
     if ((!correct && !detail.open) || (detail.grade && (detail.grade.variant || detail.grade.order))) {
       const line = el(`<p class="reason">${escape(t('model'))} </p>`);
       line.append(glossed(detail.solution, 'solution'));
       if (detail.speak) withSay(line, detail.speak);
       sheet.append(line);
+      // … und daneben, wie die Musterlösung gebaut ist.
+      if (detail.xrayMine && model) {
+        const block = xrayBlock(model, t('modelSentence'));
+        if (block) sheet.append(block);
+      }
     }
     if (!correct && detail.parked) {
       sheet.append(el(`<p class="hint">${escape(t('comesBack'))}</p>`));
-    }
-
-    if (detail.xray) {
-      const spans = TP.xray(TP.parse(detail.xray).utterance);
-      if (spans.length) {
-        sheet.append(el(`<div class="xray">${spans.map((span) => `
-          <span class="span" data-role="${escape(span.role)}">
-            <b>${escape(span.text)}</b><i>${escape(TP.roleLabel(span.role, state.lang))}</i>
-          </span>`).join('')}</div>`));
-      }
     }
 
     const next = el(`<button class="primary">${escape(t(correct ? 'next' : 'understood'))}</button>`);

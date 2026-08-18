@@ -1508,8 +1508,10 @@
         "c_praeposition"
       ],
       "direction": "de_tp",
-      "tp": "(jan) mije li pana e moku tawa jan lili.",
-      "alsoAccepted": [],
+      "tp": "jan mije li pana e moku tawa jan lili.",
+      "alsoAccepted": [
+        "mije li pana e moku tawa jan lili."
+      ],
       "de": [
         "The man feeds (\"gives out food to\") children."
       ],
@@ -2383,10 +2385,11 @@
         "c_zahlen"
       ],
       "direction": "de_tp",
-      "tp": "(tenpo mun",
+      "tp": "tenpo mun nanpa luka li pona.",
       "alsoAccepted": [
-        "tenpo sike mun) nanpa luka li (pona",
-        "suwi)."
+        "tenpo mun nanpa luka li suwi.",
+        "tenpo sike mun nanpa luka li pona.",
+        "tenpo sike mun nanpa luka li suwi."
       ],
       "de": [
         "May (\"the 5th month\") is lovely."
