@@ -36,6 +36,9 @@ TEMPLATE = """<title>o toki!</title>
 /*__DATA__*/
 </script>
 <script>
+/*__MUSI__*/
+</script>
+<script>
 /*__PARSER__*/
 </script>
 <script>
@@ -124,11 +127,14 @@ def main():
     app = (HERE / "app.js").read_text()
     style = (HERE / "style.css").read_text()
     worker = (HERE / "sw.js").read_text()
+    musi = (HERE / "musi.js").read_text()
 
     # Der Prototyp lädt nichts nach; die Node-Zeilen fliegen raus.
     for needle in ["if (typeof module !== 'undefined') { module.exports = TOKIPONA_DATA; }\n",
+                   "if (typeof module !== 'undefined') { module.exports = TOKIPONA_MUSI; }\n",
                    "if (typeof module !== 'undefined') { module.exports = TokiPona; }\n"]:
         data = data.replace(needle, "")
+        musi = musi.replace(needle, "")
         parser = parser.replace(needle, "")
     parser = parser.replace(
         "})(typeof TOKIPONA_DATA !== 'undefined' ? TOKIPONA_DATA : require('./data.js'));",
@@ -141,12 +147,13 @@ def main():
     # Quelltext ergibt immer dieselbe Nummer, sonst schlüge die Drift-Prüfung
     # in der Werkbank bei jedem Lauf an.
     fingerprint = hashlib.sha256()
-    for part in (TEMPLATE, FONT, style, data, parser, app, worker):
+    for part in (TEMPLATE, FONT, style, data, musi, parser, app, worker):
         fingerprint.update(part.encode())
     version = fingerprint.hexdigest()[:10]
 
     page = TEMPLATE.replace("__VERSION__", version)
     for marker, payload in (("/*__FONT__*/", font), ("/*__STYLE__*/", style), ("/*__DATA__*/", data),
+                            ("/*__MUSI__*/", musi),
                             ("/*__PARSER__*/", parser), ("/*__APP__*/", app)):
         page = page.replace(marker, payload)
 
