@@ -1079,3 +1079,42 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   padding: 0.1rem 0.4rem;
 }
 .netline code i { font-style: normal; color: var(--ink-faint); margin-left: 0.3rem; }
+
+/* Unterschied zwischen eigenem Satz und Musterlösung */
+.xray .span[data-diff="true"] b {
+  background: var(--wrong-soft);
+  box-shadow: inset 0 -2px 0 var(--wrong);
+}
+.xray .span[data-diff="true"] i { color: var(--wrong); }
+
+/* ---------------------------------------------- Nachschlagen beim Tippen */
+.lookup { margin-top: 0.5rem; }
+.lookup .lookuptoggle {
+  width: auto;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+}
+.lookupbody { margin-top: 0.5rem; }
+.lookupbody .search { margin-bottom: 0.5rem; }
+.lookuphits { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.lookuphits .hit {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  max-width: 100%;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 0.4rem;
+  background: var(--surface);
+  font: inherit;
+  text-align: left;
+}
+.lookuphits .hit b { font-family: var(--mono); font-weight: 500; color: var(--accent); }
+.lookuphits .hit span {
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
