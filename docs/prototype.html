@@ -1,3 +1,5 @@
+<!doctype html>
+<meta charset="utf-8">
 <title>o toki!</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Sätze bauen statt Vokabeln abhaken: zwölf Lektionen toki pona mit echter Grammatikprüfung.">
@@ -8,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="o toki!">
-<script>window.OTOKI_VERSION = '7b97c556d7';</script>
+<script>window.OTOKI_VERSION = 'f15f913ce5';</script>
 
 <style>
 /* linja pimeja 1.9 — jan Inkepa, CC0. Siehe prototype/SCHRIFT.md.
@@ -756,14 +758,20 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   font-size: 0.8125rem;
   box-shadow: 0 0.6rem 1.6rem rgba(0, 0, 0, 0.25);
 }
+.updatebar span {
+  min-width: 0;          /* der Text darf schrumpfen, statt den Knopf zu schieben */
+}
 .updatebar button {
-  flex: none;
+  flex: 0 0 auto;
+  width: auto;           /* .ghost setzt sonst 100 % und sprengt den Streifen */
+  white-space: nowrap;
   padding: 0.35rem 0.7rem;
   border-radius: 0.6rem;
   border: 1px solid currentColor;
   background: transparent;
   color: inherit;
   font: inherit;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 
@@ -5369,7 +5377,7 @@ const TokiPona = (function (data) {
     const bar = el(`
       <div class="updatebar">
         <span>${escape(t('updateReady'))}</span>
-        <button class="ghost">${escape(t('updateLoad'))}</button>
+        <button type="button">${escape(t('updateLoad'))}</button>
       </div>`);
     bar.querySelector('button').onclick = () => location.reload();
     document.body.append(bar);

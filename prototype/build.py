@@ -13,7 +13,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 HERE = ROOT / "prototype"
 
-TEMPLATE = """<title>o toki!</title>
+TEMPLATE = """<!doctype html>
+<meta charset="utf-8">
+<title>o toki!</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Sätze bauen statt Vokabeln abhaken: zwölf Lektionen toki pona mit echter Grammatikprüfung.">
 <link rel="manifest" href="./manifest.webmanifest">

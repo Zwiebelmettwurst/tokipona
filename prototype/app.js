@@ -2715,7 +2715,7 @@
     const bar = el(`
       <div class="updatebar">
         <span>${escape(t('updateReady'))}</span>
-        <button class="ghost">${escape(t('updateLoad'))}</button>
+        <button type="button">${escape(t('updateLoad'))}</button>
       </div>`);
     bar.querySelector('button').onclick = () => location.reload();
     document.body.append(bar);
