@@ -103,6 +103,12 @@
       syllableBack: (part) => `Silbe ${part} — antippen nimmt sie zurück`,
       syllableHint: 'Jede Silbe hat die Form (K)V(n) — mehr Formen gibt es nicht.',
       syllableWord: (word, sense) => `${word} — ${sense}`,
+      mapTitle: 'nimi ale — die ganze sprache',
+      mapHint: 'Jedes Kästchen ein Wort. Es färbt sich, sobald du es siehst, '
+        + 'und wird golden, wenn es sitzt.',
+      mapCount: (known, all) => `${known} von ${all} begegnet`,
+      mapFirm: (n) => `${n} sitzen fest`,
+      mapLegend: ['unbekannt', 'gesehen', 'geübt', 'sitzt'],
       netOpen: (word) => `Wortverband zu ${word} zeigen`,
       netAsHead: 'als Kopfwort', netAsMod: 'als Beifügung',
       netNone: 'Dazu steht im Korpus noch keine Verbindung.',
@@ -153,6 +159,9 @@
       answerEmpty: 'Ein Wort reicht noch nicht.',
       listen: 'anhören', listenAgain: 'nochmal hören',
       askListen: 'was hörst du?',
+      askDictation: 'schreib, was du hörst',
+      dictationHint: 'Erst hören, dann tippen. Der Knopf spielt es nochmal.',
+      dictationRight: 'Wort für Wort getroffen',
       soundTitle: 'aussprache',
       soundHint: 'toki pona wird gesprochen, wie es dasteht: fünf Vokale, keine Dehnung, '
         + 'Betonung immer auf der ersten Silbe. Die App leiht sich dafür eine italienische '
@@ -270,6 +279,12 @@
       syllableBack: (part) => `syllable ${part} — tap to take it back`,
       syllableHint: 'Every syllable has the shape (C)V(n) — there are no others.',
       syllableWord: (word, sense) => `${word} — ${sense}`,
+      mapTitle: 'nimi ale — the whole language',
+      mapHint: 'One box per word. It takes colour once you have met it and turns '
+        + 'gold once it sticks.',
+      mapCount: (known, all) => `${known} of ${all} met`,
+      mapFirm: (n) => `${n} are solid`,
+      mapLegend: ['unknown', 'met', 'practised', 'solid'],
       netOpen: (word) => `show word partnerships for ${word}`,
       netAsHead: 'as head word', netAsMod: 'as modifier',
       netNone: 'No combinations for this one in the corpus yet.',
@@ -320,6 +335,9 @@
       answerEmpty: 'One word is not enough yet.',
       listen: 'listen', listenAgain: 'play again',
       askListen: 'what do you hear?',
+      askDictation: 'write what you hear',
+      dictationHint: 'Listen first, then type. The button plays it again.',
+      dictationRight: 'Word for word',
       soundTitle: 'pronunciation',
       soundHint: 'toki pona is spoken the way it is written: five vowels, no lengthening, '
         + 'stress always on the first syllable. The app borrows an Italian voice from your '
@@ -870,7 +888,9 @@
 
     const heard = reads[2] || builds[4];
     if (state.sound && speechAvailable() && heard) {
-      tasks.push({ type: 'listen', item: heard, lesson, concepts: lessonConcepts(lesson) });
+      // Gerade Lektionen diktieren, ungerade lassen wählen.
+      const kind = lesson.number % 2 === 0 ? 'dictation' : 'listen';
+      tasks.push({ type: kind, item: heard, lesson, concepts: lessonConcepts(lesson) });
     }
 
     // Eine offene Frage ersetzt das freie Übersetzen: beides ist Tippen, aber
@@ -1654,6 +1674,7 @@
     else if (task.type === 'compound') app.append(compoundTask(task));
     else if (task.type === 'glyph') app.append(glyphTask(task));
     else if (task.type === 'listen') app.append(listenTask(task));
+    else if (task.type === 'dictation') app.append(dictationTask(task));
     else if (task.type === 'answer') app.append(answerTask(task));
     else if (task.type === 'quiz') app.append(quizTask(task));
     else if (task.type === 'trace') app.append(traceTask(task));
@@ -1750,6 +1771,62 @@
 
   // Fehlersuche: das falsche Wort antippen. Die Stelle kommt aus dem Parser,
   // nicht aus einer Handliste — deshalb stimmt sie immer.
+  // Diktat: hören und schreiben. Die härteste der Höraufgaben — und die
+  // einzige, die Lautung und Schreibung zusammenbringt.
+  function dictationTask(task) {
+    const screen = screenWith(`
+      <p class="prompt">${escape(t('askDictation'))}</p>
+      <div class="playbox">
+        <button class="play" type="button" aria-label="${escape(t('listenAgain'))}">♪</button>
+        <span class="hint">${escape(t('listenAgain'))}</span>
+      </div>
+      <input class="typed" autocomplete="off" autocapitalize="off" spellcheck="false"
+             placeholder="toki pona …" aria-label="toki pona">
+      <p class="live"></p>
+      <p class="hint">${escape(t('dictationHint'))}</p>
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
+
+    const play = screen.querySelector('.play');
+    play.onclick = () => speak(task.item.tp);
+    setTimeout(() => speak(task.item.tp), 300);
+
+    const input = screen.querySelector('.typed');
+    const live = screen.querySelector('.live');
+    const button = screen.querySelector('.primary');
+
+    input.oninput = () => {
+      const text = input.value.trim();
+      button.disabled = !text;
+      if (!text) { live.textContent = ''; live.className = 'live'; return; }
+      const result = TP.parse(TP.splitUtterances(text)[0] || text);
+      if (result.isValid) {
+        live.textContent = t('structureLive');
+        live.className = 'live good';
+      } else {
+        live.textContent = '• ' + say(result.violations[0]);
+        live.className = 'live bad';
+      }
+    };
+    input.onkeydown = (event) => { if (event.key === 'Enter' && !button.disabled) button.click(); };
+
+    button.onclick = () => {
+      const answer = input.value.trim();
+      const verdict = grade(answer, task.item);
+      // Beim Diktat zählt nur Wort für Wort — die Erklärung kommt trotzdem
+      // aus derselben Bewertung.
+      finish(task, Boolean(verdict.exact), {
+        solution: task.item.tp,
+        speak: task.item.tp,
+        xray: answer || task.item.tp,
+        xrayMine: Boolean(answer),
+        dictation: true,
+        grade: verdict.exact ? null : verdict,
+      });
+    };
+    setTimeout(() => input.focus(), 400);
+    return screen;
+  }
+
   // Höraufgabe: der Satz wird nur gesprochen, nicht gezeigt. Auf iOS darf
   // Ton erst nach einer Berührung kommen — deshalb der große Knopf.
   function listenTask(task) {
@@ -2935,7 +3012,8 @@
         <div class="verdict ${correct ? 'good' : 'bad'}">
           <span class="mark">${correct ? '✓' : '✕'}</span>
           <span>${escape(correct
-            ? (detail.coin ? t(detail.coin.exact ? 'coinExact' : 'coinGood')
+            ? (detail.dictation ? t('dictationRight')
+              : detail.coin ? t(detail.coin.exact ? 'coinExact' : 'coinGood')
               : detail.open ? t('answerFree')
               : detail.grade && detail.grade.order ? t('orderRight')
               : (detail.grade && detail.grade.variant ? t('variantRight') : t('good')))
@@ -3300,11 +3378,59 @@
     return box;
   }
 
+  // Wie fest sitzt ein Wort? Aus dem, was die Wiederholung über es weiß.
+  function wordStrength(word) {
+    const cards = ['w:', 'g:', 't:', 'y:'].map((prefix) => state.srs[prefix + word])
+      .filter(Boolean);
+    if (!cards.length) return state.seenWords[word] ? 1 : 0;
+    const best = cards.reduce((a, b) => (a.interval >= b.interval ? a : b));
+    if (best.interval >= 7 * DAY) return 3;
+    if (best.reps >= 1) return 2;
+    return state.seenWords[word] ? 1 : 0;
+  }
+
+  // Die ganze Sprache auf einen Blick: 137 Kästchen, die sich füllen.
+  function mapCard() {
+    const words = Object.keys(TP.lexicon).sort();
+    const strengths = words.map(wordStrength);
+    const met = strengths.filter((value) => value > 0).length;
+    const firm = strengths.filter((value) => value === 3).length;
+    const legend = t('mapLegend');
+
+    const card = el(`
+      <div class="card mapcard">
+        <h2>${escape(t('mapTitle'))}</h2>
+        <p class="hint">${escape(t('mapHint'))}</p>
+        <div class="wordmap"></div>
+        <p class="hint maptally">${escape(t('mapCount', met, words.length))}
+          · ${escape(t('mapFirm', firm))}</p>
+        <div class="maplegend">${legend.map((label, level) =>
+          `<span data-level="${level}"><i></i>${escape(label)}</span>`).join('')}</div>
+      </div>`);
+
+    const grid = card.querySelector('.wordmap');
+    words.forEach((word, index) => {
+      const cell = el(`<button class="cell" type="button" data-level="${strengths[index]}"
+        aria-label="${escape(word)}">${hasGlyph(word)
+          ? `<span class="sp">${escape(word)}</span>`
+          : `<small>${escape(word)}</small>`}</button>`);
+      cell.onclick = (event) => {
+        event.stopPropagation();
+        if (bubble && bubble.dataset.word === word) { hideGloss(); return; }
+        showGloss(cell, word);
+        if (bubble) bubble.dataset.word = word;
+      };
+      grid.append(cell);
+    });
+    return card;
+  }
+
   function wordScreen() {
     const screen = screenWith(`
       <input class="search" placeholder="${escape(t('search'))}" aria-label="${escape(t('search'))}">
       <div class="words"></div>`);
     screen.prepend(nameCard());
+    screen.prepend(mapCard());
     const list = screen.querySelector('.words');
     const input = screen.querySelector('.search');
 

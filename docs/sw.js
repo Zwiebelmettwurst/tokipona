@@ -2,7 +2,7 @@
 // Die Fassungsnummer setzt prototype/build.py aus dem Inhalt ein — jede
 // Änderung ergibt einen neuen Cache-Namen, alte Bestände fliegen beim
 // Aktivieren raus.
-const VERSION = 'd641cf349e';
+const VERSION = '2e5a9eb5e8';
 const CACHE = `o-toki-${VERSION}`;
 const SHELL = ['./prototype.html', './index.html', './manifest.webmanifest',
                './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
