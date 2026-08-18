@@ -66,6 +66,15 @@
       backupApply: 'Diesen Stand übernehmen',
       summary: (lvl, lessons, cards, xp) => `Stufe ${lvl}, ${lessons} Lektionen, ${cards} Karten, ${xp} XP`,
       langLabel: 'sprache', langOther: 'English',
+      listen: 'anhören', listenAgain: 'nochmal hören',
+      askListen: 'was hörst du?',
+      soundTitle: 'aussprache',
+      soundHint: 'toki pona wird gesprochen, wie es dasteht: fünf Vokale, keine Dehnung, '
+        + 'Betonung immer auf der ersten Silbe. Die App leiht sich dafür eine italienische '
+        + 'Stimme deines Geräts — die kommt am nächsten. Angeschaltet kommt in jeder '
+        + 'Lektion eine Höraufgabe dazu.',
+      soundOn: 'Aussprache anschalten', soundOff: 'Aussprache abschalten',
+      soundNone: 'Dieses Gerät bringt keine Sprachausgabe mit.',
       musiTab: 'musi', musiTitle: 'utala musi',
       musiLead: 'Sticheln, kontern, Frieden schließen — mit 137 Wörtern und ohne ein '
         + 'einziges Schimpfwort.',
@@ -139,6 +148,14 @@
       backupApply: 'Use this progress',
       summary: (lvl, lessons, cards, xp) => `level ${lvl}, ${lessons} lessons, ${cards} cards, ${xp} XP`,
       langLabel: 'language', langOther: 'Deutsch',
+      listen: 'listen', listenAgain: 'play again',
+      askListen: 'what do you hear?',
+      soundTitle: 'pronunciation',
+      soundHint: 'toki pona is spoken the way it is written: five vowels, no lengthening, '
+        + 'stress always on the first syllable. The app borrows an Italian voice from your '
+        + 'device — that one comes closest. Switched on, every lesson gains a listening task.',
+      soundOn: 'Turn pronunciation on', soundOff: 'Turn pronunciation off',
+      soundNone: 'This device has no speech output.',
       musiTab: 'musi', musiTitle: 'utala musi',
       musiLead: 'Taunt, counter, make peace — with 137 words and not a single '
         + 'swear word.',
@@ -240,6 +257,7 @@
   const blank = {
     xp: 0, streak: 0, lastDay: null, dayXp: 0, done: {}, mastery: {}, seenWords: {}, srs: {},
     sitelen: false,
+    sound: true,
     lang: (navigator.language || 'de').toLowerCase().startsWith('de') ? 'de' : 'en',
   };
 
@@ -390,6 +408,68 @@
   const unlocked = (number) => number === lessons()[0].number
     || Boolean(state.done[lessons()[lessons().findIndex((l) => l.number === number) - 1].number]);
 
+  // ------------------------------------------------------------ Aussprache
+
+  // toki pona wird gesprochen, wie es dasteht: fünf Vokale, keine Dehnung,
+  // Betonung auf der ersten Silbe. Am nächsten kommt eine italienische Stimme,
+  // danach eine spanische — beide sprechen die Vokale sauber und kurz.
+  const VOICE_ORDER = ['it-it', 'it', 'es-es', 'es', 'pt-br', 'fi-fi', 'sw'];
+  let voice = null;
+
+  const speechAvailable = () => typeof window !== 'undefined'
+    && 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function';
+
+  function pickVoice() {
+    if (!speechAvailable()) return null;
+    let voices = [];
+    try { voices = window.speechSynthesis.getVoices() || []; } catch (error) { return null; }
+    const tag = (entry) => String(entry.lang || '').toLowerCase().replace('_', '-');
+    for (const wanted of VOICE_ORDER) {
+      const found = voices.find((entry) => tag(entry).startsWith(wanted));
+      if (found) return found;
+    }
+    return voices[0] || null;
+  }
+
+  function speak(text) {
+    if (!speechAvailable()) return false;
+    voice = voice || pickVoice();
+    const clean = String(text).replace(/[.!?:]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!clean) return false;
+    const utterance = new window.SpeechSynthesisUtterance(clean);
+    if (voice) { utterance.voice = voice; utterance.lang = voice.lang; }
+    else utterance.lang = 'it-IT';
+    utterance.rate = 0.85;              // langsam genug zum Mitlesen
+    try {
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    } catch (error) { return false; }
+    return true;
+  }
+
+  // Stimmen kommen in manchen Browsern erst nach einem Augenblick.
+  if (speechAvailable() && window.speechSynthesis.addEventListener) {
+    window.speechSynthesis.addEventListener('voiceschanged', () => {
+      const found = pickVoice();
+      if (found && !voice) { voice = found; if (!session) render(); }
+    });
+  }
+
+  // Hörknopf an einem Satz oder Wort. Ohne Sprachausgabe gibt es ihn nicht.
+  function sayButton(text, label) {
+    if (!state.sound || !speechAvailable()) return null;
+    const button = el(`<button class="say" type="button"
+      aria-label="${escape(label || t('listen'))}" title="${escape(label || t('listen'))}">♪</button>`);
+    button.onclick = (event) => { event.stopPropagation(); speak(text); };
+    return button;
+  }
+
+  const withSay = (node, text) => {
+    const button = sayButton(text);
+    if (button) node.append(button);
+    return node;
+  };
+
   // ------------------------------------------------------------ Aufgabenbau
 
   const shuffle = (list) => {
@@ -422,6 +502,11 @@
     const glyphWord = words.find(hasGlyph);
     if (state.sitelen && glyphWord) {
       tasks.push({ type: 'glyph', word: glyphWord, lesson, concepts: [] });
+    }
+
+    const heard = reads[2] || builds[4];
+    if (state.sound && speechAvailable() && heard) {
+      tasks.push({ type: 'listen', item: heard, lesson, concepts: lessonConcepts(lesson) });
     }
 
     if (builds[3]) tasks.push({ type: 'free', item: builds[3], lesson, concepts: lessonConcepts(lesson) });
@@ -665,6 +750,7 @@
     }
 
     screen.append(languageCard());
+    screen.append(soundCard());
     screen.append(sitelenCard());
     screen.append(backupCard());
 
@@ -686,6 +772,30 @@
       save();
       render();
     };
+    return card;
+  }
+
+  function soundCard() {
+    const card = el(`
+      <div class="card">
+        <h2>${escape(t('soundTitle'))}</h2>
+        <p class="hint">${escape(t('soundHint'))}</p>
+        <div class="row"></div>
+      </div>`);
+    const row = card.querySelector('.row');
+    if (!speechAvailable()) {
+      row.append(el(`<p class="hint">${escape(t('soundNone'))}</p>`));
+      return card;
+    }
+    const button = el(`<button class="ghost">${escape(t(state.sound ? 'soundOff' : 'soundOn'))}</button>`);
+    button.onclick = () => {
+      state.sound = !state.sound;
+      save();
+      render();
+    };
+    row.append(button);
+    const demo = sayButton('toki pona li pona.', t('listen'));
+    if (demo) row.append(demo);
     return card;
   }
 
@@ -939,6 +1049,7 @@
     else if (task.type === 'fix') app.append(fixTask(task));
     else if (task.type === 'compound') app.append(compoundTask(task));
     else if (task.type === 'glyph') app.append(glyphTask(task));
+    else if (task.type === 'listen') app.append(listenTask(task));
     else app.append(freeTask(task));
   }
 
@@ -958,6 +1069,8 @@
       <div class="choices"></div>
       <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
 
+    withSay(screen.querySelector('.question'), task.word);
+
     let picked = null;
     const list = screen.querySelector('.choices');
     const button = screen.querySelector('.primary');
@@ -976,6 +1089,7 @@
       state.seenWords[task.word] = true;
       finish(task, picked === right, {
         solution: `${task.word} — ${right}`,
+        speak: task.word,
         xray: null,                     // eine Wortbedeutung hat keinen Satzbau
         reason: picked === right ? null
           : t('covers', escape(task.word), escape(glossesOf(task.word).join(', '))),
@@ -998,7 +1112,9 @@
       <div class="choices"></div>
       <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
 
-    screen.querySelector('.question').append(glossed(task.item.tp, 'glossline'));
+    const asked = screen.querySelector('.question');
+    asked.append(glossed(task.item.tp, 'glossline'));
+    withSay(asked, task.item.tp);
 
     let picked = null;
     const list = screen.querySelector('.choices');
@@ -1016,6 +1132,7 @@
 
     button.onclick = () => finish(task, picked === right, {
       solution: right,
+      speak: task.item.tp,
       xray: task.item.tp,
     });
     return screen;
@@ -1023,6 +1140,52 @@
 
   // Fehlersuche: das falsche Wort antippen. Die Stelle kommt aus dem Parser,
   // nicht aus einer Handliste — deshalb stimmt sie immer.
+  // Höraufgabe: der Satz wird nur gesprochen, nicht gezeigt. Auf iOS darf
+  // Ton erst nach einer Berührung kommen — deshalb der große Knopf.
+  function listenTask(task) {
+    const right = task.item.target[0];
+    const pool = task.lesson.items
+      .filter((item) => item.id !== task.item.id)
+      .flatMap((item) => item.target)
+      .filter((text) => text !== right);
+    const options = shuffle([right, ...shuffle(pool).slice(0, 2)]);
+
+    const screen = screenWith(`
+      <p class="prompt">${escape(t('askListen'))}</p>
+      <div class="playbox">
+        <button class="play" type="button" aria-label="${escape(t('listenAgain'))}">♪</button>
+        <span class="hint">${escape(t('listenAgain'))}</span>
+      </div>
+      <div class="choices"></div>
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
+
+    const play = screen.querySelector('.play');
+    play.onclick = () => speak(task.item.tp);
+    // Am Rechner spielt es von selbst; auf dem Telefon wartet es auf den Knopf.
+    setTimeout(() => speak(task.item.tp), 300);
+
+    let picked = null;
+    const list = screen.querySelector('.choices');
+    const button = screen.querySelector('.primary');
+    options.forEach((option) => {
+      const choice = el(`<button class="choice">${escape(option)}</button>`);
+      choice.onclick = () => {
+        picked = option;
+        list.querySelectorAll('.choice').forEach((c) => { c.dataset.picked = 'false'; });
+        choice.dataset.picked = 'true';
+        button.disabled = false;
+      };
+      list.append(choice);
+    });
+
+    button.onclick = () => finish(task, picked === right, {
+      solution: task.item.tp,
+      speak: task.item.tp,
+      xray: task.item.tp,
+    });
+    return screen;
+  }
+
   function fixTask(task) {
     const screen = screenWith(`
       <p class="prompt">${escape(t('askFix'))}</p>
@@ -1050,6 +1213,7 @@
       const correct = wanted.includes(picked);
       finish(task, correct, {
         solution: task.flawed.correct,
+        speak: task.flawed.correct,
         xray: task.flawed.correct,
         reason: escape(task.flawed.violation.message),
       });
@@ -1086,6 +1250,7 @@
       const entry = TP.lexicon[task.word];
       finish(task, picked === task.word, {
         solution: task.word,
+        speak: task.word,
         xray: null,
         reason: `<span class="sp glyph-inline">${escape(task.word)}</span> `
           + t('glyphIs', escape(task.word), escape(glossesOf(task.word).slice(0, 3).join(', '))),
@@ -1122,6 +1287,7 @@
 
     button.onclick = () => finish(task, picked === right, {
       solution: right.tp,
+      speak: right.tp,
       xray: right.tp,
       reason: t('literally', escape(right.tp), escape(right.literal[state.lang] || right.literal.de)),
     });
@@ -1291,6 +1457,7 @@
       const correct = Boolean(verdict.exact || verdict.order);
       finish(task, correct, {
         solution: task.item.tp,
+        speak: task.item.tp,
         xray: answer || task.item.tp,
         grade: verdict.exact ? null : verdict,
       });
@@ -1332,6 +1499,7 @@
       const verdict = grade(answer, task.item);
       finish(task, verdict.correct, {
         solution: task.item.tp,
+        speak: task.item.tp,
         xray: answer || task.item.tp,
         grade: verdict,
       });
@@ -1445,6 +1613,7 @@
     if (!correct || (detail.grade && (detail.grade.variant || detail.grade.order))) {
       const line = el(`<p class="reason">${escape(t('model'))} </p>`);
       line.append(glossed(detail.solution, 'solution'));
+      if (detail.speak) withSay(line, detail.speak);
       sheet.append(line);
     }
     if (!correct && detail.parked) {
@@ -1555,6 +1724,7 @@
       if (!made) return;
       const line = el('<p class="tp glossable"></p>');
       line.append(glossed(made.tp, 'glossline'));
+      withSay(line, made.tp);
       box.append(line);
       box.append(el(`<p class="meaning">${escape(made.say)}</p>`));
       box.append(el(`<p class="hint">${escape(t('musiPattern'))}: <code>${escape(made.name)}</code></p>`));
@@ -1578,6 +1748,7 @@
         const row = el(`<div class="musiline" data-kind="${escape(kind)}"></div>`);
         const line = el('<p class="tp glossable"></p>');
         line.append(glossed(item.tp, 'glossline'));
+        withSay(line, item.tp);
         row.append(line);
         row.append(el(`<p class="meaning">${escape(item.target[0])}</p>`));
         row.append(el(`
@@ -1609,14 +1780,16 @@
         const entry = TP.lexicon[word];
         const text = glossesOf(word).join(', ');
         if (term && !word.includes(term) && !text.toLowerCase().includes(term)) return;
-        list.append(el(`
+        const row = el(`
           <div class="word">
             <span class="${hasGlyph(word) ? 'sp glyph-inline' : 'glyph-inline empty'}"
               aria-hidden="true">${hasGlyph(word) ? escape(word) : ''}</span>
             <b>${escape(word)}</b>
             <span>${escape(text)}</span>
             <em>${entry.book === 'pu' ? 'pu' : 'ku'}${state.seenWords[word] ? ' ✓' : ''}</em>
-          </div>`));
+          </div>`);
+        withSay(row, word);
+        list.append(row);
       });
     };
     input.oninput = () => draw(input.value);
