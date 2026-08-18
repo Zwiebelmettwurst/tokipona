@@ -194,7 +194,14 @@ for (const [word, extra] of Object.entries(open.extras)) {
   }
 }
 
-// 11. Lesetexte: jede Zeile und jede Frage muss durch den Parser
+// 11. Lesetexte: jede Zeile durch den Parser — und kein Wort vor seiner Lektion
+const introducedIn = {};
+for (const lesson of data.languages.de.lessons) {
+  for (const word of lesson.words) {
+    if (introducedIn[word] === undefined) introducedIn[word] = lesson.number;
+  }
+}
+const clean = (sentence) => /^[a-zA-Z .!?:]+$/.test(sentence);
 let lines = 0;
 const textIds = new Set();
 for (const text of lipu.texts) {
@@ -211,24 +218,44 @@ for (const text of lipu.texts) {
       .flatMap((u) => TokiPona.parse(u).violations);
     check(!violations.length,
       `TEXT ${text.id}  ${line.tp} → ${violations.map((v) => v.rule).join(', ')}`);
+    check(clean(line.tp), `TEXT ${text.id}  ${line.tp}: fremde Zeichen im Satz`);
+    for (const token of TokiPona.tokenize(line.tp)) {
+      if (!TokiPona.lexicon[token.text]) continue;
+      check((introducedIn[token.text] || 99) <= text.stage,
+        `TEXT ${text.id} (Stufe ${text.stage}): „${token.text}“ kommt erst in Lektion `
+        + `${introducedIn[token.text]}`);
+    }
     for (const lang of Object.keys(data.languages)) {
       check(line[lang] && line[lang].trim(), `TEXT ${text.id}  ${line.tp}: keine Lesart für ${lang}`);
     }
   }
   check(text.questions.length >= 2, `TEXT ${text.id}: weniger als zwei Fragen`);
   for (const question of text.questions) {
-    const violations = TokiPona.splitUtterances(question.tp)
-      .flatMap((u) => TokiPona.parse(u).violations);
-    check(!violations.length,
-      `TEXT ${text.id}  ${question.tp} → ${violations.map((v) => v.rule).join(', ')}`);
+    // Vor Lektion 7 gibt es kein Fragewort — dann steht die Frage nur in der
+    // Lernsprache, und das ist in Ordnung.
+    if (question.tp) {
+      const violations = TokiPona.splitUtterances(question.tp)
+        .flatMap((u) => TokiPona.parse(u).violations);
+      check(!violations.length,
+        `TEXT ${text.id}  ${question.tp} → ${violations.map((v) => v.rule).join(', ')}`);
+      check(clean(question.tp), `TEXT ${text.id}  ${question.tp}: fremde Zeichen in der Frage`);
+      for (const token of TokiPona.tokenize(question.tp)) {
+        if (!TokiPona.lexicon[token.text]) continue;
+        check((introducedIn[token.text] || 99) <= text.stage,
+          `TEXT ${text.id} (Stufe ${text.stage}): „${token.text}“ in der Frage kommt erst in `
+          + `Lektion ${introducedIn[token.text]}`);
+      }
+    } else {
+      check(text.stage < 7, `TEXT ${text.id}: Frage ohne toki pona, obwohl seme längst da ist`);
+    }
     for (const lang of Object.keys(data.languages)) {
       const options = question.options[lang];
       check(Array.isArray(options) && options.length >= 3,
-        `TEXT ${text.id}  ${question.tp}: zu wenig Antworten für ${lang}`);
+        `TEXT ${text.id}: zu wenig Antworten für ${lang}`);
       check(options && options[question.right],
-        `TEXT ${text.id}  ${question.tp}: richtige Antwort ${question.right} fehlt in ${lang}`);
+        `TEXT ${text.id}: richtige Antwort ${question.right} fehlt in ${lang}`);
       check(question[lang] && question[lang].trim(),
-        `TEXT ${text.id}  ${question.tp}: keine Lesart für ${lang}`);
+        `TEXT ${text.id}: Frage ohne Lesart für ${lang}`);
     }
   }
 }

@@ -77,6 +77,9 @@
       readHint: 'Zusammenhängende Texte. Tipp auf eine Zeile, dann steht die '
         + 'Übersetzung da; erst raten lohnt sich.',
       readReveal: 'Übersetzung',
+      readAll: 'ganzen Text vorlesen', readStop: 'still',
+      readShowAll: 'alle Übersetzungen', readHideAll: 'wieder zudecken',
+      readCount: (done, all) => `${done} von ${all} gelesen`,
       readLocked: (stage) => `ab Lektion ${stage}`,
       readQuestions: 'Fragen zum Text',
       readBack: 'zurück',
@@ -193,6 +196,9 @@
       readHint: 'Texts that hang together. Tap a line and the translation appears; '
         + 'guessing first pays off.',
       readReveal: 'translation',
+      readAll: 'read the whole text', readStop: 'quiet',
+      readShowAll: 'all translations', readHideAll: 'cover again',
+      readCount: (done, all) => `${done} of ${all} read`,
       readLocked: (stage) => `from lesson ${stage}`,
       readQuestions: 'Questions about the text',
       readBack: 'back',
@@ -536,21 +542,50 @@
     return voices[0] || null;
   }
 
-  function speak(text) {
-    if (!speechAvailable()) return false;
-    voice = voice || pickVoice();
+  function utteranceFor(text) {
     const clean = String(text).replace(/[.!?:]/g, ' ').replace(/\s+/g, ' ').trim();
-    if (!clean) return false;
+    if (!clean) return null;
     const utterance = new window.SpeechSynthesisUtterance(clean);
     if (voice) { utterance.voice = voice; utterance.lang = voice.lang; }
     else utterance.lang = 'it-IT';
     utterance.rate = 0.85;              // langsam genug zum Mitlesen
+    return utterance;
+  }
+
+  function speak(text) {
+    if (!speechAvailable()) return false;
+    voice = voice || pickVoice();
+    const utterance = utteranceFor(text);
+    if (!utterance) return false;
     try {
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utterance);
     } catch (error) { return false; }
     return true;
   }
+
+  // Ganze Texte am Stück: die Sätze werden hintereinander in die Warteschlange
+  // gelegt, der Browser spielt sie der Reihe nach ab.
+  function speakLines(list, onLine, onEnd) {
+    if (!speechAvailable()) return false;
+    voice = voice || pickVoice();
+    try { window.speechSynthesis.cancel(); } catch (error) { return false; }
+    let spoken = 0;
+    list.forEach((text, index) => {
+      const utterance = utteranceFor(text);
+      if (!utterance) return;
+      spoken += 1;
+      utterance.onstart = () => { if (onLine) onLine(index); };
+      if (index === list.length - 1 && onEnd) utterance.onend = onEnd;
+      try { window.speechSynthesis.speak(utterance); } catch (error) { /* egal */ }
+    });
+    return spoken > 0;
+  }
+
+  const stopSpeaking = () => {
+    if (!speechAvailable()) return;
+    try { window.speechSynthesis.cancel(); } catch (error) { /* egal */ }
+  };
 
   // Stimmen kommen in manchen Browsern erst nach einem Augenblick.
   if (speechAvailable() && window.speechSynthesis.addEventListener) {
@@ -898,7 +933,9 @@
     const card = el(`
       <div class="card">
         <h2>${escape(t('readTitle'))}</h2>
-        <p class="hint">${escape(t('readHint'))}</p>
+        <p class="hint">${escape(t('readHint'))} ${escape(t('readCount',
+          LIPU.texts.filter((text) => state.read && state.read[text.id]).length,
+          LIPU.texts.length))}</p>
         <div class="lipulist"></div>
       </div>`);
     const list = card.querySelector('.lipulist');
@@ -933,10 +970,12 @@
       </div>
       <h1 class="lipu-title">${escape(text.title[state.lang] || text.title.de)}</h1>
       <p class="ask">${escape(text.about[state.lang] || text.about.de)}</p>
+      <div class="row lipuactions">
+        <button class="ghost sayall">${escape(t('readAll'))}</button>
+        <button class="ghost showall">${escape(t('readShowAll'))}</button>
+      </div>
       <div class="lipulines"></div>
       <div class="actions"><button class="primary">${escape(t('readQuestions'))}</button></div>`);
-
-    screen.querySelector('.exbar button').onclick = () => { reading = null; render(); };
 
     const lines = screen.querySelector('.lipulines');
     text.lines.forEach((line) => {
@@ -964,7 +1003,46 @@
       lines.append(row);
     });
 
+    // Ganzen Text vorlesen, Satz für Satz mitleuchtend.
+    const sayAll = screen.querySelector('.sayall');
+    if (!speechAvailable() || !state.sound) sayAll.hidden = true;
+    let playing = false;
+    const highlight = (index) => {
+      lines.querySelectorAll('.lipuline').forEach((row, i) => {
+        row.dataset.spoken = String(i === index);
+      });
+    };
+    const stopAll = () => {
+      playing = false;
+      stopSpeaking();
+      sayAll.textContent = t('readAll');
+      highlight(-1);
+    };
+    sayAll.onclick = () => {
+      if (playing) { stopAll(); return; }
+      playing = true;
+      sayAll.textContent = t('readStop');
+      speakLines(text.lines.map((line) => line.tp), highlight, stopAll);
+    };
+
+    // Alles aufdecken — oder wieder zudecken.
+    const showAll = screen.querySelector('.showall');
+    let open = false;
+    showAll.onclick = () => {
+      open = !open;
+      lines.querySelectorAll('.lipuline').forEach((row) => {
+        const meaning = row.querySelector('.meaning');
+        const reveal = row.querySelector('.reveal');
+        meaning.hidden = !open;
+        reveal.hidden = open;
+      });
+      showAll.textContent = t(open ? 'readHideAll' : 'readShowAll');
+    };
+
+    screen.querySelector('.exbar button').onclick = () => { stopAll(); reading = null; render(); };
+
     screen.querySelector('.primary').onclick = () => {
+      stopAll();
       session = buildQuizSession(text);
       reading = null;
       render();
@@ -1631,14 +1709,16 @@
 
     const screen = screenWith(`
       <p class="prompt">${escape(t('askQuiz'))}</p>
-      <h2 class="question tp glossable"></h2>
+      ${question.tp ? '<h2 class="question tp glossable"></h2>' : ''}
       <p class="ask">${escape(question[state.lang] || question.de)}</p>
       <div class="choices"></div>
       <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
 
     const asked = screen.querySelector('.question');
-    asked.append(glossed(question.tp, 'glossline'));
-    withSay(asked, question.tp);
+    if (asked) {
+      asked.append(glossed(question.tp, 'glossline'));
+      withSay(asked, question.tp);
+    }
 
     let picked = null;
     const list = screen.querySelector('.choices');
@@ -1656,8 +1736,8 @@
 
     button.onclick = () => finish(task, picked === right, {
       solution: right,
-      speak: question.tp,
-      xray: question.tp,
+      speak: question.tp || null,
+      xray: question.tp || null,
     });
     return screen;
   }

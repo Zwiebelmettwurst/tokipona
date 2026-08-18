@@ -950,3 +950,9 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   color: var(--accent);
   touch-action: none;   /* sonst scrollt die Seite beim Zeichnen */
 }
+
+.lipuactions { margin: 0.6rem 0 0.3rem; }
+.lipuline[data-spoken="true"] {
+  background: var(--accent-soft);
+  border-radius: 0.4rem;
+}

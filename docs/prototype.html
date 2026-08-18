@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="o toki!">
-<script>window.OTOKI_VERSION = '5043335d04';</script>
+<script>window.OTOKI_VERSION = 'ee044551ad';</script>
 
 <style>
 /* linja pimeja 1.9 — jan Inkepa, CC0. Siehe prototype/SCHRIFT.md.
@@ -971,6 +971,12 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   touch-action: none;   /* sonst scrollt die Seite beim Zeichnen */
 }
 
+.lipuactions { margin: 0.6rem 0 0.3rem; }
+.lipuline[data-spoken="true"] {
+  background: var(--accent-soft);
+  border-radius: 0.4rem;
+}
+
 </style>
 
 <div id="app"></div>
@@ -1346,86 +1352,217 @@ const TOKIPONA_TOKI = {
 <script>
 // Lesen am Stück: kurze zusammenhängende Texte statt lauter Einzelsätze.
 //
-// Jede Zeile ist ein gültiger Satz (geprüft in prototype/test.js), die
-// Übersetzung liegt darunter und wird erst auf Tippen sichtbar — erst raten,
-// dann nachsehen. Danach ein paar Fragen zum Text.
+// Zwei Regeln, die prototype/test.js durchsetzt:
+//   1. Jede Zeile ist ein gültiger Satz.
+//   2. Kein Text benutzt ein Wort, das seine Lektion noch nicht eingeführt
+//      hat — sonst liest man Zeichen statt Sprache.
+// Deshalb sind die frühen Texte karg: vor Lektion 7 gibt es kein Fragewort,
+// die Fragen dazu stehen dann nur auf Deutsch beziehungsweise Englisch.
 const TOKIPONA_LIPU = {
   texts: [
     {
-      id: 'lipu1', stage: 3,
-      title: { de: 'soweli lili', en: 'soweli lili' },
-      about: { de: 'Ein kleines Tier und sein Hunger.', en: 'A small animal and its hunger.' },
+      id: 'lipu1', stage: 2,
+      title: { de: 'jan lili', en: 'jan lili' },
+      about: { de: 'Ein Kind, eine Mama, ein Tier.', en: 'A child, a mother, an animal.' },
       lines: [
-        { tp: 'soweli lili li lon ma.', de: 'Ein kleines Tier ist auf dem Land.',
-          en: 'A small animal is in the land.' },
-        { tp: 'ona li wile moku.', de: 'Es will essen.', en: 'It wants to eat.' },
-        { tp: 'soweli li lukin e kili.', de: 'Das Tier sieht eine Frucht.',
-          en: 'The animal sees a fruit.' },
-        { tp: 'kili li suli.', de: 'Die Frucht ist groß.', en: 'The fruit is big.' },
-        { tp: 'soweli li moku e kili.', de: 'Das Tier isst die Frucht.',
-          en: 'The animal eats the fruit.' },
-        { tp: 'soweli li pona.', de: 'Dem Tier geht es gut.', en: 'The animal is well.' },
+        { tp: 'mi jan lili.', de: 'Ich bin ein Kind.', en: 'I am a child.' },
+        { tp: 'mama mi li suli.', de: 'Meine Mama ist groß.', en: 'My mother is big.' },
+        { tp: 'mama mi li pona.', de: 'Meine Mama ist gut.', en: 'My mother is good.' },
+        { tp: 'soweli mi li lili li suwi.', de: 'Mein Tier ist klein und süß.',
+          en: 'My animal is small and sweet.' },
+        { tp: 'soweli li moku.', de: 'Das Tier frisst.', en: 'The animal eats.' },
+        { tp: 'mi moku.', de: 'Ich esse.', en: 'I eat.' },
+        { tp: 'mi pona.', de: 'Mir geht es gut.', en: 'I am well.' },
       ],
       questions: [
-        { tp: 'soweli li moku e seme?', de: 'Was isst das Tier?', en: 'What does the animal eat?',
-          options: { de: ['die Frucht', 'das Land', 'Wasser'],
-                     en: ['the fruit', 'the land', 'water'] }, right: 0 },
-        { tp: 'kili li suli anu lili?', de: 'Ist die Frucht groß oder klein?',
-          en: 'Is the fruit big or small?',
-          options: { de: ['groß', 'klein', 'das steht nicht da'],
-                     en: ['big', 'small', 'it does not say'] }, right: 0 },
+        { de: 'Wie ist das Tier?', en: 'What is the animal like?',
+          options: { de: ['klein und süß', 'groß und böse', 'krank'],
+                     en: ['small and sweet', 'big and bad', 'sick'] }, right: 0 },
+        { de: 'Wer ist groß?', en: 'Who is big?',
+          options: { de: ['die Mama', 'das Kind', 'das Tier'],
+                     en: ['the mother', 'the child', 'the animal'] }, right: 0 },
       ],
     },
     {
-      id: 'lipu2', stage: 6,
+      id: 'lipu2', stage: 3,
       title: { de: 'tomo mi', en: 'tomo mi' },
-      about: { de: 'Ein Tag zwischen Haus und Stadt.', en: 'A day between house and town.' },
+      about: { de: 'Was in einem kleinen Haus passiert.', en: 'What happens in a small house.' },
+      lines: [
+        { tp: 'mi lukin e tomo mi.', de: 'Ich schaue mein Haus an.', en: 'I look at my house.' },
+        { tp: 'tomo li suli ala. tomo li lili.', de: 'Das Haus ist nicht groß. Es ist klein.',
+          en: 'The house is not big. It is small.' },
+        { tp: 'mi pali e moku.', de: 'Ich mache Essen.', en: 'I make food.' },
+        { tp: 'mama mi li moku e telo.', de: 'Meine Mama trinkt Wasser.',
+          en: 'My mother drinks water.' },
+        { tp: 'mi pana e lipu.', de: 'Ich reiche ein Buch herüber.', en: 'I hand over a book.' },
+        { tp: 'mama mi li lukin e lipu.', de: 'Meine Mama liest das Buch.',
+          en: 'My mother reads the book.' },
+        { tp: 'mi olin e mama mi.', de: 'Ich liebe meine Mama.', en: 'I love my mother.' },
+      ],
+      questions: [
+        { de: 'Was macht das Kind?', en: 'What does the child do?',
+          options: { de: ['Essen', 'ein Buch', 'ein Haus'], en: ['food', 'a book', 'a house'] },
+          right: 0 },
+        { de: 'Was bekommt die Mama?', en: 'What does the mother get?',
+          options: { de: ['ein Buch', 'Wasser', 'ein Tier'], en: ['a book', 'water', 'an animal'] },
+          right: 0 },
+      ],
+    },
+    {
+      id: 'lipu3', stage: 4,
+      title: { de: 'ma pona', en: 'ma pona' },
+      about: { de: 'Draußen: Pflanzen, Vögel, Käfer.', en: 'Outside: plants, birds, bugs.' },
+      lines: [
+        { tp: 'ma li suli li pona.', de: 'Das Land ist groß und schön.',
+          en: 'The land is large and good.' },
+        { tp: 'kasi li lili. kasi li suwi.', de: 'Die Pflanze ist klein. Sie ist süß.',
+          en: 'The plant is small. It is sweet.' },
+        { tp: 'waso li moku e pipi.', de: 'Der Vogel frisst einen Käfer.',
+          en: 'The bird eats a bug.' },
+        { tp: 'telo li suli. kala li moku.', de: 'Das Wasser ist groß. Die Fische fressen.',
+          en: 'The water is large. The fish eat.' },
+        { tp: 'mi jo e sitelen.', de: 'Ich habe ein Bild.', en: 'I have a picture.' },
+        { tp: 'mi pali e sitelen ma.', de: 'Ich male ein Bild vom Land.',
+          en: 'I make a picture of the land.' },
+        { tp: 'mi toki e toki pona.', de: 'Ich spreche toki pona.', en: 'I speak toki pona.' },
+      ],
+      questions: [
+        { de: 'Was frisst der Vogel?', en: 'What does the bird eat?',
+          options: { de: ['einen Käfer', 'einen Fisch', 'eine Pflanze'],
+                     en: ['a bug', 'a fish', 'a plant'] }, right: 0 },
+        { de: 'Was macht die Erzählerin?', en: 'What does the narrator make?',
+          options: { de: ['ein Bild', 'ein Haus', 'Essen'], en: ['a picture', 'a house', 'food'] },
+          right: 0 },
+      ],
+    },
+    {
+      id: 'lipu4', stage: 5,
+      title: { de: 'kulupu mi', en: 'kulupu mi' },
+      about: { de: 'Eine Gruppe, ein Feuer, ein Lied.', en: 'A group, a fire, a song.' },
+      lines: [
+        { tp: 'mi en jan pona mi li kulupu.', de: 'Meine Freunde und ich sind eine Gruppe.',
+          en: 'My friends and I are a group.' },
+        { tp: 'kulupu li mute.', de: 'Die Gruppe ist groß (viele).', en: 'The group is many.' },
+        { tp: 'seli li suli.', de: 'Das Feuer ist groß.', en: 'The fire is big.' },
+        { tp: 'jan ante li kalama.', de: 'Ein anderer Mensch macht Musik.',
+          en: 'Another person makes sound.' },
+        { tp: 'kalama ni li pona.', de: 'Dieser Klang ist schön.', en: 'This sound is good.' },
+        { tp: 'jan mute li lape ala. mi lape.', de: 'Viele schlafen nicht. Ich schlafe.',
+          en: 'Many do not sleep. I sleep.' },
+        { tp: 'ni li pona.', de: 'Das ist gut so.', en: 'That is good.' },
+      ],
+      questions: [
+        { de: 'Wer schläft?', en: 'Who sleeps?',
+          options: { de: ['die Erzählerin', 'die ganze Gruppe', 'niemand'],
+                     en: ['the narrator', 'the whole group', 'nobody'] }, right: 0 },
+        { de: 'Was macht der andere Mensch?', en: 'What does the other person do?',
+          options: { de: ['Musik', 'Feuer', 'Essen'], en: ['sound', 'fire', 'food'] }, right: 0 },
+      ],
+    },
+    {
+      id: 'lipu5', stage: 6,
+      title: { de: 'nasin mi', en: 'nasin mi' },
+      about: { de: 'Ein Weg hinaus und wieder zurück.', en: 'A way out and back again.' },
       lines: [
         { tp: 'mi lon tomo mi.', de: 'Ich bin in meinem Haus.', en: 'I am in my house.' },
-        { tp: 'tomo mi li lili taso li pona.', de: 'Mein Haus ist klein, aber gut.',
-          en: 'My house is small but good.' },
-        { tp: 'tenpo suno la mi tawa ma tomo.', de: 'Am Tag gehe ich in die Stadt.',
-          en: 'During the day I go to town.' },
-        { tp: 'mi kepeken e tomo tawa.', de: 'Ich benutze ein Auto.', en: 'I use a car.' },
-        { tp: 'jan pona mi li lon ma tomo.', de: 'Mein Freund ist in der Stadt.',
-          en: 'My friend is in town.' },
-        { tp: 'mi moku lon tomo pi jan pona mi.', de: 'Ich esse im Haus meines Freundes.',
-          en: 'I eat at my friend’s house.' },
-        { tp: 'tenpo pimeja la mi tawa tomo mi.', de: 'In der Nacht gehe ich nach Hause.',
-          en: 'At night I go back to my house.' },
+        { tp: 'mi tawa ma.', de: 'Ich gehe hinaus aufs Land.', en: 'I go out to the land.' },
+        { tp: 'mi tawa kepeken noka mi.', de: 'Ich gehe zu Fuß.', en: 'I travel using my legs.' },
+        { tp: 'soweli li tawa poka mi.', de: 'Ein Tier läuft neben mir.',
+          en: 'An animal walks beside me.' },
+        { tp: 'mi lukin e waso lon sewi.', de: 'Ich sehe Vögel oben.',
+          en: 'I see birds up above.' },
+        { tp: 'mi awen lon ma.', de: 'Ich bleibe draußen.', en: 'I stay in the land.' },
+        { tp: 'mi pona tan ni.', de: 'Davon geht es mir gut.', en: 'I am well from that.' },
+        { tp: 'mi tawa tomo mi.', de: 'Ich gehe nach Hause.', en: 'I go to my house.' },
       ],
       questions: [
-        { tp: 'mi tawa seme lon tenpo suno?', de: 'Wohin geht die Erzählerin am Tag?',
-          en: 'Where does the narrator go during the day?',
-          options: { de: ['in die Stadt', 'ins Bett', 'aufs Land'],
-                     en: ['to town', 'to bed', 'to the countryside'] }, right: 0 },
-        { tp: 'mi moku lon seme?', de: 'Wo wird gegessen?', en: 'Where is the eating done?',
-          options: { de: ['im Haus des Freundes', 'im eigenen Haus', 'im Auto'],
-                     en: ['at the friend’s house', 'at home', 'in the car'] }, right: 0 },
+        { de: 'Womit ist die Erzählerin unterwegs?', en: 'How does the narrator travel?',
+          options: { de: ['zu Fuß', 'mit dem Auto', 'mit dem Tier'],
+                     en: ['on foot', 'by car', 'on the animal'] }, right: 0 },
+        { de: 'Wo sind die Vögel?', en: 'Where are the birds?',
+          options: { de: ['oben', 'neben ihr', 'im Haus'],
+                     en: ['above', 'beside her', 'in the house'] }, right: 0 },
       ],
     },
     {
-      id: 'lipu3', stage: 9,
+      id: 'lipu6', stage: 7,
+      title: { de: 'toki tu', en: 'toki tu' },
+      about: { de: 'Zwei Menschen reden. Ein Gespräch zum Mitlesen.',
+               en: 'Two people talking. A dialogue to read along.' },
+      lines: [
+        { tp: 'jan Ana o!', de: 'Ana!', en: 'Ana!' },
+        { tp: 'sina pona anu ike?', de: 'Geht es dir gut oder schlecht?',
+          en: 'Are you well or unwell?' },
+        { tp: 'mi pona a!', de: 'Mir geht es gut!', en: 'I am well!' },
+        { tp: 'sina pali e seme?', de: 'Was machst du?', en: 'What are you making?' },
+        { tp: 'mi pali e ilo.', de: 'Ich baue ein Werkzeug.', en: 'I am making a tool.' },
+        { tp: 'ilo li seme?', de: 'Was für ein Werkzeug?', en: 'What kind of tool?' },
+        { tp: 'o kute! ilo li kalama.', de: 'Hör mal! Das Werkzeug macht Geräusche.',
+          en: 'Listen! The tool makes sound.' },
+        { tp: 'mu a! ilo sina li pona.', de: 'Oha! Dein Werkzeug ist gut.',
+          en: 'Wow! Your tool is good.' },
+      ],
+      questions: [
+        { tp: 'jan li pali e seme?', de: 'Was baut der Mensch?', en: 'What is the person making?',
+          options: { de: ['ein Werkzeug', 'ein Haus', 'Essen'],
+                     en: ['a tool', 'a house', 'food'] }, right: 0 },
+        { tp: 'ilo li pali e seme?', de: 'Was macht das Werkzeug?', en: 'What does the tool do?',
+          options: { de: ['Geräusche', 'Essen', 'gar nichts'],
+                     en: ['sound', 'food', 'nothing at all'] }, right: 0 },
+      ],
+    },
+    {
+      id: 'lipu7', stage: 8,
+      title: { de: 'kule ale', en: 'kule ale' },
+      about: { de: 'Ein Bild entsteht, Farbe für Farbe.', en: 'A picture appears, colour by colour.' },
+      lines: [
+        { tp: 'mi pali e sitelen.', de: 'Ich male ein Bild.', en: 'I make a picture.' },
+        { tp: 'kasi li laso.', de: 'Die Pflanzen sind grün.', en: 'The plants are green.' },
+        { tp: 'kili li loje li suwi.', de: 'Die Frucht ist rot und süß.',
+          en: 'The fruit is red and sweet.' },
+        { tp: 'waso li walo li lili.', de: 'Der Vogel ist weiß und klein.',
+          en: 'The bird is white and small.' },
+        { tp: 'ma li pimeja. mi lukin ala.', de: 'Das Land ist dunkel. Ich sehe nichts.',
+          en: 'The land is dark. I do not see.' },
+        { tp: 'soweli nasa li moku e jaki.', de: 'Ein komisches Tier frisst Dreck.',
+          en: 'A strange animal eats filth.' },
+        { tp: 'mi lukin e kule mute. mi pona.', de: 'Ich sehe viele Farben. Mir geht es gut.',
+          en: 'I see many colours. I am well.' },
+      ],
+      questions: [
+        { tp: 'kili li kule seme?', de: 'Welche Farbe hat die Frucht?',
+          en: 'What colour is the fruit?',
+          options: { de: ['rot', 'grün', 'weiß'], en: ['red', 'green', 'white'] }, right: 0 },
+        { tp: 'soweli li moku e seme?', de: 'Was frisst das komische Tier?',
+          en: 'What does the strange animal eat?',
+          options: { de: ['Dreck', 'die Frucht', 'den Vogel'],
+                     en: ['filth', 'the fruit', 'the bird'] }, right: 0 },
+      ],
+    },
+    {
+      id: 'lipu8', stage: 9,
       title: { de: 'jan pi toki pona', en: 'jan pi toki pona' },
-      about: { de: 'Warum jemand diese Sprache lernt.', en: 'Why someone learns this language.' },
+      about: { de: 'Warum jemand bei dieser Sprache bleibt.',
+               en: 'Why someone sticks with this language.' },
       lines: [
         { tp: 'jan Ana li jan pi toki pona.', de: 'Ana ist ein toki-pona-Mensch.',
           en: 'Ana is a toki pona person.' },
-        { tp: 'tenpo pini la ona li sona ala e nimi.', de: 'Früher kannte sie die Wörter nicht.',
-          en: 'Earlier she did not know the words.' },
-        { tp: 'ona li kama sona e nimi mute.', de: 'Sie lernte viele Wörter.',
-          en: 'She learned many words.' },
-        { tp: 'nimi li lili taso toki li suli.', de: 'Die Wörter sind wenige, aber die Sprache ist groß.',
-          en: 'The words are few but the language is large.' },
-        { tp: 'tenpo ni la ona li toki e ijo ale.', de: 'Jetzt sagt sie alles.',
-          en: 'Now she says everything.' },
-        { tp: 'toki pona li pona tawa ona.', de: 'toki pona gefällt ihr.',
-          en: 'She likes toki pona.' },
+        { tp: 'nimi li lili. toki li suli.',
+          de: 'Die Wörter sind wenige. Die Sprache ist groß.',
+          en: 'The words are few. The language is large.' },
+        { tp: 'ona li sitelen e linja lon lipu.', de: 'Sie zeichnet Striche auf Papier.',
+          en: 'She draws lines on paper.' },
+        { tp: 'luka ona li lete.', de: 'Ihre Hände sind kalt.', en: 'Her hands are cold.' },
+        { tp: 'ni la ona li musi.', de: 'Trotzdem hat sie Spaß.', en: 'Even so she has fun.' },
+        { tp: 'jan pi toki pona li kulupu pona.', de: 'Die toki-pona-Leute sind eine gute Gruppe.',
+          en: 'The toki pona people are a good group.' },
+        { tp: 'mi toki lon kulupu ni.', de: 'Ich rede in dieser Gruppe.',
+          en: 'I speak in this group.' },
       ],
       questions: [
-        { tp: 'jan Ana li kama sona e seme?', de: 'Was hat Ana gelernt?', en: 'What did Ana learn?',
-          options: { de: ['viele Wörter', 'ein Lied', 'gar nichts'],
-                     en: ['many words', 'a song', 'nothing at all'] }, right: 0 },
+        { tp: 'jan Ana li sitelen e seme?', de: 'Was zeichnet Ana?', en: 'What does Ana draw?',
+          options: { de: ['Striche', 'ein Tier', 'ein Haus'],
+                     en: ['lines', 'an animal', 'a house'] }, right: 0 },
         { tp: 'nimi li mute anu lili?', de: 'Sind es viele Wörter oder wenige?',
           en: 'Are the words many or few?',
           options: { de: ['wenige', 'viele', 'das steht nicht da'],
@@ -1433,18 +1570,51 @@ const TOKIPONA_LIPU = {
       ],
     },
     {
-      id: 'lipu4', stage: 11,
+      id: 'lipu9', stage: 10,
+      title: { de: 'kama sona', en: 'kama sona' },
+      about: { de: 'Wie das Lernen anfing und weiterging.',
+               en: 'How the learning started and kept going.' },
+      lines: [
+        { tp: 'tenpo pini la mi sona ala e toki pona.',
+          de: 'Früher konnte ich kein toki pona.', en: 'Earlier I did not know toki pona.' },
+        { tp: 'mi lukin e lipu. mi sona ala e nimi.',
+          de: 'Ich sah ein Buch an. Ich kannte die Wörter nicht.',
+          en: 'I looked at a book. I did not know the words.' },
+        { tp: 'mi wile kama sona.', de: 'Ich wollte lernen.', en: 'I wanted to learn.' },
+        { tp: 'mi open e nasin.', de: 'Ich schlug einen Weg ein.', en: 'I started on a path.' },
+        { tp: 'tenpo mute la mi pali.', de: 'Lange Zeit habe ich geübt.',
+          en: 'For a long time I worked at it.' },
+        { tp: 'tenpo ni la mi ken toki.', de: 'Jetzt kann ich sprechen.', en: 'Now I can speak.' },
+        { tp: 'mi pini ala. mi awen kama sona.',
+          de: 'Ich höre nicht auf. Ich lerne weiter.',
+          en: 'I am not finished. I keep learning.' },
+      ],
+      questions: [
+        { tp: 'tenpo pini la mi sona ala e seme?', de: 'Was konnte die Erzählerin früher nicht?',
+          en: 'What did the narrator not know earlier?',
+          options: { de: ['toki pona', 'lesen', 'schlafen'],
+                     en: ['toki pona', 'reading', 'sleeping'] }, right: 0 },
+        { tp: 'tenpo ni la mi ken seme?', de: 'Was kann sie jetzt?', en: 'What can she do now?',
+          options: { de: ['sprechen', 'gar nichts', 'schlafen'],
+                     en: ['speak', 'nothing at all', 'sleep'] }, right: 0 },
+      ],
+    },
+    {
+      id: 'lipu10', stage: 11,
       title: { de: 'tenpo mute', en: 'tenpo mute' },
       about: { de: 'Zählen, warten, weitermachen.', en: 'Counting, waiting, carrying on.' },
       lines: [
         { tp: 'mi jo e soweli tu.', de: 'Ich habe zwei Tiere.', en: 'I have two animals.' },
-        { tp: 'soweli wan li suli. soweli wan li lili.',
-          de: 'Ein Tier ist groß. Ein Tier ist klein.',
-          en: 'One animal is big. One animal is small.' },
+        { tp: 'soweli wan li suli. soweli ante li lili.',
+          de: 'Ein Tier ist groß. Das andere ist klein.',
+          en: 'One animal is big. The other is small.' },
         { tp: 'tenpo suno luka la mi pana e moku tawa ona.',
-          de: 'Fünf Tage lang gebe ich ihnen Essen.',
-          en: 'For five days I give them food.' },
+          de: 'Fünf Tage lang gebe ich ihnen Essen.', en: 'For five days I give them food.' },
         { tp: 'ona li kama suli.', de: 'Sie werden groß.', en: 'They grow big.' },
+        { tp: 'mi esun e moku kepeken mani mi.',
+          de: 'Ich kaufe das Essen mit meinem Geld.', en: 'I buy the food with my money.' },
+        { tp: 'tenpo pimeja la mun li lon sewi.',
+          de: 'Nachts steht der Mond oben.', en: 'At night the moon is up above.' },
         { tp: 'tenpo kama la mi jo e soweli mute.',
           de: 'Später habe ich viele Tiere.', en: 'Later I will have many animals.' },
       ],
@@ -1452,9 +1622,9 @@ const TOKIPONA_LIPU = {
         { tp: 'mi jo e soweli mute seme?', de: 'Wie viele Tiere sind es am Anfang?',
           en: 'How many animals are there at the start?',
           options: { de: ['zwei', 'fünf', 'viele'], en: ['two', 'five', 'many'] }, right: 0 },
-        { tp: 'mi pana e seme tawa soweli?', de: 'Was bekommen die Tiere?',
-          en: 'What do the animals get?',
-          options: { de: ['Essen', 'Wasser', 'ein Haus'], en: ['food', 'water', 'a house'] }, right: 0 },
+        { tp: 'mi esun kepeken seme?', de: 'Womit wird gekauft?', en: 'What is used to buy?',
+          options: { de: ['mit Geld', 'mit Essen', 'mit einem Tier'],
+                     en: ['with money', 'with food', 'with an animal'] }, right: 0 },
       ],
     },
   ],
@@ -2333,6 +2503,9 @@ const TokiPona = (function (data) {
       readHint: 'Zusammenhängende Texte. Tipp auf eine Zeile, dann steht die '
         + 'Übersetzung da; erst raten lohnt sich.',
       readReveal: 'Übersetzung',
+      readAll: 'ganzen Text vorlesen', readStop: 'still',
+      readShowAll: 'alle Übersetzungen', readHideAll: 'wieder zudecken',
+      readCount: (done, all) => `${done} von ${all} gelesen`,
       readLocked: (stage) => `ab Lektion ${stage}`,
       readQuestions: 'Fragen zum Text',
       readBack: 'zurück',
@@ -2449,6 +2622,9 @@ const TokiPona = (function (data) {
       readHint: 'Texts that hang together. Tap a line and the translation appears; '
         + 'guessing first pays off.',
       readReveal: 'translation',
+      readAll: 'read the whole text', readStop: 'quiet',
+      readShowAll: 'all translations', readHideAll: 'cover again',
+      readCount: (done, all) => `${done} of ${all} read`,
       readLocked: (stage) => `from lesson ${stage}`,
       readQuestions: 'Questions about the text',
       readBack: 'back',
@@ -2792,21 +2968,50 @@ const TokiPona = (function (data) {
     return voices[0] || null;
   }
 
-  function speak(text) {
-    if (!speechAvailable()) return false;
-    voice = voice || pickVoice();
+  function utteranceFor(text) {
     const clean = String(text).replace(/[.!?:]/g, ' ').replace(/\s+/g, ' ').trim();
-    if (!clean) return false;
+    if (!clean) return null;
     const utterance = new window.SpeechSynthesisUtterance(clean);
     if (voice) { utterance.voice = voice; utterance.lang = voice.lang; }
     else utterance.lang = 'it-IT';
     utterance.rate = 0.85;              // langsam genug zum Mitlesen
+    return utterance;
+  }
+
+  function speak(text) {
+    if (!speechAvailable()) return false;
+    voice = voice || pickVoice();
+    const utterance = utteranceFor(text);
+    if (!utterance) return false;
     try {
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utterance);
     } catch (error) { return false; }
     return true;
   }
+
+  // Ganze Texte am Stück: die Sätze werden hintereinander in die Warteschlange
+  // gelegt, der Browser spielt sie der Reihe nach ab.
+  function speakLines(list, onLine, onEnd) {
+    if (!speechAvailable()) return false;
+    voice = voice || pickVoice();
+    try { window.speechSynthesis.cancel(); } catch (error) { return false; }
+    let spoken = 0;
+    list.forEach((text, index) => {
+      const utterance = utteranceFor(text);
+      if (!utterance) return;
+      spoken += 1;
+      utterance.onstart = () => { if (onLine) onLine(index); };
+      if (index === list.length - 1 && onEnd) utterance.onend = onEnd;
+      try { window.speechSynthesis.speak(utterance); } catch (error) { /* egal */ }
+    });
+    return spoken > 0;
+  }
+
+  const stopSpeaking = () => {
+    if (!speechAvailable()) return;
+    try { window.speechSynthesis.cancel(); } catch (error) { /* egal */ }
+  };
 
   // Stimmen kommen in manchen Browsern erst nach einem Augenblick.
   if (speechAvailable() && window.speechSynthesis.addEventListener) {
@@ -3154,7 +3359,9 @@ const TokiPona = (function (data) {
     const card = el(`
       <div class="card">
         <h2>${escape(t('readTitle'))}</h2>
-        <p class="hint">${escape(t('readHint'))}</p>
+        <p class="hint">${escape(t('readHint'))} ${escape(t('readCount',
+          LIPU.texts.filter((text) => state.read && state.read[text.id]).length,
+          LIPU.texts.length))}</p>
         <div class="lipulist"></div>
       </div>`);
     const list = card.querySelector('.lipulist');
@@ -3189,10 +3396,12 @@ const TokiPona = (function (data) {
       </div>
       <h1 class="lipu-title">${escape(text.title[state.lang] || text.title.de)}</h1>
       <p class="ask">${escape(text.about[state.lang] || text.about.de)}</p>
+      <div class="row lipuactions">
+        <button class="ghost sayall">${escape(t('readAll'))}</button>
+        <button class="ghost showall">${escape(t('readShowAll'))}</button>
+      </div>
       <div class="lipulines"></div>
       <div class="actions"><button class="primary">${escape(t('readQuestions'))}</button></div>`);
-
-    screen.querySelector('.exbar button').onclick = () => { reading = null; render(); };
 
     const lines = screen.querySelector('.lipulines');
     text.lines.forEach((line) => {
@@ -3220,7 +3429,46 @@ const TokiPona = (function (data) {
       lines.append(row);
     });
 
+    // Ganzen Text vorlesen, Satz für Satz mitleuchtend.
+    const sayAll = screen.querySelector('.sayall');
+    if (!speechAvailable() || !state.sound) sayAll.hidden = true;
+    let playing = false;
+    const highlight = (index) => {
+      lines.querySelectorAll('.lipuline').forEach((row, i) => {
+        row.dataset.spoken = String(i === index);
+      });
+    };
+    const stopAll = () => {
+      playing = false;
+      stopSpeaking();
+      sayAll.textContent = t('readAll');
+      highlight(-1);
+    };
+    sayAll.onclick = () => {
+      if (playing) { stopAll(); return; }
+      playing = true;
+      sayAll.textContent = t('readStop');
+      speakLines(text.lines.map((line) => line.tp), highlight, stopAll);
+    };
+
+    // Alles aufdecken — oder wieder zudecken.
+    const showAll = screen.querySelector('.showall');
+    let open = false;
+    showAll.onclick = () => {
+      open = !open;
+      lines.querySelectorAll('.lipuline').forEach((row) => {
+        const meaning = row.querySelector('.meaning');
+        const reveal = row.querySelector('.reveal');
+        meaning.hidden = !open;
+        reveal.hidden = open;
+      });
+      showAll.textContent = t(open ? 'readHideAll' : 'readShowAll');
+    };
+
+    screen.querySelector('.exbar button').onclick = () => { stopAll(); reading = null; render(); };
+
     screen.querySelector('.primary').onclick = () => {
+      stopAll();
       session = buildQuizSession(text);
       reading = null;
       render();
@@ -3887,14 +4135,16 @@ const TokiPona = (function (data) {
 
     const screen = screenWith(`
       <p class="prompt">${escape(t('askQuiz'))}</p>
-      <h2 class="question tp glossable"></h2>
+      ${question.tp ? '<h2 class="question tp glossable"></h2>' : ''}
       <p class="ask">${escape(question[state.lang] || question.de)}</p>
       <div class="choices"></div>
       <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
 
     const asked = screen.querySelector('.question');
-    asked.append(glossed(question.tp, 'glossline'));
-    withSay(asked, question.tp);
+    if (asked) {
+      asked.append(glossed(question.tp, 'glossline'));
+      withSay(asked, question.tp);
+    }
 
     let picked = null;
     const list = screen.querySelector('.choices');
@@ -3912,8 +4162,8 @@ const TokiPona = (function (data) {
 
     button.onclick = () => finish(task, picked === right, {
       solution: right,
-      speak: question.tp,
-      xray: question.tp,
+      speak: question.tp || null,
+      xray: question.tp || null,
     });
     return screen;
   }
