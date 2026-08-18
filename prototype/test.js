@@ -116,13 +116,34 @@ for (const pattern of musi.patterns) {
   }
 }
 
-// 9. Satzröntgen
+// 9. Gleichwertige Wortstellung: Beifügungen dürfen tauschen, Rollen nicht
+const ORDER_CASES = [
+  ['jan mije lili sina li wawa.', 'jan lili mije sina li wawa.', true],
+  ['mi jo e kili suwi loje.', 'mi jo e kili loje suwi.', true],
+  ['soweli lili sina li suwi.', 'soweli sina lili li suwi.', true],
+  ['jan li moku e soweli.', 'soweli li moku e jan.', false],       // Rollentausch
+  ['jan lili ala li wawa.', 'jan ala lili li wawa.', false],       // Verneinung
+  ['jan pona mute li lape.', 'jan mute pona li lape.', false],     // Menge
+  ['tomo tawa mi li pona.', 'tomo mi tawa li pona.', false],       // feste Fügung
+  ['jan pi toki pona li pona.', 'jan pi pona toki li pona.', false], // pi-Gruppe
+  ['jan Sonja suli li pona.', 'jan suli Sonja li pona.', false],   // Name am Kopfwort
+];
+for (const [a, b, same] of ORDER_CASES) {
+  check(TokiPona.sameMeaning(a, b) === same,
+    `STELLUNG „${a}“ ${same ? 'sollte' : 'sollte nicht'} „${b}“ entsprechen`);
+}
+check(TokiPona.canonical('mi mije suli li lape.') === null
+      || TokiPona.canonical('jan lili mije li wawa.') === 'jan lili mije li wawa',
+      'STELLUNG: Vergleichsform sortiert nicht alphabetisch');
+check(TokiPona.canonical('jan sina li') === null, 'STELLUNG: kaputter Satz hat keine Vergleichsform');
+
+// 10. Satzröntgen
 const spans = TokiPona.xray(TokiPona.parse('jan suli li pana e lipu tawa mi.').utterance);
 check(JSON.stringify(spans.map((s) => s.role))
       === JSON.stringify(['subject', 'predicateMarker', 'verb', 'object', 'preposition', 'complement']),
       'Satzröntgen: ' + spans.map((s) => `${s.text}=${s.role}`).join(' '));
 
-// 10. Rollennamen: in jeder Sprache vorhanden, und wirklich übersetzt.
+// 11. Rollennamen: in jeder Sprache vorhanden, und wirklich übersetzt.
 // Auf Englisch ist die Beschriftung mit dem Schlüssel identisch — das ist
 // kein Fehler, deshalb prüft der Vergleich gegen die deutsche Fassung.
 for (const span of spans) {

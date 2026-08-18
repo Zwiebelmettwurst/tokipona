@@ -28,6 +28,10 @@
       check: 'Prüfen', next: 'Weiter', understood: 'Verstanden', again: 'Nochmal üben',
       good: 'pona!', notYet: 'Noch nicht',
       variantRight: 'Richtig — andere Wortwahl, gleiche Aussage',
+      orderRight: 'Richtig — Beifügungen darfst du umstellen',
+      orderNote: 'Beifügungen wirken der Reihe nach. Üblich ist die Reihenfolge unten — '
+        + 'sie hält feste Fügungen zusammen.',
+      orderWrong: 'Alle Wörter stimmen — in dieser Stellung sagen sie aber etwas anderes.',
       model: 'Musterlösung:', comesBack: 'Kommt in einer der nächsten Wiederholungen zurück.',
       structureOk: '✓ Satzbau in Ordnung', structureLive: '✓ Satzbau in Ordnung',
       missing: (words) => `Satzbau stimmt, aber es fehlt: ${words}`,
@@ -97,6 +101,10 @@
       check: 'Check', next: 'Continue', understood: 'Got it', again: 'Practise again',
       good: 'pona!', notYet: 'Not yet',
       variantRight: 'Correct — different words, same meaning',
+      orderRight: 'Correct — modifiers may swap places',
+      orderNote: 'Modifiers apply one after another. The order below is the usual one — '
+        + 'it keeps set phrases together.',
+      orderWrong: 'All the right words — but in this order they say something else.',
       model: 'Model answer:', comesBack: 'This will come back in one of the next reviews.',
       structureOk: '✓ structure is sound', structureLive: '✓ structure is sound',
       missing: (words) => `The structure holds, but this is missing: ${words}`,
@@ -1276,13 +1284,15 @@
 
     button.onclick = () => {
       const answer = chosen.map((id) => wordOf.get(id)).join(' ');
-      const accepted = [task.item.tp, ...task.item.also]
-        .map((s) => TP.tokenize(s).map((t) => t.text).join(' '));
-      const correct = accepted.includes(answer);
+      const verdict = grade(answer, task.item);
+      // Beim Bauen zählt die Musterlösung oder eine reine Umstellung der
+      // Beifügungen. Dieselben Wörter in anderer Rolle sagen etwas anderes —
+      // dafür gibt es keinen Punkt, aber eine Erklärung.
+      const correct = Boolean(verdict.exact || verdict.order);
       finish(task, correct, {
         solution: task.item.tp,
         xray: answer || task.item.tp,
-        grade: correct ? null : grade(answer, task.item),
+        grade: verdict.exact ? null : verdict,
       });
     };
     return screen;
@@ -1346,6 +1356,12 @@
       return { correct: false, exact: false, violations: result.violations, utterance: result.utterance };
     }
 
+    // Dieselbe Aussage, nur die Beifügungen in anderer Reihenfolge:
+    // „jan mije lili sina“ ist derselbe Sohn wie „jan lili mije sina“.
+    if ([item.tp, ...item.also].some((solution) => TP.sameMeaning(answer, solution))) {
+      return { correct: true, exact: false, order: true, violations: [], utterance: result.utterance };
+    }
+
     // Grammatisch sauber: zählt, wenn die tragenden Inhaltswörter vorkommen.
     const content = TP.tokenize(item.tp)
       .filter((t) => t.word && !t.word.roles.includes('particle') && !t.word.roles.includes('pronoun'))
@@ -1401,7 +1417,8 @@
         <div class="verdict ${correct ? 'good' : 'bad'}">
           <span class="mark">${correct ? '✓' : '✕'}</span>
           <span>${escape(correct
-            ? (detail.grade && detail.grade.variant ? t('variantRight') : t('good'))
+            ? (detail.grade && detail.grade.order ? t('orderRight')
+              : (detail.grade && detail.grade.variant ? t('variantRight') : t('good')))
             : t('notYet'))}</span>
         </div>
       </div>`);
@@ -1413,6 +1430,11 @@
           ${escape(say(violation))}
           ${violation.correction ? `<br><code>→ ${escape(violation.correction)}</code>` : ''}
         </div>`));
+    } else if (detail.grade && detail.grade.order) {
+      sheet.append(el(`<p class="reason">${escape(t('orderNote'))}</p>`));
+    } else if (detail.grade && detail.grade.variant && !correct) {
+      // Alle Bausteine da, aber in anderer Rolle — die häufigste Verwechslung.
+      sheet.append(el(`<p class="reason">${escape(t('orderWrong'))}</p>`));
     } else if (detail.grade && detail.grade.missing) {
       sheet.append(el(`<p class="reason">${escape(t('missing',
         detail.grade.missing.join(', ')))}</p>`));
@@ -1420,7 +1442,7 @@
       sheet.append(el(`<p class="reason">${detail.reason}</p>`));
     }
 
-    if (!correct || (detail.grade && detail.grade.variant)) {
+    if (!correct || (detail.grade && (detail.grade.variant || detail.grade.order))) {
       const line = el(`<p class="reason">${escape(t('model'))} </p>`);
       line.append(glossed(detail.solution, 'solution'));
       sheet.append(line);
