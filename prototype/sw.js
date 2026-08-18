@@ -27,11 +27,25 @@ self.addEventListener('activate', (event) => {
 });
 
 // Netz zuerst, Cache nur als Rückfall — mit kurzer Geduld, damit ein zähes
-// Netz nicht die ganze App aufhält.
+// Netz nicht die ganze App aufhält. Die Tondateien ändern sich nie; für sie
+// ist der Cache die erste Wahl.
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
+
+  // Aufnahmen: einmal geholt, immer da.
+  if (url.pathname.includes('/kalama/')) {
+    event.respondWith((async () => {
+      const hit = await caches.match(event.request);
+      if (hit) return hit;
+      const fresh = await fetch(event.request);
+      const copy = fresh.clone();
+      caches.open(CACHE).then((cache) => cache.put(event.request, copy)).catch(() => {});
+      return fresh;
+    })());
+    return;
+  }
 
   event.respondWith((async () => {
     const cached = caches.match(event.request);

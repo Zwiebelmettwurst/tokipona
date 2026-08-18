@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="o toki!">
-<script>window.OTOKI_VERSION = '6c5d952c4b';</script>
+<script>window.OTOKI_VERSION = 'db179eef44';</script>
 
 <style>
 /* linja pimeja 1.9 — jan Inkepa, CC0. Siehe prototype/SCHRIFT.md.
@@ -3263,6 +3263,13 @@ const TokiPona = (function (data) {
       syllableBack: (part) => `Silbe ${part} — antippen nimmt sie zurück`,
       syllableHint: 'Jede Silbe hat die Form (K)V(n) — mehr Formen gibt es nicht.',
       syllableWord: (word, sense) => `${word} — ${sense}`,
+      voiceTitle: 'kalama — gesprochene wörter',
+      voiceHint: 'Alle 137 Wörter sind von kala Asi gesprochen (Projekt Linku, '
+        + 'CC BY-SA). Die App nimmt diese Aufnahme, wo es eine gibt, und die '
+        + 'Gerätestimme nur für Sätze.',
+      voiceFetch: 'für unterwegs holen', voiceFetching: (n, all) => `holt … ${n}/${all}`,
+      voiceReady: 'liegen auf dem Gerät', voiceFailed: 'Holen ging nicht.',
+      voiceCredit: 'Aufnahmen: kala Asi · Projekt Linku · CC BY-SA 4.0',
       recTitle: 'eigene aufnahmen',
       recHint: 'Die App spricht mit der Stimme deines Geräts. Nimm ein Wort '
         + 'selbst auf, und sie nimmt deine — überall dort, wo ♪ steht.',
@@ -3338,9 +3345,9 @@ const TokiPona = (function (data) {
       dictationRight: 'Wort für Wort getroffen',
       soundTitle: 'aussprache',
       soundHint: 'toki pona wird gesprochen, wie es dasteht: fünf Vokale, keine Dehnung, '
-        + 'Betonung immer auf der ersten Silbe. Die App leiht sich dafür eine italienische '
-        + 'Stimme deines Geräts — die kommt am nächsten. Angeschaltet kommt in jeder '
-        + 'Lektion eine Höraufgabe dazu.',
+        + 'Betonung immer auf der ersten Silbe. Einzelne Wörter kommen von kala Asi '
+        + '(Projekt Linku, CC BY-SA), ganze Sätze von der Stimme deines Geräts. '
+        + 'Angeschaltet kommt in jeder Lektion eine Höraufgabe dazu.',
       soundOn: 'Aussprache anschalten', soundOff: 'Aussprache abschalten',
       soundNone: 'Dieses Gerät bringt keine Sprachausgabe mit.',
       musiTab: 'musi', musiTitle: 'utala musi',
@@ -3453,6 +3460,13 @@ const TokiPona = (function (data) {
       syllableBack: (part) => `syllable ${part} — tap to take it back`,
       syllableHint: 'Every syllable has the shape (C)V(n) — there are no others.',
       syllableWord: (word, sense) => `${word} — ${sense}`,
+      voiceTitle: 'kalama — spoken words',
+      voiceHint: 'All 137 words are spoken by kala Asi (Linku project, CC BY-SA). '
+        + 'The app uses that recording wherever there is one and falls back to the '
+        + 'device voice for sentences.',
+      voiceFetch: 'keep them offline', voiceFetching: (n, all) => `fetching … ${n}/${all}`,
+      voiceReady: 'stored on the device', voiceFailed: 'Fetching failed.',
+      voiceCredit: 'Recordings: kala Asi · Linku project · CC BY-SA 4.0',
       recTitle: 'your own recordings',
       recHint: 'The app speaks with your device voice. Record a word yourself and '
         + 'it will use yours — everywhere the ♪ appears.',
@@ -3528,8 +3542,9 @@ const TokiPona = (function (data) {
       dictationRight: 'Word for word',
       soundTitle: 'pronunciation',
       soundHint: 'toki pona is spoken the way it is written: five vowels, no lengthening, '
-        + 'stress always on the first syllable. The app borrows an Italian voice from your '
-        + 'device — that one comes closest. Switched on, every lesson gains a listening task.',
+        + 'stress always on the first syllable. Single words come from kala Asi (Linku '
+        + 'project, CC BY-SA), whole sentences from your device voice. Switched on, every '
+        + 'lesson gains a listening task.',
       soundOn: 'Turn pronunciation on', soundOff: 'Turn pronunciation off',
       soundNone: 'This device has no speech output.',
       musiTab: 'musi', musiTitle: 'utala musi',
@@ -3973,12 +3988,28 @@ const TokiPona = (function (data) {
     } catch (error) { /* ohne Speicher eben ohne Aufnahmen */ }
   }
 
+  // Für jedes einzelne Wort gibt es eine echte Aufnahme; sie liegt neben der
+  // Seite und wird vom Service Worker mitgecacht.
+  const spokenWord = (text) => {
+    const word = String(text).trim().toLowerCase().replace(/[.!?:,]/g, '');
+    return TP.lexicon[word] ? word : null;
+  };
+
   function playRecording(text) {
-    const blob = RECORDED.get(String(text).trim());
-    if (!blob) return false;
+    const key = String(text).trim();
+    const blob = RECORDED.get(key);
+    if (blob) {
+      try {
+        const audio = new Audio(URL.createObjectURL(blob));
+        audio.onended = () => URL.revokeObjectURL(audio.src);
+        audio.play().catch(() => {});
+        return true;
+      } catch (error) { /* dann eben die nächste Stufe */ }
+    }
+    const word = spokenWord(key);
+    if (!word) return false;
     try {
-      const audio = new Audio(URL.createObjectURL(blob));
-      audio.onended = () => URL.revokeObjectURL(audio.src);
+      const audio = new Audio(`./kalama/${word}.mp3`);
       audio.play().catch(() => {});
       return true;
     } catch (error) { return false; }
@@ -4033,6 +4064,40 @@ const TokiPona = (function (data) {
       button.dataset.has = String(RECORDED.has(text));
     };
     return button;
+  }
+
+  // Die mitgelieferten Aufnahmen: woher sie kommen, und wie sie offline
+  // verfügbar bleiben.
+  let fetching = false;
+  function voiceCard() {
+    const card = el(`
+      <div class="card">
+        <h2>${escape(t('voiceTitle'))}</h2>
+        <p class="hint">${escape(t('voiceHint'))}</p>
+        <div class="row"></div>
+        <p class="hint voicecredit"><a href="https://github.com/lipu-linku/ijo"
+          rel="noopener">${escape(t('voiceCredit'))}</a></p>
+      </div>`);
+    const row = card.querySelector('.row');
+    const button = el(`<button class="ghost">${escape(t('voiceFetch'))}</button>`);
+    button.onclick = async () => {
+      if (fetching) return;
+      fetching = true;
+      const words = Object.keys(TP.lexicon);
+      let done = 0;
+      button.disabled = true;
+      for (const word of words) {
+        try { await fetch(`./kalama/${word}.mp3`, { cache: 'force-cache' }); } catch (error) { /* weiter */ }
+        done += 1;
+        if (done % 10 === 0 || done === words.length) button.textContent = t('voiceFetching', done, words.length);
+      }
+      button.textContent = t('voiceReady');
+      fetching = false;
+    };
+    row.append(button);
+    const probe = sayButton('toki', t('listen'));
+    if (probe) row.append(probe);
+    return card;
   }
 
   function recordCard() {
@@ -6889,6 +6954,7 @@ const TokiPona = (function (data) {
       <input class="search" placeholder="${escape(t('search'))}" aria-label="${escape(t('search'))}">
       <div class="words"></div>`);
     screen.prepend(recordCard());
+    screen.prepend(voiceCard());
     screen.prepend(nameCard());
     screen.prepend(mapCard());
     const list = screen.querySelector('.words');
