@@ -117,6 +117,7 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 }
 
 .ring {
+  position: relative;
   width: 2.1rem;
   height: 2.1rem;
   border-radius: 50%;
@@ -125,8 +126,17 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--accent);
-  background: var(--accent-soft);
+  /* Der Ring zeigt, wie weit es bis zur nächsten Stufe ist. */
+  background: conic-gradient(var(--accent) var(--fill, 0%), var(--accent-soft) 0);
 }
+.ring::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--surface);
+}
+.ring b { position: relative; z-index: 1; font-weight: 600; }
 
 .metric {
   display: flex;

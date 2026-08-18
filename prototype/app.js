@@ -4,13 +4,16 @@
 
 (function (DATA, MUSI, OPEN, LIPU, TP) {
   const KEY = 'o-toki-fortschritt-v1';
-  const GOALS = [20, 40, 60];
+  const GOALS = [20, 40, 60, 100];
 
   // Alles, was die Oberfläche sagt, steht hier — die Lektionen selbst kommen
   // aus den Kursdaten, die in derselben Sprache vorliegen.
   const T = {
     de: {
       level: 'Stufe', xpToday: (a, b) => `${a}/${b} XP heute`, days: 'Tage',
+      goalMet: (xp) => `${xp} XP heute · geschafft`,
+      levelNext: (xp) => `Noch ${xp} XP bis zur nächsten Stufe`,
+      levelLine: (lvl, xp) => `Stufe ${lvl} · noch ${xp} XP bis zur nächsten`,
       greeting: 'o kama pona!',
       introFirst: 'Zwölf Lektionen. Du baust Sätze, statt Vokabeln abzuhaken.',
       introBack: (title) => `Weiter bei „${title}“.`,
@@ -141,6 +144,9 @@
     },
     en: {
       level: 'Level', xpToday: (a, b) => `${a}/${b} XP today`, days: 'days',
+      goalMet: (xp) => `${xp} XP today · done`,
+      levelNext: (xp) => `${xp} XP to go until the next level`,
+      levelLine: (lvl, xp) => `Level ${lvl} · ${xp} XP to the next one`,
       greeting: 'o kama pona!',
       introFirst: 'Twelve lessons. You build sentences instead of ticking off words.',
       introBack: (title) => `Continue with “${title}”.`,
@@ -423,8 +429,18 @@
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (error) { /* egal */ }
   }
 
-  function level() { return Math.floor(state.xp / 100) + 1; }
-  function levelProgress() { return state.xp % 100; }
+  // Eine Stufe alle 100 Punkte hieß: alle zehn Aufgaben eine Stufe. Nach zwei
+  // Tagen stand da Stufe 9, und die Zahl sagte nichts mehr. Jetzt wächst der
+  // Abstand: Stufe n beginnt bei 25·n·(n−1) Punkten — 50, 150, 300, 500, 750 …
+  const xpForLevel = (n) => 25 * n * (n - 1);
+  const levelOf = (xp) => Math.max(1, Math.floor((Math.sqrt(1 + (8 * Math.max(0, xp)) / 50) + 1) / 2));
+  function level() { return levelOf(state.xp); }
+  function toNextLevel() { return xpForLevel(level() + 1) - state.xp; }
+  function levelProgress() {
+    const from = xpForLevel(level());
+    const to = xpForLevel(level() + 1);
+    return Math.round(((state.xp - from) / (to - from)) * 100);
+  }
 
   const goal = () => state.goal || 40;
   // Datum von vor n Tagen, als Zeichenkette — die Tagesschlüssel sind sortierbar.
@@ -855,8 +871,12 @@
     const bar = el(`
       <div>
         <div class="topbar">
-          <div class="level"><div class="ring">${level()}</div><span>${escape(t('level'))}</span></div>
-          <div class="metric spacer gold">${escape(t('xpToday', state.dayXp, goal()))}</div>
+          <div class="level" title="${escape(t('levelNext', toNextLevel()))}">
+            <div class="ring" style="--fill:${levelProgress()}%"><b>${level()}</b></div>
+            <span>${escape(t('level'))}</span>
+          </div>
+          <div class="metric spacer gold">${escape(state.dayXp >= goal()
+            ? t('goalMet', state.dayXp) : t('xpToday', state.dayXp, goal()))}</div>
           <div class="metric"><b>${state.streak}</b> ${escape(t('days'))}</div>
         </div>
         <div class="goalbar"><span style="width:${Math.min(100, (state.dayXp / goal()) * 100)}%"></span></div>
@@ -1105,7 +1125,8 @@
             <span class="bar"><i style="height:${Math.round((day.xp / highest) * 100)}%"></i></span>
             <span class="tick">${escape(names[day.weekday])}</span>
           </div>`).join('')}</div>
-        <p class="hint">${escape(t('weekSum', total, reached))}</p>
+        <p class="hint">${escape(t('weekSum', total, reached))}<br>
+          ${escape(t('levelLine', level(), toNextLevel()))}</p>
       </div>`);
     return card;
   }
