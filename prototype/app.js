@@ -5,6 +5,9 @@
 (function (DATA, MUSI, OPEN, LIPU, TP) {
   const KEY = 'o-toki-fortschritt-v1';
   const GOALS = [20, 40, 60, 100];
+  // Die beiden Sprecherinnen — hier oben, weil der geladene Zustand dagegen
+  // geprüft wird.
+  const VOICES = [{ id: 'kalaasi' }, { id: 'jlakuse' }, { id: 'ante' }];
 
   // Alles, was die Oberfläche sagt, steht hier — die Lektionen selbst kommen
   // aus den Kursdaten, die in derselben Sprache vorliegen.
@@ -104,12 +107,14 @@
       syllableHint: 'Jede Silbe hat die Form (K)V(n) — mehr Formen gibt es nicht.',
       syllableWord: (word, sense) => `${word} — ${sense}`,
       voiceTitle: 'kalama — gesprochene wörter',
-      voiceHint: 'Alle 137 Wörter sind von kala Asi gesprochen (Projekt Linku, '
-        + 'CC BY-SA). Die App nimmt diese Aufnahme, wo es eine gibt, und die '
-        + 'Gerätestimme nur für Sätze.',
+      voiceHint: 'Alle 137 Wörter sind zweimal aufgenommen, von kala Asi und von '
+        + 'jan Lakuse (Projekt Linku). Die App nimmt eine echte Aufnahme, wo es '
+        + 'eine gibt, und die Gerätestimme nur für ganze Sätze.',
+      voicePick: 'Stimme',
+      voiceNames: { kalaasi: 'kala Asi', jlakuse: 'jan Lakuse', ante: 'abwechselnd' },
       voiceFetch: 'für unterwegs holen', voiceFetching: (n, all) => `holt … ${n}/${all}`,
       voiceReady: 'liegen auf dem Gerät', voiceFailed: 'Holen ging nicht.',
-      voiceCredit: 'Aufnahmen: kala Asi · Projekt Linku · CC BY-SA 4.0',
+      voiceCredit: 'Aufnahmen: kala Asi (CC BY-SA 4.0) und jan Lakuse · Projekt Linku',
       recTitle: 'eigene aufnahmen',
       recHint: 'Die App spricht mit der Stimme deines Geräts. Nimm ein Wort '
         + 'selbst auf, und sie nimmt deine — überall dort, wo ♪ steht.',
@@ -301,12 +306,14 @@
       syllableHint: 'Every syllable has the shape (C)V(n) — there are no others.',
       syllableWord: (word, sense) => `${word} — ${sense}`,
       voiceTitle: 'kalama — spoken words',
-      voiceHint: 'All 137 words are spoken by kala Asi (Linku project, CC BY-SA). '
-        + 'The app uses that recording wherever there is one and falls back to the '
-        + 'device voice for sentences.',
+      voiceHint: 'All 137 words are recorded twice, by kala Asi and by jan Lakuse '
+        + '(Linku project). The app uses a real recording wherever there is one and '
+        + 'falls back to the device voice for whole sentences.',
+      voicePick: 'voice',
+      voiceNames: { kalaasi: 'kala Asi', jlakuse: 'jan Lakuse', ante: 'alternating' },
       voiceFetch: 'keep them offline', voiceFetching: (n, all) => `fetching … ${n}/${all}`,
       voiceReady: 'stored on the device', voiceFailed: 'Fetching failed.',
-      voiceCredit: 'Recordings: kala Asi · Linku project · CC BY-SA 4.0',
+      voiceCredit: 'Recordings: kala Asi (CC BY-SA 4.0) and jan Lakuse · Linku project',
       recTitle: 'your own recordings',
       recHint: 'The app speaks with your device voice. Record a word yourself and '
         + 'it will use yours — everywhere the ♪ appears.',
@@ -529,6 +536,7 @@
     sitelen: false,
     sound: true,
     nameHead: 'jan',
+    voice: 'kalaasi',
     lang: (navigator.language || 'de').toLowerCase().startsWith('de') ? 'de' : 'en',
   };
 
@@ -614,6 +622,7 @@
     state.lastDay = typeof raw.lastDay === 'string' ? raw.lastDay.slice(0, 10) : null;
     state.lang = DATA.languages[raw.lang] ? raw.lang : blank.lang;
     state.nameHead = typeof raw.nameHead === 'string' ? raw.nameHead.slice(0, 16) : blank.nameHead;
+    state.voice = VOICES.some((entry) => entry.id === raw.voice) ? raw.voice : blank.voice;
     state.sitelen = raw.sitelen === true;
     state.sound = raw.sound !== false;
     state.done = plain(raw.done, (value) => (value ? true : undefined));
@@ -828,6 +837,17 @@
     } catch (error) { /* ohne Speicher eben ohne Aufnahmen */ }
   }
 
+  // Zwei Sprecherinnen, dazu die Möglichkeit zu wechseln. „abwechselnd“ nimmt
+  // je nach Wort mal die eine, mal die andere — dieselbe Wahl bleibt für
+  // dasselbe Wort immer gleich.
+  const voiceFolder = (word) => {
+    if (state.voice === 'jlakuse') return 'jlakuse';
+    if (state.voice !== 'ante') return 'kalaasi';
+    let sum = 0;
+    for (let i = 0; i < word.length; i += 1) sum += word.charCodeAt(i);
+    return sum % 2 ? 'jlakuse' : 'kalaasi';
+  };
+
   // Für jedes einzelne Wort gibt es eine echte Aufnahme; sie liegt neben der
   // Seite und wird vom Service Worker mitgecacht.
   const spokenWord = (text) => {
@@ -849,7 +869,7 @@
     const word = spokenWord(key);
     if (!word) return false;
     try {
-      const audio = new Audio(`./kalama/${word}.mp3`);
+      const audio = new Audio(`./kalama/${voiceFolder(word)}/${word}.mp3`);
       audio.play().catch(() => {});
       return true;
     } catch (error) { return false; }
@@ -918,7 +938,22 @@
         <p class="hint voicecredit"><a href="https://github.com/lipu-linku/ijo"
           rel="noopener">${escape(t('voiceCredit'))}</a></p>
       </div>`);
-    const row = card.querySelector('.row');
+    const picker = el(`<div class="row voicepick"></div>`);
+    const names = t('voiceNames');
+    VOICES.forEach((entry) => {
+      const chip = el(`<button class="ghost" data-picked="${state.voice === entry.id}"
+        >${escape(names[entry.id])}</button>`);
+      chip.onclick = () => {
+        state.voice = entry.id;
+        save();
+        render();
+        speak('toki');
+      };
+      picker.append(chip);
+    });
+    card.querySelector('.row').before(picker);
+
+    const row = card.querySelector('.row:not(.voicepick)');
     const button = el(`<button class="ghost">${escape(t('voiceFetch'))}</button>`);
     button.onclick = async () => {
       if (fetching) return;
@@ -927,7 +962,9 @@
       let done = 0;
       button.disabled = true;
       for (const word of words) {
-        try { await fetch(`./kalama/${word}.mp3`, { cache: 'force-cache' }); } catch (error) { /* weiter */ }
+        try {
+          await fetch(`./kalama/${voiceFolder(word)}/${word}.mp3`, { cache: 'force-cache' });
+        } catch (error) { /* weiter */ }
         done += 1;
         if (done % 10 === 0 || done === words.length) button.textContent = t('voiceFetching', done, words.length);
       }
