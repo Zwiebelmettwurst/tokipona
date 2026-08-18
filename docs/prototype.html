@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="o toki!">
-<script>window.OTOKI_VERSION = 'cf19c4934c';</script>
+<script>window.OTOKI_VERSION = '434028d72a';</script>
 
 <style>
 /* linja pimeja 1.9 — jan Inkepa, CC0. Siehe prototype/SCHRIFT.md.
@@ -1672,6 +1672,79 @@ const TokiPona = (function (data) {
   };
   const phraseText = (phrase) => phraseTokens(phrase).map((t) => t.text).join(' ');
 
+  // ------------------------------------------------- gleichwertige Stellung
+
+  // Beifügungen desselben Kopfworts dürfen die Plätze tauschen, ohne dass sich
+  // die Aussage ändert: „jan lili mije“ und „jan mije lili“ sind beide der
+  // kleine männliche Mensch. Ein paar Wörter binden allerdings fester und
+  // dürfen nicht wandern — Zahlen und Mengen, die Verneinung, und die
+  // Präpositionen, die feste Fügungen bilden (tomo tawa ist ein Fahrzeug).
+  const FIXED_ORDER = new Set([
+    'ala', 'taso', 'kin', 'seme', 'nanpa', 'mute', 'wan', 'tu', 'luka', 'ale', 'ali',
+    'tawa', 'lon', 'tan', 'kepeken', 'sama',
+  ]);
+
+  // Alle Wortgruppen eines Satzes einsammeln — dieselben Stellen, die auch das
+  // Satzröntgen beschriftet.
+  function collectPhrases(utterance, out) {
+    const found = out || [];
+    if (!utterance) return found;
+    const take = (phrase) => {
+      if (!phrase) return;
+      found.push(phrase);
+      if (phrase.embedded) collectPhrases(phrase.embedded, found);
+    };
+    const clause = (node) => {
+      if (!node) return;
+      node.subjects.forEach(take);
+      for (const predicate of node.predicates) {
+        if (predicate.core.kind === 'phrase') take(predicate.core.phrase);
+        else if (predicate.core.phrase) take(predicate.core.phrase.object);
+        predicate.objects.forEach(take);
+        for (const prepositional of predicate.prepositions) take(prepositional.object);
+      }
+    };
+    for (const context of utterance.contexts) {
+      if (context.kind === 'phrase') take(context.phrase);
+      else clause(context.clause);
+    }
+    clause(utterance.clause);
+    return found;
+  }
+
+  // Vergleichsform eines Satzes: fehlerfrei geparst, und in jeder Wortgruppe
+  // stehen die vertauschbaren Beifügungen alphabetisch. Zwei Sätze mit
+  // derselben Vergleichsform sagen dasselbe.
+  function canonical(input) {
+    const { tokens, utterance, isValid } = parse(input);
+    if (!isValid || !utterance) return null;
+    const words = tokens.map((token) => token.text);
+
+    for (const phrase of collectPhrases(utterance)) {
+      const modifiers = phrase.modifiers || [];
+      if (modifiers.length < 2) continue;
+      // pi-Gruppen bleiben, wo sie sind: ihre Reichweite hängt am Platz.
+      if (modifiers.some((modifier) => modifier.kind !== 'simple')) continue;
+      // Namen bleiben am Kopfwort kleben: jan Sonja suli, nicht jan suli Sonja.
+      if (modifiers.some((modifier) => modifier.token.kind !== 'known')) continue;
+      const texts = modifiers.map((modifier) => modifier.token.text);
+      if (texts.some((text) => FIXED_ORDER.has(text))) continue;
+      const places = modifiers.map((modifier) => modifier.token.index);
+      // Nur zusammenhängende Beifügungen umsortieren.
+      if (places.some((place, i) => i > 0 && place !== places[i - 1] + 1)) continue;
+      const sorted = texts.slice().sort();
+      places.forEach((place, i) => { words[place] = sorted[i]; });
+    }
+    return words.join(' ');
+  }
+
+  // Sagen zwei Sätze dasselbe, obwohl sie verschieden geschrieben sind?
+  function sameMeaning(a, b) {
+    const left = canonical(a);
+    const right = canonical(b);
+    return Boolean(left && right && left === right);
+  }
+
   function xray(utterance) {
     if (!utterance) return [];
     const spans = [];
@@ -1724,7 +1797,7 @@ const TokiPona = (function (data) {
 
   return {
     parse, tokenize, splitUtterances, xray, phonoCheck, suggest, editDistance, describe, roleLabel,
-    lookup, phraseText, lexicon: LEX,
+    lookup, phraseText, canonical, sameMeaning, lexicon: LEX,
   };
 })(TOKIPONA_DATA);
 
@@ -1761,6 +1834,10 @@ const TokiPona = (function (data) {
       check: 'Prüfen', next: 'Weiter', understood: 'Verstanden', again: 'Nochmal üben',
       good: 'pona!', notYet: 'Noch nicht',
       variantRight: 'Richtig — andere Wortwahl, gleiche Aussage',
+      orderRight: 'Richtig — Beifügungen darfst du umstellen',
+      orderNote: 'Beifügungen wirken der Reihe nach. Üblich ist die Reihenfolge unten — '
+        + 'sie hält feste Fügungen zusammen.',
+      orderWrong: 'Alle Wörter stimmen — in dieser Stellung sagen sie aber etwas anderes.',
       model: 'Musterlösung:', comesBack: 'Kommt in einer der nächsten Wiederholungen zurück.',
       structureOk: '✓ Satzbau in Ordnung', structureLive: '✓ Satzbau in Ordnung',
       missing: (words) => `Satzbau stimmt, aber es fehlt: ${words}`,
@@ -1830,6 +1907,10 @@ const TokiPona = (function (data) {
       check: 'Check', next: 'Continue', understood: 'Got it', again: 'Practise again',
       good: 'pona!', notYet: 'Not yet',
       variantRight: 'Correct — different words, same meaning',
+      orderRight: 'Correct — modifiers may swap places',
+      orderNote: 'Modifiers apply one after another. The order below is the usual one — '
+        + 'it keeps set phrases together.',
+      orderWrong: 'All the right words — but in this order they say something else.',
       model: 'Model answer:', comesBack: 'This will come back in one of the next reviews.',
       structureOk: '✓ structure is sound', structureLive: '✓ structure is sound',
       missing: (words) => `The structure holds, but this is missing: ${words}`,
@@ -3009,13 +3090,15 @@ const TokiPona = (function (data) {
 
     button.onclick = () => {
       const answer = chosen.map((id) => wordOf.get(id)).join(' ');
-      const accepted = [task.item.tp, ...task.item.also]
-        .map((s) => TP.tokenize(s).map((t) => t.text).join(' '));
-      const correct = accepted.includes(answer);
+      const verdict = grade(answer, task.item);
+      // Beim Bauen zählt die Musterlösung oder eine reine Umstellung der
+      // Beifügungen. Dieselben Wörter in anderer Rolle sagen etwas anderes —
+      // dafür gibt es keinen Punkt, aber eine Erklärung.
+      const correct = Boolean(verdict.exact || verdict.order);
       finish(task, correct, {
         solution: task.item.tp,
         xray: answer || task.item.tp,
-        grade: correct ? null : grade(answer, task.item),
+        grade: verdict.exact ? null : verdict,
       });
     };
     return screen;
@@ -3079,6 +3162,12 @@ const TokiPona = (function (data) {
       return { correct: false, exact: false, violations: result.violations, utterance: result.utterance };
     }
 
+    // Dieselbe Aussage, nur die Beifügungen in anderer Reihenfolge:
+    // „jan mije lili sina“ ist derselbe Sohn wie „jan lili mije sina“.
+    if ([item.tp, ...item.also].some((solution) => TP.sameMeaning(answer, solution))) {
+      return { correct: true, exact: false, order: true, violations: [], utterance: result.utterance };
+    }
+
     // Grammatisch sauber: zählt, wenn die tragenden Inhaltswörter vorkommen.
     const content = TP.tokenize(item.tp)
       .filter((t) => t.word && !t.word.roles.includes('particle') && !t.word.roles.includes('pronoun'))
@@ -3134,7 +3223,8 @@ const TokiPona = (function (data) {
         <div class="verdict ${correct ? 'good' : 'bad'}">
           <span class="mark">${correct ? '✓' : '✕'}</span>
           <span>${escape(correct
-            ? (detail.grade && detail.grade.variant ? t('variantRight') : t('good'))
+            ? (detail.grade && detail.grade.order ? t('orderRight')
+              : (detail.grade && detail.grade.variant ? t('variantRight') : t('good')))
             : t('notYet'))}</span>
         </div>
       </div>`);
@@ -3146,6 +3236,11 @@ const TokiPona = (function (data) {
           ${escape(say(violation))}
           ${violation.correction ? `<br><code>→ ${escape(violation.correction)}</code>` : ''}
         </div>`));
+    } else if (detail.grade && detail.grade.order) {
+      sheet.append(el(`<p class="reason">${escape(t('orderNote'))}</p>`));
+    } else if (detail.grade && detail.grade.variant && !correct) {
+      // Alle Bausteine da, aber in anderer Rolle — die häufigste Verwechslung.
+      sheet.append(el(`<p class="reason">${escape(t('orderWrong'))}</p>`));
     } else if (detail.grade && detail.grade.missing) {
       sheet.append(el(`<p class="reason">${escape(t('missing',
         detail.grade.missing.join(', ')))}</p>`));
@@ -3153,7 +3248,7 @@ const TokiPona = (function (data) {
       sheet.append(el(`<p class="reason">${detail.reason}</p>`));
     }
 
-    if (!correct || (detail.grade && detail.grade.variant)) {
+    if (!correct || (detail.grade && (detail.grade.variant || detail.grade.order))) {
       const line = el(`<p class="reason">${escape(t('model'))} </p>`);
       line.append(glossed(detail.solution, 'solution'));
       sheet.append(line);

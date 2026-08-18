@@ -657,6 +657,79 @@ const TokiPona = (function (data) {
   };
   const phraseText = (phrase) => phraseTokens(phrase).map((t) => t.text).join(' ');
 
+  // ------------------------------------------------- gleichwertige Stellung
+
+  // Beifügungen desselben Kopfworts dürfen die Plätze tauschen, ohne dass sich
+  // die Aussage ändert: „jan lili mije“ und „jan mije lili“ sind beide der
+  // kleine männliche Mensch. Ein paar Wörter binden allerdings fester und
+  // dürfen nicht wandern — Zahlen und Mengen, die Verneinung, und die
+  // Präpositionen, die feste Fügungen bilden (tomo tawa ist ein Fahrzeug).
+  const FIXED_ORDER = new Set([
+    'ala', 'taso', 'kin', 'seme', 'nanpa', 'mute', 'wan', 'tu', 'luka', 'ale', 'ali',
+    'tawa', 'lon', 'tan', 'kepeken', 'sama',
+  ]);
+
+  // Alle Wortgruppen eines Satzes einsammeln — dieselben Stellen, die auch das
+  // Satzröntgen beschriftet.
+  function collectPhrases(utterance, out) {
+    const found = out || [];
+    if (!utterance) return found;
+    const take = (phrase) => {
+      if (!phrase) return;
+      found.push(phrase);
+      if (phrase.embedded) collectPhrases(phrase.embedded, found);
+    };
+    const clause = (node) => {
+      if (!node) return;
+      node.subjects.forEach(take);
+      for (const predicate of node.predicates) {
+        if (predicate.core.kind === 'phrase') take(predicate.core.phrase);
+        else if (predicate.core.phrase) take(predicate.core.phrase.object);
+        predicate.objects.forEach(take);
+        for (const prepositional of predicate.prepositions) take(prepositional.object);
+      }
+    };
+    for (const context of utterance.contexts) {
+      if (context.kind === 'phrase') take(context.phrase);
+      else clause(context.clause);
+    }
+    clause(utterance.clause);
+    return found;
+  }
+
+  // Vergleichsform eines Satzes: fehlerfrei geparst, und in jeder Wortgruppe
+  // stehen die vertauschbaren Beifügungen alphabetisch. Zwei Sätze mit
+  // derselben Vergleichsform sagen dasselbe.
+  function canonical(input) {
+    const { tokens, utterance, isValid } = parse(input);
+    if (!isValid || !utterance) return null;
+    const words = tokens.map((token) => token.text);
+
+    for (const phrase of collectPhrases(utterance)) {
+      const modifiers = phrase.modifiers || [];
+      if (modifiers.length < 2) continue;
+      // pi-Gruppen bleiben, wo sie sind: ihre Reichweite hängt am Platz.
+      if (modifiers.some((modifier) => modifier.kind !== 'simple')) continue;
+      // Namen bleiben am Kopfwort kleben: jan Sonja suli, nicht jan suli Sonja.
+      if (modifiers.some((modifier) => modifier.token.kind !== 'known')) continue;
+      const texts = modifiers.map((modifier) => modifier.token.text);
+      if (texts.some((text) => FIXED_ORDER.has(text))) continue;
+      const places = modifiers.map((modifier) => modifier.token.index);
+      // Nur zusammenhängende Beifügungen umsortieren.
+      if (places.some((place, i) => i > 0 && place !== places[i - 1] + 1)) continue;
+      const sorted = texts.slice().sort();
+      places.forEach((place, i) => { words[place] = sorted[i]; });
+    }
+    return words.join(' ');
+  }
+
+  // Sagen zwei Sätze dasselbe, obwohl sie verschieden geschrieben sind?
+  function sameMeaning(a, b) {
+    const left = canonical(a);
+    const right = canonical(b);
+    return Boolean(left && right && left === right);
+  }
+
   function xray(utterance) {
     if (!utterance) return [];
     const spans = [];
@@ -709,7 +782,7 @@ const TokiPona = (function (data) {
 
   return {
     parse, tokenize, splitUtterances, xray, phonoCheck, suggest, editDistance, describe, roleLabel,
-    lookup, phraseText, lexicon: LEX,
+    lookup, phraseText, canonical, sameMeaning, lexicon: LEX,
   };
 })(typeof TOKIPONA_DATA !== 'undefined' ? TOKIPONA_DATA : require('./data.js'));
 
