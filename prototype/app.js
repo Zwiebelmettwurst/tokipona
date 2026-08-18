@@ -73,6 +73,10 @@
       traceThin: 'Da fehlt noch ein Stück der Vorlage.',
       traceWide: 'Zu viel daneben — bleib auf der Linie.',
       traceScore: (hit, clean) => `Vorlage ${hit}% getroffen, ${clean}% deiner Linie sitzt drauf.`,
+      cancel: 'Abbrechen',
+      tileHelp: (word) => `${word} — antippen entfernt, ziehen oder Pfeiltasten sortieren um`,
+      sentenceLabel: 'Satz',
+      pageTitle: 'o toki! — toki pona lernen',
       phraseTitle: 'toki lon — Sätze für draußen',
       phraseHint: 'Was man wirklich sagt. Tipp ein Wort an, um es nachzuschlagen.',
       phrasePractice: 'Alltagssätze üben',
@@ -198,6 +202,10 @@
       traceThin: 'Part of the template is still missing.',
       traceWide: 'Too much beside it — stay on the line.',
       traceScore: (hit, clean) => `${hit}% of the template covered, ${clean}% of your line sits on it.`,
+      cancel: 'cancel',
+      tileHelp: (word) => `${word} — tap to remove, drag or use the arrow keys to reorder`,
+      sentenceLabel: 'sentence',
+      pageTitle: 'o toki! — learn toki pona',
       phraseTitle: 'toki lon — everyday sentences',
       phraseHint: 'What people actually say. Tap a word to look it up.',
       phrasePractice: 'practise everyday sentences',
@@ -826,6 +834,9 @@
 
   function render() {
     hideGloss();
+    // Seitensprache mitführen: Vorlesehilfen und Browser richten sich danach.
+    document.documentElement.lang = state.lang;
+    document.title = t('pageTitle');
     app.innerHTML = '';
     if (session) { renderSession(); clearStrayFocus(); return; }
     if (reading) { app.append(readerScreen(reading)); clearStrayFocus(); return; }
@@ -1416,7 +1427,7 @@
 
     const head = el(`
       <div class="exbar">
-        <button aria-label="Abbrechen">✕</button>
+        <button aria-label="${escape(t('cancel'))}">✕</button>
         <span class="track"><i style="width:${(session.index / session.queue.length) * 100}%"></i></span>
         <span class="metric">✓ <b>${session.correct}</b></span>
       </div>`);
@@ -2139,7 +2150,7 @@
     const place = (id) => {
       const word = wordOf.get(id);
       const tile = el(`<button class="tile placed" data-word="${escape(word)}" data-id="${escape(id)}"
-        aria-label="${escape(word)} — antippen entfernt, ziehen oder Pfeiltasten sortieren um"
+        aria-label="${escape(t('tileHelp', word))}"
         >${escape(word)}</button>`);
       tile.addEventListener('pointerdown', (event) => grab(tile, event));
       tile.addEventListener('keydown', (event) => {
@@ -2642,7 +2653,7 @@
         <p>${escape(t('sandboxIntro'))}</p>
       </div>
       <input class="typed" autocomplete="off" autocapitalize="off" spellcheck="false"
-             value="jan suli li pana e lipu tawa mi." aria-label="Satz">
+             value="jan suli li pana e lipu tawa mi." aria-label="${escape(t('sentenceLabel'))}">
       <div class="result"></div>`);
 
     const input = screen.querySelector('.typed');
