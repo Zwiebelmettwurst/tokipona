@@ -48,37 +48,57 @@ TEMPLATE = """<title>o toki!</title>
 if ('serviceWorker' in navigator && window.self === window.top
     && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   (() => {
-    // Wurde die Seite schon von einem Service Worker bedient, dann bedeutet
-    // ein Wechsel: eine neue Fassung hat übernommen.
-    const wasControlled = Boolean(navigator.serviceWorker.controller);
+    // Ob es etwas Neues gibt, entscheidet nicht der Lebenslauf des Service
+    // Workers — der meldet sich auch beim ersten Einrichten —, sondern der
+    // Vergleich der Fassungsnummern: die der Seite gegen die des Workers.
+    const askWorker = () => new Promise((resolve) => {
+      const worker = navigator.serviceWorker.controller;
+      if (!worker) { resolve(null); return; }
+      const channel = new MessageChannel();
+      const giveUp = setTimeout(() => resolve(null), 2000);
+      channel.port1.onmessage = (event) => { clearTimeout(giveUp); resolve(event.data); };
+      try { worker.postMessage('version', [channel.port2]); } catch (error) { resolve(null); }
+    });
+
     let told = false;
-    const announce = () => {
-      if (!wasControlled || told) return;
+    const check = async () => {
+      if (told || !window.OTOKI_VERSION) return;
+      const live = await askWorker();
+      if (!live || live === window.OTOKI_VERSION) return;
       told = true;
+      // Beim zweiten Mal nicht noch einmal von selbst neu laden: sonst dreht
+      // sich die Seite im Kreis, falls der Server doch Altes ausliefert.
+      let again = false;
+      try {
+        again = sessionStorage.getItem('otoki-fassung') === live;
+        sessionStorage.setItem('otoki-fassung', live);
+      } catch (error) { /* ohne sessionStorage eben ohne Gedächtnis */ }
       // Die App entscheidet: mitten in einer Übung stört ein Neuladen.
-      if (typeof window.otokiUpdateReady === 'function') window.otokiUpdateReady();
-      else location.reload();
+      if (typeof window.otokiUpdateReady === 'function') window.otokiUpdateReady(!again);
+      else if (!again) location.reload();
     };
 
-    navigator.serviceWorker.addEventListener('controllerchange', announce);
+    navigator.serviceWorker.addEventListener('controllerchange', check);
 
     navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
       .then((registration) => {
         // Beim Start und bei jeder Rückkehr zur App nachsehen, ob es etwas
         // Neues gibt. iOS hält installierte Apps sonst tagelang eingefroren.
-        const look = () => { registration.update().catch(() => {}); };
+        const look = () => {
+          registration.update().catch(() => {});
+          setTimeout(check, 400);
+        };
         look();
         document.addEventListener('visibilitychange', () => {
           if (document.visibilityState === 'visible') look();
         });
         window.addEventListener('online', look);
 
-        if (registration.waiting) announce();
         registration.addEventListener('updatefound', () => {
           const fresh = registration.installing;
           if (!fresh) return;
           fresh.addEventListener('statechange', () => {
-            if (fresh.state === 'installed' || fresh.state === 'activated') announce();
+            if (fresh.state === 'activated') check();
           });
         });
       })

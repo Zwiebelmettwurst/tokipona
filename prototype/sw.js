@@ -50,7 +50,13 @@ self.addEventListener('fetch', (event) => {
   })());
 });
 
-// Die Seite kann eine wartende Fassung sofort übernehmen lassen.
 self.addEventListener('message', (event) => {
+  // Die Seite kann eine wartende Fassung sofort übernehmen lassen …
   if (event.data === 'skip-waiting') self.skipWaiting();
+  // … und nachfragen, welche Fassung hier gerade bedient wird. Der Vergleich
+  // mit der eigenen Nummer ist der einzige verlässliche Hinweis darauf, dass
+  // die angezeigte Seite veraltet ist.
+  if (event.data === 'version' && event.ports && event.ports[0]) {
+    event.ports[0].postMessage(VERSION);
+  }
 });
