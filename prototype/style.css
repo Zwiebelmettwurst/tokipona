@@ -1142,3 +1142,63 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 }
 .word .netopen::after { content: ""; position: absolute; inset: -0.5rem; }
 .word[data-open="true"] .netopen { color: var(--accent); border-color: var(--accent); }
+
+/* ------------------------------------------------------- Sprachkarte */
+.mapcard { margin-bottom: 0.9rem; }
+.wordmap {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(2.4rem, 1fr));
+  gap: 0.25rem;
+  margin-top: 0.7rem;
+}
+.wordmap .cell {
+  position: relative;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 0.4rem;
+  background: var(--surface);
+  color: var(--ink-faint);
+  overflow: hidden;
+}
+.wordmap .cell .sp { font-size: 1.4rem; line-height: 1; }
+.wordmap .cell small {
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  line-height: 1.1;
+  padding: 0 0.1rem;
+  overflow-wrap: anywhere;
+}
+.wordmap .cell[data-level="1"] { background: var(--sunk); color: var(--ink-dim); }
+.wordmap .cell[data-level="2"] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.wordmap .cell[data-level="3"] {
+  background: var(--gold-soft);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.maptally { margin-top: 0.6rem; }
+.maplegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.35rem;
+  font-size: 0.6875rem;
+  color: var(--ink-faint);
+}
+.maplegend span { display: inline-flex; align-items: center; gap: 0.3rem; }
+.maplegend i {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 0.2rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+.maplegend span[data-level="1"] i { background: var(--sunk); }
+.maplegend span[data-level="2"] i { background: var(--accent-soft); border-color: var(--accent); }
+.maplegend span[data-level="3"] i { background: var(--gold-soft); border-color: var(--gold); }
