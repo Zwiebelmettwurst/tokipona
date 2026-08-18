@@ -2,6 +2,7 @@
 //   node prototype/test.js
 
 const data = require('./data.js');
+const musi = require('./musi.js');
 const TokiPona = require('./tokipona.js');
 
 let failures = 0;
@@ -66,13 +67,62 @@ for (const [sentence] of data.corpus.invalid) {
   }
 }
 
-// 7. Satzröntgen
+// 7. Spaßmodus: jede Zeile muss sauber sein und in beiden Sprachen stehen
+const KINDS = Object.keys(musi.kinds);
+const ids = new Set();
+for (const line of musi.lines) {
+  check(!ids.has(line.id), `MUSI ${line.id}: doppelte Kennung`);
+  ids.add(line.id);
+  check(KINDS.includes(line.kind), `MUSI ${line.id}: unbekannte Sorte ${line.kind}`);
+  check(line.sting >= 1 && line.sting <= 3, `MUSI ${line.id}: Frechheit ausserhalb 1..3`);
+  const violations = TokiPona.splitUtterances(line.tp).flatMap((u) => TokiPona.parse(u).violations);
+  check(!violations.length,
+    `MUSI ${line.id}  ${line.tp} → ${violations.map((v) => v.rule).join(', ')}`);
+  for (const lang of Object.keys(data.languages)) {
+    check(Array.isArray(line[lang]) && line[lang].length && line[lang][0].trim(),
+      `MUSI ${line.id}: keine Bedeutung für ${lang}`);
+    check(line.lit && line.lit[lang] && line.lit[lang].trim(),
+      `MUSI ${line.id}: keine wörtliche Lesart für ${lang}`);
+  }
+  check(musi.intro.de && musi.intro.en, 'MUSI: Einleitung fehlt');
+}
+
+// 8. Bausätze: JEDE Kombination muss grammatisch sein — der Würfel darf
+//    keinen kaputten Satz ausspucken können.
+let combos = 0;
+for (const pattern of musi.patterns) {
+  for (const lang of Object.keys(data.languages)) {
+    check(typeof pattern.say[lang] === 'function', `MUSI ${pattern.id}: keine Lesart für ${lang}`);
+    check(pattern.name[lang], `MUSI ${pattern.id}: kein Name für ${lang}`);
+  }
+  const rows = pattern.slots.reduce(
+    (acc, slot) => acc.flatMap((prefix) => slot.map((option) => [...prefix, option])), [[]]);
+  for (const row of rows) {
+    combos += 1;
+    const sentence = pattern.frame
+      .replace('{a}', row[0][0])
+      .replace('{b}', row[1] ? row[1][0] : '');
+    const violations = TokiPona.parse(sentence).violations;
+    check(!violations.length,
+      `MUSI ${pattern.id}  ${sentence} → ${violations.map((v) => v.rule).join(', ')}`);
+    for (const option of row) {
+      check(option.length === 3 && option[1] && option[2],
+        `MUSI ${pattern.id}: Füllung „${option[0]}“ ohne beide Lesarten`);
+      for (const token of TokiPona.tokenize(option[0])) {
+        check(Boolean(TokiPona.lexicon[token.text]),
+          `MUSI ${pattern.id}: „${token.text}“ steht nicht im Lexikon`);
+      }
+    }
+  }
+}
+
+// 9. Satzröntgen
 const spans = TokiPona.xray(TokiPona.parse('jan suli li pana e lipu tawa mi.').utterance);
 check(JSON.stringify(spans.map((s) => s.role))
       === JSON.stringify(['subject', 'predicateMarker', 'verb', 'object', 'preposition', 'complement']),
       'Satzröntgen: ' + spans.map((s) => `${s.text}=${s.role}`).join(' '));
 
-// 8. Rollennamen: in jeder Sprache vorhanden, und wirklich übersetzt.
+// 10. Rollennamen: in jeder Sprache vorhanden, und wirklich übersetzt.
 // Auf Englisch ist die Beschriftung mit dem Schlüssel identisch — das ist
 // kein Fehler, deshalb prüft der Vergleich gegen die deutsche Fassung.
 for (const span of spans) {
@@ -89,5 +139,6 @@ check(TokiPona.roleLabel('predicateMarker', 'en') === 'predicate', 'englische Ro
 console.log(`Golden:  ${data.corpus.valid.length} gültige, ${data.corpus.invalid.length} fehlerhafte`);
 console.log(`Kurs:    ${externalOk}/${data.corpus.external.length} fehlerfrei`);
 console.log(`Import:  ${items} Musterlösungen in ${Object.keys(data.languages).length} Sprachen geprüft`);
+console.log(`musi:    ${musi.lines.length} Zeilen, ${combos} gewürfelte Sätze geprüft`);
 console.log(failures ? `\n✗ ${failures} Abweichung(en)` : '\n✓ alle Prüfungen bestanden');
 process.exit(failures ? 1 : 0);

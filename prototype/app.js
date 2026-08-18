@@ -2,7 +2,7 @@
 // bauen statt erkennen, sofortige Rückmeldung mit Satzröntgen, sichtbarer
 // Fortschritt — ohne Herzen und ohne Bestenliste.
 
-(function (DATA, TP) {
+(function (DATA, MUSI, TP) {
   const KEY = 'o-toki-fortschritt-v1';
   const GOAL = 40;
 
@@ -62,6 +62,17 @@
       backupApply: 'Diesen Stand übernehmen',
       summary: (lvl, lessons, cards, xp) => `Stufe ${lvl}, ${lessons} Lektionen, ${cards} Karten, ${xp} XP`,
       langLabel: 'sprache', langOther: 'English',
+      musiTab: 'musi', musiTitle: 'utala musi',
+      musiLead: 'Sticheln, kontern, Frieden schließen — mit 137 Wörtern und ohne ein '
+        + 'einziges Schimpfwort.',
+      musiStart: 'utala anfangen',
+      musiForgeTitle: 'nimi sin — frisch gebaut',
+      musiForgeHint: 'Ein Muster, viele Füllungen. Der Parser prüft jeden Wurf, '
+        + 'bevor er hier steht.',
+      musiForge: 'Noch einen', musiPattern: 'Muster',
+      musiSting: 'Frechheit', musiLiteral: 'wörtlich',
+      musiSection: (name, count) => `${name} · ${count}`,
+      musiPeace: 'Und danach: <i>mi musi taso</i> — war nur Spaß.',
       updateReady: 'Neue Fassung ist da.', updateLoad: 'Jetzt laden',
       versionLabel: (v) => `Fassung ${v}`,
       credit: (link) => `Prototyp. Übungssätze aus ${link} (MIT, © 2020 /dev/urandom `
@@ -120,6 +131,17 @@
       backupApply: 'Use this progress',
       summary: (lvl, lessons, cards, xp) => `level ${lvl}, ${lessons} lessons, ${cards} cards, ${xp} XP`,
       langLabel: 'language', langOther: 'Deutsch',
+      musiTab: 'musi', musiTitle: 'utala musi',
+      musiLead: 'Taunt, counter, make peace — with 137 words and not a single '
+        + 'swear word.',
+      musiStart: 'start the sparring',
+      musiForgeTitle: 'nimi sin — freshly built',
+      musiForgeHint: 'One pattern, many fillings. The parser checks every roll '
+        + 'before it lands here.',
+      musiForge: 'One more', musiPattern: 'pattern',
+      musiSting: 'cheek', musiLiteral: 'literally',
+      musiSection: (name, count) => `${name} · ${count}`,
+      musiPeace: 'And afterwards: <i>mi musi taso</i> — it was only play.',
       updateReady: 'A new version is here.', updateLoad: 'Load it now',
       versionLabel: (v) => `Version ${v}`,
       credit: (link) => `Prototype. Exercise sentences from ${link} (MIT, © 2020 /dev/urandom `
@@ -331,7 +353,7 @@
       const compound = COMPOUNDS[Number(rest)];
       return compound ? { type: 'compound', compound, lesson: lessons()[0], concepts: [] } : null;
     }
-    for (const lesson of lessons()) {
+    for (const lesson of lessons().concat([musiLesson()])) {
       const item = lesson.items.find((i) => i.id === rest);
       if (item) {
         return { type: item.direction === 'de_tp' ? 'build' : 'choose', item, lesson,
@@ -405,6 +427,52 @@
       xp: 0,
       retried: new Set(),
     };
+  }
+
+  // Der Spaßmodus sieht für die Übungsmaschine aus wie eine Lektion — Nummer
+  // 99, damit die Ablenkungswörter aus dem ganzen Kurs kommen dürfen.
+  let musiCache = null;
+  function musiLesson() {
+    if (musiCache && musiCache.lang === state.lang) return musiCache.lesson;
+    const lesson = {
+      number: 99,
+      musi: true,
+      title: t('musiTitle'),
+      note: '',
+      words: [...new Set(MUSI.lines
+        .flatMap((line) => TP.tokenize(line.tp).map((token) => token.text))
+        .filter((word) => TP.lexicon[word]))],
+      items: MUSI.lines.map((line) => ({
+        id: line.id,
+        direction: 'tp_de',
+        tp: line.tp,
+        also: [],
+        target: line[state.lang] || line.de,
+        kind: line.kind,
+        sting: line.sting,
+        lit: line.lit[state.lang] || line.lit.de,
+      })),
+    };
+    musiCache = { lang: state.lang, lesson };
+    return lesson;
+  }
+
+  function buildMusiSession() {
+    const lesson = musiLesson();
+    // Aus jeder Sorte etwas, damit die Runde nicht nur aus Sticheleien besteht.
+    const bySort = ['utala', 'utala', 'konter', 'wawa', 'pona'].map((kind) =>
+      shuffle(lesson.items.filter((item) => item.kind === kind))[0]).filter(Boolean);
+    const picks = [...new Set(bySort.concat(shuffle(lesson.items)))].slice(0, 6);
+    const tasks = shuffle(picks).map((item, index) => ({
+      type: index % 2 ? 'build' : 'choose', item, lesson, concepts: [],
+    }));
+    const flawed = brokenSentence(lesson);
+    if (flawed) {
+      tasks.splice(Math.min(3, tasks.length), 0,
+        { type: 'fix', flawed, lesson, concepts: [flawed.violation.concept].filter(Boolean) });
+    }
+    return { lesson, musi: true, queue: tasks, index: 0, correct: 0, total: 0, xp: 0,
+             retried: new Set() };
   }
 
   function buildReviewSession() {
@@ -494,6 +562,7 @@
     app.append(topbar());
     if (tab === 'pfad') app.append(pathScreen());
     else if (tab === 'nimi') app.append(wordScreen());
+    else if (tab === 'musi') app.append(musiScreen());
     else app.append(sandboxScreen());
     app.append(tabs());
     clearStrayFocus();
@@ -517,6 +586,7 @@
       <nav class="tabs">
         <button data-tab="pfad"><span class="glyph">◈</span>nasin</button>
         <button data-tab="nimi"><span class="glyph">◍</span>nimi</button>
+        <button data-tab="musi"><span class="glyph">◇</span>musi</button>
         <button data-tab="toki"><span class="glyph">◐</span>o toki</button>
       </nav>`);
     bar.querySelectorAll('button').forEach((button) => {
@@ -1379,7 +1449,9 @@
   function renderDone() {
     const lesson = session.lesson;
     const review = Boolean(session.review);
-    if (lesson) {
+    const musi = Boolean(session.musi);
+    // Der Spaßmodus hakt keine Lektion ab — der Kursfortschritt bleibt seiner.
+    if (lesson && !musi) {
       state.done[lesson.number] = true;
       lesson.words.forEach((word) => { state.seenWords[word] = true; });
     }
@@ -1389,11 +1461,12 @@
       <div class="screen done">
         <div class="burst">pona!</div>
         <h2>${escape(review ? t('reviewDone') : lesson.title)}</h2>
-        <p>${escape(review ? t('reviewNote') : lesson.note.replace(/<[^>]+>/g, ''))}</p>
+        <p>${escape(review ? t('reviewNote')
+          : (musi ? t('musiLead') : lesson.note.replace(/<[^>]+>/g, '')))}</p>
         <div class="tally">
           <div><b>+${session.xp}</b><span>${escape(t('xp'))}</span></div>
           <div><b>${session.correct}</b><span>${escape(t('correct'))}</span></div>
-          <div><b>${review ? session.queue.length : lesson.words.length}</b><span>${escape(t(review ? 'cards' : 'words'))}</span></div>
+          <div><b>${review || musi ? session.queue.length : lesson.words.length}</b><span>${escape(t(review || musi ? 'cards' : 'words'))}</span></div>
         </div>
         <div class="actions">
           <button class="primary">${escape(t('next'))}</button>
@@ -1401,12 +1474,101 @@
         </div>
       </div>`);
 
-    screen.querySelector('.primary').onclick = () => { session = null; tab = 'pfad'; render(); };
+    screen.querySelector('.primary').onclick = () => {
+      session = null;
+      tab = musi ? 'musi' : 'pfad';
+      render();
+    };
     if (!review) {
-      screen.querySelector('.ghost').onclick = () => { session = buildSession(lesson); render(); };
+      screen.querySelector('.ghost').onclick = () => {
+        session = musi ? buildMusiSession() : buildSession(lesson);
+        render();
+      };
     }
     app.append(topbar());
     app.append(screen);
+  }
+
+  // ------------------------------------------------------------ musi
+
+  // Würfelt aus einem Muster einen frischen Satz. Geprüft wird er vom selben
+  // Parser wie alles andere — was hier steht, ist garantiert grammatisch.
+  function forge() {
+    const column = state.lang === 'en' ? 2 : 1;
+    for (let tries = 0; tries < 30; tries += 1) {
+      const pattern = MUSI.patterns[Math.floor(Math.random() * MUSI.patterns.length)];
+      const picks = pattern.slots.map((slot) => slot[Math.floor(Math.random() * slot.length)]);
+      const tp = pattern.frame
+        .replace('{a}', picks[0][0])
+        .replace('{b}', picks[1] ? picks[1][0] : '');
+      if (TP.parse(tp).violations.length) continue;
+      const say = (pattern.say[state.lang] || pattern.say.de)(...picks.map((pick) => pick[column]));
+      return { tp, say, name: pattern.name[state.lang] || pattern.name.de };
+    }
+    return null;
+  }
+
+  const stingDots = (level) => '●'.repeat(level) + '○'.repeat(Math.max(0, 3 - level));
+
+  function musiScreen() {
+    const screen = screenWith(`
+      <div class="card">
+        <h2>${escape(t('musiTitle'))}</h2>
+        <p class="hint">${MUSI.intro[state.lang] || MUSI.intro.de}</p>
+        <div class="row"><button class="primary">${escape(t('musiStart'))}</button></div>
+      </div>`);
+    screen.querySelector('.primary').onclick = () => { session = buildMusiSession(); render(); };
+
+    const forgeCard = el(`
+      <div class="card">
+        <h2>${escape(t('musiForgeTitle'))}</h2>
+        <p class="hint">${escape(t('musiForgeHint'))}</p>
+        <div class="forged"></div>
+        <div class="row"><button class="ghost">${escape(t('musiForge'))}</button></div>
+      </div>`);
+    const box = forgeCard.querySelector('.forged');
+    const roll = () => {
+      const made = forge();
+      box.innerHTML = '';
+      if (!made) return;
+      const line = el('<p class="tp glossable"></p>');
+      line.append(glossed(made.tp, 'glossline'));
+      box.append(line);
+      box.append(el(`<p class="meaning">${escape(made.say)}</p>`));
+      box.append(el(`<p class="hint">${escape(t('musiPattern'))}: <code>${escape(made.name)}</code></p>`));
+    };
+    forgeCard.querySelector('.ghost').onclick = roll;
+    roll();
+    screen.append(forgeCard);
+
+    const items = musiLesson().items;
+    Object.keys(MUSI.kinds).forEach((kind) => {
+      const group = items.filter((item) => item.kind === kind);
+      if (!group.length) return;
+      const name = MUSI.kinds[kind][state.lang] || MUSI.kinds[kind].de;
+      const card = el(`
+        <div class="card">
+          <h2>${escape(t('musiSection', name, group.length))}</h2>
+          <div class="musilines"></div>
+        </div>`);
+      const list = card.querySelector('.musilines');
+      group.forEach((item) => {
+        const row = el(`<div class="musiline" data-kind="${escape(kind)}"></div>`);
+        const line = el('<p class="tp glossable"></p>');
+        line.append(glossed(item.tp, 'glossline'));
+        row.append(line);
+        row.append(el(`<p class="meaning">${escape(item.target[0])}</p>`));
+        row.append(el(`
+          <p class="hint">${escape(t('musiLiteral'))}: ${escape(item.lit)}
+            <span class="sting" title="${escape(t('musiSting'))}">${stingDots(item.sting)}</span>
+          </p>`));
+        list.append(row);
+      });
+      screen.append(card);
+    });
+
+    screen.append(el(`<p class="foot">${t('musiPeace')}</p>`));
+    return screen;
   }
 
   // ------------------------------------------------------------ Wörter
@@ -1516,4 +1678,4 @@
 
   render();
   probeGlyphs();
-})(TOKIPONA_DATA, TokiPona);
+})(TOKIPONA_DATA, TOKIPONA_MUSI, TokiPona);

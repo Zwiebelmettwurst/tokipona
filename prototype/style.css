@@ -748,3 +748,29 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 }
 
 .version { opacity: 0.75; }
+
+/* ---------------------------------------------------------------- musi */
+.musilines { display: flex; flex-direction: column; }
+.musiline { padding: 0.55rem 0; border-top: 1px solid var(--rule); }
+.musiline:first-child { border-top: 0; padding-top: 0.1rem; }
+.musiline p { margin: 0; }
+.musiline .tp,
+.forged .tp {
+  font-family: var(--mono);
+  color: var(--accent);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.musiline .meaning,
+.forged .meaning { font-size: 0.9375rem; margin-top: 0.1rem; }
+.musiline .hint,
+.forged .hint { font-size: 0.75rem; margin-top: 0.15rem; }
+.sting { color: var(--gold); letter-spacing: 0.08em; margin-left: 0.35rem; white-space: nowrap; }
+
+.forged {
+  border-left: 2px solid var(--accent-soft);
+  padding: 0.15rem 0 0.15rem 0.7rem;
+  margin-top: 0.6rem;
+}
+.forged .hint code { font-family: var(--mono); color: var(--ink-faint); }
