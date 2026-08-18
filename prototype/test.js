@@ -166,6 +166,30 @@ for (const match of appSource.matchAll(/(aria-label|placeholder|title)="([^"$][^
     `SPRACHE feste Beschriftung im Quelltext: ${match[1]}="${match[2]}"`);
 }
 
+// 8c. Namen nachsprechen: was herauskommt, muss die Lautlehre bestehen —
+//     bei jedem Namen, auch bei absurden.
+const NAMES = ['Klaus', 'Anna', 'Deutschland', 'Berlin', 'Christian', 'Zwiebelmettwurst',
+  'Jürgen', 'München', 'Sophie', 'Alexander', 'Max', 'Elisabeth', 'Wien', 'Zürich',
+  'New York', 'Schmidt', 'Öztürk', 'Nguyen', 'Xavier', 'Quentin', 'Yvonne', 'Bjørn',
+  'Kraków', 'Vladimir', 'Fatima', 'Giuseppe', 'José', 'Claude', 'Instagram', 'Playstation',
+  'Pizza', 'Espresso', 'Whatsapp', 'Wolfgang', 'Wuppertal', 'Tim', 'Titus', 'Jill',
+  'Toyota', 'Volvo', 'Uwe', 'Ute', 'Ole', 'Ida', 'Ai', 'Óscar', 'Łukasz'];
+for (const name of NAMES) {
+  const made = TokiPona.foreignName(name);
+  check(Boolean(made), `NAME ${name}: nichts herausgekommen`);
+  if (!made) continue;
+  for (const part of made.split(' ')) {
+    const trouble = TokiPona.phonoCheck(part.toLowerCase());
+    check(!trouble, `NAME ${name} → ${made}: ${trouble && trouble.kind} „${trouble && trouble.detail}“`);
+    check(/^[A-Z]/.test(part), `NAME ${name} → ${made}: nicht groß geschrieben`);
+    check(/^[A-Za-z]+$/.test(part), `NAME ${name} → ${made}: fremde Zeichen`);
+  }
+}
+check(TokiPona.foreignName('') === null, 'NAME: leere Eingabe ergibt etwas');
+check(TokiPona.foreignName('123') === null, 'NAME: Ziffern ergeben etwas');
+check(TokiPona.foreignName('Anna') === TokiPona.foreignName('anna'),
+  'NAME: Großschreibung ändert das Ergebnis');
+
 // 9. Offene Fragen: Frage, Beispielantworten und die geforderten Satzteile
 const roleSet = (text) => {
   const parts = TokiPona.splitUtterances(text);
@@ -380,6 +404,7 @@ console.log(`musi:    ${musi.lines.length} Zeilen, ${combos} gewürfelte Sätze 
 console.log(`offen:   ${open.prompts.length} Fragen, ${answers} Beispielantworten geprüft`);
 console.log(`fügen:   ${open.joins.length} Fügungen geprüft`);
 console.log(`alltag:  ${phrases} Sätze in ${open.phrases.length} Gruppen geprüft`);
+console.log(`namen:   ${NAMES.length} Namen nachgesprochen und lautlich geprüft`);
 console.log(`lesen:   ${lipu.texts.length} Texte, ${lines} Zeilen, `
   + `${lipu.texts.reduce((n, text) => n + text.questions.length, 0)} Fragen geprüft`);
 console.log(failures ? `\n✗ ${failures} Abweichung(en)` : '\n✓ alle Prüfungen bestanden');

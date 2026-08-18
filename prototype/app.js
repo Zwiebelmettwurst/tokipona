@@ -81,6 +81,22 @@
       tileHelp: (word) => `${word} — antippen entfernt, ziehen oder Pfeiltasten sortieren um`,
       sentenceLabel: 'Satz',
       pageTitle: 'o toki! — toki pona lernen',
+      askCoin: 'sag es ohne eigenes wort',
+      coinHint: 'Es gibt kein Wort dafür. Bau eins aus den Wörtern, die es gibt — '
+        + 'zwei oder drei reichen.',
+      coinGood: 'Geht — so kann man das sagen',
+      coinExact: 'Genau so sagt man es meistens',
+      coinUsual: (tp, lit) => `Verbreitet ist <code>${tp}</code> — wörtlich ${lit}.`,
+      coinThin: 'Ein Wort allein umschreibt noch nichts.',
+      unknownWords: (list) => `Kein toki-pona-Wort: ${list}`,
+      coinBroken: 'Als Wortgruppe geht das noch nicht auf.',
+      nameTitle: 'nimi sina — dein name auf toki pona',
+      nameHint: 'toki pona kennt vierzehn Buchstaben und nur Silben aus '
+        + '(K)V(n). Fremde Namen werden deshalb nicht übersetzt, sondern '
+        + 'nachgesprochen — und stehen immer hinter einem Kopfwort.',
+      namePlaceholder: 'Name oder Fremdwort',
+      nameHeads: { jan: 'Mensch', ma: 'Ort', toki: 'Sprache', ilo: 'Ding' },
+      nameEmpty: 'Schreib etwas hinein.',
       phraseTitle: 'toki lon — Sätze für draußen',
       phraseHint: 'Was man wirklich sagt. Tipp ein Wort an, um es nachzuschlagen.',
       phrasePractice: 'Alltagssätze üben',
@@ -214,6 +230,22 @@
       tileHelp: (word) => `${word} — tap to remove, drag or use the arrow keys to reorder`,
       sentenceLabel: 'sentence',
       pageTitle: 'o toki! — learn toki pona',
+      askCoin: 'say it without a word for it',
+      coinHint: 'There is no word for this. Build one from the words there are — '
+        + 'two or three will do.',
+      coinGood: 'Works — you can say it like that',
+      coinExact: 'That is exactly how it is usually said',
+      coinUsual: (tp, lit) => `The common one is <code>${tp}</code> — literally ${lit}.`,
+      coinThin: 'One word alone does not describe anything yet.',
+      unknownWords: (list) => `Not a toki pona word: ${list}`,
+      coinBroken: 'That does not add up as a phrase yet.',
+      nameTitle: 'nimi sina — your name in toki pona',
+      nameHint: 'toki pona has fourteen letters and only syllables of the '
+        + 'shape (C)V(n). Foreign names are therefore not translated but '
+        + 'echoed — and always follow a head word.',
+      namePlaceholder: 'name or foreign word',
+      nameHeads: { jan: 'person', ma: 'place', toki: 'language', ilo: 'thing' },
+      nameEmpty: 'Write something in there.',
       phraseTitle: 'toki lon — everyday sentences',
       phraseHint: 'What people actually say. Tap a word to look it up.',
       phrasePractice: 'practise everyday sentences',
@@ -350,6 +382,44 @@
       literal: { de: 'Mensch, der Wissen gibt', en: 'person who gives knowledge' } },
     { name: { de: 'Freund', en: 'Friend' }, tp: 'jan pona',
       literal: { de: 'guter Mensch', en: 'good person' } },
+    { name: { de: 'Fahrrad', en: 'Bicycle' }, tp: 'ilo tawa pi noka wawa',
+      literal: { de: 'Fahrgerät der starken Beine', en: 'moving tool of strong legs' } },
+    { name: { de: 'Zug', en: 'Train' }, tp: 'tomo tawa linja',
+      literal: { de: 'langgezogenes Fahrhaus', en: 'long moving house' } },
+    { name: { de: 'Flugzeug', en: 'Aeroplane' }, tp: 'tomo tawa sewi',
+      literal: { de: 'Fahrhaus in der Höhe', en: 'moving house up high' } },
+    { name: { de: 'Krankenhaus', en: 'Hospital' }, tp: 'tomo pi pona sijelo',
+      literal: { de: 'Haus der Körpergüte', en: 'house of body wellness' } },
+    { name: { de: 'Schule', en: 'School' }, tp: 'tomo pi pana sona',
+      literal: { de: 'Haus, das Wissen gibt', en: 'house that gives knowledge' } },
+    { name: { de: 'Bibliothek', en: 'Library' }, tp: 'tomo lipu',
+      literal: { de: 'Blätterhaus', en: 'document house' } },
+    { name: { de: 'Zahnbürste', en: 'Toothbrush' }, tp: 'ilo pi telo uta',
+      literal: { de: 'Gerät für das Mundwasser', en: 'tool for mouth water' } },
+    { name: { de: 'Handy', en: 'Phone' }, tp: 'ilo toki lili',
+      literal: { de: 'kleines Redegerät', en: 'small talking tool' } },
+    { name: { de: 'Rechner', en: 'Computer' }, tp: 'ilo nanpa',
+      literal: { de: 'Zahlengerät', en: 'number tool' } },
+    { name: { de: 'Uhr', en: 'Clock' }, tp: 'ilo tenpo',
+      literal: { de: 'Zeitgerät', en: 'time tool' } },
+    { name: { de: 'Brille', en: 'Glasses' }, tp: 'ilo lukin',
+      literal: { de: 'Sehgerät', en: 'seeing tool' } },
+    { name: { de: 'Schnee', en: 'Snow' }, tp: 'ko lete walo',
+      literal: { de: 'kalte weiße Masse', en: 'cold white stuff' } },
+    { name: { de: 'Regen', en: 'Rain' }, tp: 'telo sewi',
+      literal: { de: 'Wasser von oben', en: 'water from above' } },
+    { name: { de: 'Bier', en: 'Beer' }, tp: 'telo nasa pan',
+      literal: { de: 'wirres Kornwasser', en: 'strange grain water' } },
+    { name: { de: 'Käse', en: 'Cheese' }, tp: 'ko moku pi telo mama',
+      literal: { de: 'Essmasse aus Muttermilch', en: 'food stuff of mother water' } },
+    { name: { de: 'Katze', en: 'Cat' }, tp: 'soweli lili pi kalama musi',
+      literal: { de: 'kleines Tier mit lustigem Laut', en: 'small animal of funny sound' } },
+    { name: { de: 'Musik', en: 'Music' }, tp: 'kalama musi',
+      literal: { de: 'lustiger Klang', en: 'playful sound' } },
+    { name: { de: 'Zeitung', en: 'Newspaper' }, tp: 'lipu pi tenpo sin',
+      literal: { de: 'Blatt der neuen Zeit', en: 'document of new times' } },
+    { name: { de: 'Schlüssel', en: 'Key' }, tp: 'ilo pi open lupa',
+      literal: { de: 'Gerät zum Löcheröffnen', en: 'tool for opening the hole' } },
   ];
 
 
@@ -361,6 +431,7 @@
     done: {}, mastery: {}, seenWords: {}, srs: {},
     sitelen: false,
     sound: true,
+    nameHead: 'jan',
     lang: (navigator.language || 'de').toLowerCase().startsWith('de') ? 'de' : 'en',
   };
 
@@ -521,6 +592,10 @@
       return prompt ? { type: 'answer', prompt, lesson: lessonOf(prompt.stage) || lessons()[0],
                         concepts: [] } : null;
     }
+    if (kind === 'n') {
+      const compound = COMPOUNDS[Number(rest)];
+      return compound ? { type: 'coin', compound, lesson: lessons()[0], concepts: [] } : null;
+    }
     if (kind === 'c') {
       const compound = COMPOUNDS[Number(rest)];
       return compound ? { type: 'compound', compound, lesson: lessons()[0], concepts: [] } : null;
@@ -541,6 +616,7 @@
     if (task.type === 'trace') return 't:' + task.word;
     if (task.type === 'glyph') return 'g:' + task.word;
     if (task.type === 'word') return 'w:' + task.word;
+    if (task.type === 'coin') return 'n:' + COMPOUNDS.indexOf(task.compound);
     if (task.type === 'compound') return 'c:' + COMPOUNDS.indexOf(task.compound);
     if (task.item) return 's:' + task.item.id;
     return null;
@@ -675,7 +751,11 @@
     if (flawed) tasks.push({ type: 'fix', flawed, lesson, concepts: [flawed.violation.concept].filter(Boolean) });
 
     const compound = availableCompounds(lesson)[0];
-    if (compound) tasks.push({ type: 'compound', compound, lesson, concepts: [] });
+    if (compound) {
+      // Ab Lektion 4 wird nicht mehr nur erkannt, sondern selbst umschrieben.
+      const build = lesson.number >= 4 && lesson.number % 2 === 0;
+      tasks.push({ type: build ? 'coin' : 'compound', compound, lesson, concepts: [] });
+    }
 
     const glyphWord = words.find(hasGlyph);
     if (state.sitelen && glyphWord) {
@@ -1472,6 +1552,7 @@
     else if (task.type === 'answer') app.append(answerTask(task));
     else if (task.type === 'quiz') app.append(quizTask(task));
     else if (task.type === 'trace') app.append(traceTask(task));
+    else if (task.type === 'coin') app.append(coinTask(task));
     else app.append(freeTask(task));
   }
 
@@ -1842,6 +1923,72 @@
     }));
     return { lesson, musi: true, home: 'toki', restart: buildPhraseSession,
              queue: tasks, index: 0, correct: 0, total: 0, xp: 0, retried: new Set() };
+  }
+
+  // Umschreiben, aber selbst gebaut: für „Kaffee“ gibt es kein Wort, also
+  // muss eins entstehen. Richtig ist alles, was eine gültige Wortgruppe ist —
+  // danach zeigt die App, was die Sprechenden üblicherweise sagen.
+  function coinTask(task) {
+    const right = task.compound;
+    const screen = screenWith(`
+      <p class="prompt">${escape(t('askCoin'))}</p>
+      <h2 class="question">${escape(right.name[state.lang] || right.name.de)}</h2>
+      <input class="typed" autocomplete="off" autocapitalize="off" spellcheck="false"
+             placeholder="toki pona …" aria-label="toki pona">
+      <p class="live"></p>
+      <p class="hint">${escape(t('coinHint'))}</p>
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
+
+    const input = screen.querySelector('.typed');
+    const live = screen.querySelector('.live');
+    const button = screen.querySelector('.primary');
+
+    const judge = (text) => {
+      const words = TP.tokenize(text).filter((token) => token.word);
+      const unknown = TP.tokenize(text).filter((token) => !token.word && token.text);
+      if (unknown.length) return { ok: false, unknown: unknown.map((token) => token.text) };
+      if (words.length < 2) return { ok: false, thin: true };
+      const result = TP.parse(text);
+      if (!result.isValid) return { ok: false, violations: result.violations };
+      return { ok: true };
+    };
+
+    input.oninput = () => {
+      const text = input.value.trim();
+      button.disabled = !text;
+      const verdict = judge(text);
+      if (!text) { live.textContent = ''; live.className = 'live'; return; }
+      if (verdict.ok) {
+        live.textContent = t('structureLive');
+        live.className = 'live good';
+      } else {
+        live.textContent = '• ' + (verdict.violations ? say(verdict.violations[0])
+          : verdict.thin ? t('coinThin') : t('coinBroken'));
+        live.className = 'live bad';
+      }
+    };
+    input.onkeydown = (event) => { if (event.key === 'Enter' && !button.disabled) button.click(); };
+
+    button.onclick = () => {
+      const text = input.value.trim();
+      const verdict = judge(text);
+      const usual = TP.tokenize(right.tp).map((token) => token.text).join(' ');
+      const mine = TP.tokenize(text).map((token) => token.text).join(' ');
+      const exact = verdict.ok && mine === usual;
+      finish(task, verdict.ok, {
+        solution: right.tp,
+        speak: right.tp,
+        xray: verdict.ok ? text : right.tp,
+        xrayMine: verdict.ok,
+        coin: Object.assign({ exact }, verdict),
+        reason: verdict.ok && !exact
+          ? t('coinUsual', escape(right.tp), escape(right.literal[state.lang] || right.literal.de))
+          : (verdict.ok ? t('literally', escape(right.tp),
+              escape(right.literal[state.lang] || right.literal.de)) : null),
+      });
+    };
+    setTimeout(() => input.focus(), 50);
+    return screen;
   }
 
   // Frage zum gelesenen Text.
@@ -2427,7 +2574,8 @@
         <div class="verdict ${correct ? 'good' : 'bad'}">
           <span class="mark">${correct ? '✓' : '✕'}</span>
           <span>${escape(correct
-            ? (detail.open ? t('answerFree')
+            ? (detail.coin ? t(detail.coin.exact ? 'coinExact' : 'coinGood')
+              : detail.open ? t('answerFree')
               : detail.grade && detail.grade.order ? t('orderRight')
               : (detail.grade && detail.grade.variant ? t('variantRight') : t('good')))
             : t(nearMiss(detail) ? 'almost' : 'notYet'))}</span>
@@ -2441,6 +2589,11 @@
           ${escape(say(violation))}
           ${violation.correction ? `<br><code>→ ${escape(violation.correction)}</code>` : ''}
         </div>`));
+    } else if (detail.coin && !detail.coin.ok) {
+      sheet.append(el(`<p class="reason">${escape(detail.coin.violations
+        ? say(detail.coin.violations[0])
+        : detail.coin.unknown ? t('unknownWords', detail.coin.unknown.join(', '))
+          : detail.coin.thin ? t('coinThin') : t('coinBroken'))}</p>`));
     } else if (detail.open && !detail.open.ok) {
       const reason = detail.open.violations ? say(detail.open.violations[0])
         : detail.open.echo ? t('answerEcho')
@@ -2656,10 +2809,64 @@
     return map;
   }
 
+  // Namen und Fremdwörter nachsprechen — das kann nur eine App, die die
+  // Lautlehre kennt. Was hier herauskommt, besteht sie immer.
+  function nameCard() {
+    const heads = t('nameHeads');
+    const card = el(`
+      <div class="card namecard">
+        <h2>${escape(t('nameTitle'))}</h2>
+        <p class="hint">${escape(t('nameHint'))}</p>
+        <input class="typed nameinput" autocomplete="off" autocapitalize="words"
+               spellcheck="false" placeholder="${escape(t('namePlaceholder'))}"
+               aria-label="${escape(t('namePlaceholder'))}">
+        <div class="row heads"></div>
+        <p class="nameout"></p>
+      </div>`);
+
+    const input = card.querySelector('.nameinput');
+    const out = card.querySelector('.nameout');
+    const row = card.querySelector('.heads');
+    let head = state.nameHead && heads[state.nameHead] ? state.nameHead : 'jan';
+
+    const draw = () => {
+      out.innerHTML = '';
+      const made = TP.foreignName(input.value);
+      if (!made) {
+        out.append(el(`<span class="hint">${escape(t('nameEmpty'))}</span>`));
+        return;
+      }
+      const full = `${head} ${made}`;
+      const line = el('<span class="tp"></span>');
+      line.append(glossed(full, 'glossline'));
+      out.append(line);
+      withSay(out, full);
+    };
+
+    Object.keys(heads).forEach((word) => {
+      const chip = el(`<button class="ghost" data-picked="${word === head}">${escape(word)}
+        <small>${escape(heads[word])}</small></button>`);
+      chip.onclick = () => {
+        head = word;
+        state.nameHead = word;
+        save();
+        row.querySelectorAll('.ghost').forEach((b) => { b.dataset.picked = 'false'; });
+        chip.dataset.picked = 'true';
+        draw();
+      };
+      row.append(chip);
+    });
+
+    input.oninput = draw;
+    draw();
+    return card;
+  }
+
   function wordScreen() {
     const screen = screenWith(`
       <input class="search" placeholder="${escape(t('search'))}" aria-label="${escape(t('search'))}">
       <div class="words"></div>`);
+    screen.prepend(nameCard());
     const list = screen.querySelector('.words');
     const input = screen.querySelector('.search');
 

@@ -1011,3 +1011,36 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   color: var(--ink-faint);
 }
 .xraywrap .xray { margin-top: 0; }
+
+/* ------------------------------------------------- Namen nachsprechen */
+.namecard { margin-bottom: 0.9rem; }
+.namecard .nameinput { margin-top: 0.7rem; }
+.namecard .heads { flex-wrap: wrap; }
+.namecard .heads .ghost {
+  flex: 1 1 auto;
+  width: auto;           /* .ghost setzt sonst 100 % — dann bricht jede Wahl um */
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.4rem 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.875rem;
+}
+.namecard .heads .ghost small {
+  font-family: var(--sans);
+  font-size: 0.625rem;
+  color: var(--ink-faint);
+}
+.nameout {
+  margin: 0.8rem 0 0;
+  display: flex;
+  align-items: center;
+  min-height: 1.6rem;
+}
+.nameout .tp {
+  font-family: var(--mono);
+  font-size: 1.125rem;
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
