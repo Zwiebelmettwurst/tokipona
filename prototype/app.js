@@ -32,6 +32,12 @@
       good: 'pona!', notYet: 'Nicht ganz', almost: 'Fast',
       yourSentence: 'dein satz', modelSentence: 'so ist sie gebaut',
       variantRight: 'Richtig — andere Wortwahl, gleiche Aussage',
+      lookupOpen: 'Wörter nachschlagen', lookupClose: 'nachschlagen zu',
+      lookupSearch: 'Bedeutung oder Wort suchen',
+      lookupNone: 'Nichts gefunden.',
+      lookupTake: 'antippen setzt das Wort ein',
+      particleMissing: (word, help) => `Es fehlt ${word} — ${help}`,
+      particleExtra: (word, help) => `${word} ist hier zu viel — ${help}`,
       orderRight: 'Richtig — Beifügungen darfst du umstellen',
       orderNote: 'Beifügungen wirken der Reihe nach. Üblich ist die Reihenfolge unten — '
         + 'sie hält feste Fügungen zusammen.',
@@ -192,6 +198,12 @@
       good: 'pona!', notYet: 'Not quite', almost: 'Almost',
       yourSentence: 'your sentence', modelSentence: 'how it is built',
       variantRight: 'Correct — different words, same meaning',
+      lookupOpen: 'look words up', lookupClose: 'close the lookup',
+      lookupSearch: 'search a meaning or a word',
+      lookupNone: 'Nothing found.',
+      lookupTake: 'tap to drop the word in',
+      particleMissing: (word, help) => `${word} is missing — ${help}`,
+      particleExtra: (word, help) => `${word} is one too many — ${help}`,
       orderRight: 'Correct — modifiers may swap places',
       orderNote: 'Modifiers apply one after another. The order below is the usual one — '
         + 'it keeps set phrases together.',
@@ -1992,6 +2004,60 @@
              queue: tasks, index: 0, correct: 0, total: 0, xp: 0, retried: new Set() };
   }
 
+  // Beim Tippen braucht man das Wörterbuch griffbereit — sonst schreibt man
+  // nur, was man ohnehin schon weiß. Antippen setzt das Wort in die Zeile.
+  function lookupHelper(input) {
+    const box = el(`
+      <div class="lookup">
+        <button class="ghost lookuptoggle" type="button">${escape(t('lookupOpen'))}</button>
+        <div class="lookupbody" hidden>
+          <input class="search lookupsearch" autocomplete="off" spellcheck="false"
+                 placeholder="${escape(t('lookupSearch'))}"
+                 aria-label="${escape(t('lookupSearch'))}">
+          <div class="lookuphits"></div>
+          <p class="hint">${escape(t('lookupTake'))}</p>
+        </div>
+      </div>`);
+
+    const toggle = box.querySelector('.lookuptoggle');
+    const body = box.querySelector('.lookupbody');
+    const search = box.querySelector('.lookupsearch');
+    const hits = box.querySelector('.lookuphits');
+
+    const draw = () => {
+      const term = search.value.trim().toLowerCase();
+      hits.innerHTML = '';
+      const found = Object.keys(TP.lexicon).filter((word) => {
+        if (!term) return false;
+        if (word.includes(term)) return true;
+        return glossesOf(word).some((gloss) => gloss.toLowerCase().includes(term));
+      }).slice(0, 12);
+      if (!found.length) {
+        hits.append(el(`<p class="hint">${escape(term ? t('lookupNone') : '')}</p>`));
+        return;
+      }
+      found.forEach((word) => {
+        const chip = el(`<button class="hit" type="button"><b>${escape(word)}</b>
+          <span>${escape(glossesOf(word).slice(0, 2).join(', '))}</span></button>`);
+        chip.onclick = () => {
+          const text = input.value.trim();
+          input.value = (text ? text + ' ' : '') + word;
+          input.dispatchEvent(new Event('input'));
+          input.focus();
+        };
+        hits.append(chip);
+      });
+    };
+
+    toggle.onclick = () => {
+      body.hidden = !body.hidden;
+      toggle.textContent = t(body.hidden ? 'lookupOpen' : 'lookupClose');
+      if (!body.hidden) search.focus();
+    };
+    search.oninput = draw;
+    return box;
+  }
+
   // Umschreiben, aber selbst gebaut: für „Kaffee“ gibt es kein Wort, also
   // muss eins entstehen. Richtig ist alles, was eine gültige Wortgruppe ist —
   // danach zeigt die App, was die Sprechenden üblicherweise sagen.
@@ -2007,6 +2073,7 @@
       <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
 
     const input = screen.querySelector('.typed');
+    input.after(lookupHelper(input));
     const live = screen.querySelector('.live');
     const button = screen.querySelector('.primary');
 
@@ -2227,6 +2294,7 @@
     const input = screen.querySelector('.typed');
     const live = screen.querySelector('.live');
     const button = screen.querySelector('.primary');
+    input.after(lookupHelper(input));
 
     input.oninput = () => {
       const text = input.value.trim();
@@ -2558,6 +2626,7 @@
     const input = screen.querySelector('.typed');
     const live = screen.querySelector('.live');
     const button = screen.querySelector('.primary');
+    input.after(lookupHelper(input));
 
     input.oninput = () => {
       const text = input.value.trim();
@@ -2614,6 +2683,56 @@
       && mine.subject === model.object && mine.object === model.subject;
   }
 
+  // Die Teilchen tragen den Satzbau. Fehlt eins, ist das die Erklärung —
+  // und nicht „irgendwas an der Stellung“.
+  const PARTICLE_HELP = {
+    de: {
+      li: 'li trennt Subjekt und Prädikat.',
+      e: 'e kündigt das Objekt an.',
+      la: 'la stellt den Rahmen voran.',
+      pi: 'pi gruppiert mehrwortige Beifügungen um.',
+      o: 'o macht daraus Anrede oder Aufforderung.',
+      en: 'en verbindet zwei Subjekte.',
+      anu: 'anu stellt zur Wahl.',
+    },
+    en: {
+      li: 'li separates subject and predicate.',
+      e: 'e announces the object.',
+      la: 'la fronts the context.',
+      pi: 'pi regroups modifiers of two or more words.',
+      o: 'o turns it into an address or a command.',
+      en: 'en joins two subjects.',
+      anu: 'anu offers a choice.',
+    },
+  };
+  const particleHelp = (word) => (PARTICLE_HELP[state.lang] || PARTICLE_HELP.de)[word] || '';
+
+  // Welche Teilchen fehlen, welche sind zu viel? Verglichen wird als Menge,
+  // damit die Reihenfolge hier nichts verwischt.
+  function particleGap(answer, solution) {
+    const bag = (text) => {
+      const counts = {};
+      for (const token of TP.tokenize(text)) {
+        if (!token.word) continue;
+        counts[token.text] = (counts[token.text] || 0) + 1;
+      }
+      return counts;
+    };
+    const mine = bag(answer);
+    const model = bag(solution);
+    const missing = [];
+    const extra = [];
+    for (const word of new Set([...Object.keys(mine), ...Object.keys(model)])) {
+      const diff = (model[word] || 0) - (mine[word] || 0);
+      for (let i = 0; i < diff; i += 1) missing.push(word);
+      for (let i = 0; i < -diff; i += 1) extra.push(word);
+    }
+    const isParticle = (word) => Boolean(PARTICLE_HELP.de[word]);
+    if (!missing.length && !extra.length) return null;
+    if (!missing.every(isParticle) || !extra.every(isParticle)) return null;
+    return { missing, extra };
+  }
+
   function grade(answer, item) {
     const normalise = (text) => TP.tokenize(text).map((t) => t.text).join(' ');
     const accepted = [item.tp, ...item.also].map(normalise);
@@ -2638,6 +2757,15 @@
       .map((t) => t.text);
     const mine = new Set(TP.tokenize(answer).map((t) => t.text));
     const missing = content.filter((word) => !mine.has(word));
+
+    // Es hängt nur an einem Teilchen? Dann sagen wir genau das.
+    for (const solution of [item.tp, ...item.also]) {
+      const gap = particleGap(answer, solution);
+      if (gap) {
+        return { correct: false, exact: false, violations: [], utterance: result.utterance,
+                 particles: gap };
+      }
+    }
 
     if (!missing.length) {
       // Alle Wörter da heißt noch nicht dasselbe gesagt: wer Subjekt und
@@ -2719,17 +2847,26 @@
 
   // Ein beschriftetes Satzröntgen. Ohne Beschriftung weiß niemand, ob da der
   // eigene Satz steht oder die Musterlösung.
-  function xrayBlock(text, label) {
+  const spanKey = (span) => `${span.text}|${span.role}`;
+
+  function xrayBlock(text, label, otherKeys) {
     const spans = TP.xray(TP.parse(text).utterance);
     if (!spans.length) return null;
     const box = el('<div class="xraywrap"></div>');
     if (label) box.append(el(`<p class="xraylabel">${escape(label)}</p>`));
     box.append(el(`<div class="xray">${spans.map((span) => `
-      <span class="span" data-role="${escape(span.role)}">
+      <span class="span" data-role="${escape(span.role)}"
+        data-diff="${otherKeys ? String(!otherKeys.has(spanKey(span))) : 'false'}">
         <b>${escape(span.text)}</b><i>${escape(TP.roleLabel(span.role, state.lang))}</i>
       </span>`).join('')}</div>`));
     return box;
   }
+
+  // Was steht im einen Satz, aber nicht im anderen? Genau das wird markiert.
+  const spanKeys = (text) => {
+    const parsed = TP.parse(text);
+    return new Set(TP.xray(parsed.utterance).map(spanKey));
+  };
 
   function showSheet(correct, detail) {
     // Die Aufgabe ist beantwortet: „Prüfen“ hat seinen Zweck erfüllt und
@@ -2773,6 +2910,13 @@
           : detail.open.missing ? t('answerMissing', detail.open.missing.map(needLabel).join(' + '))
             : t('answerEmpty');
       sheet.append(el(`<p class="reason">${reason}</p>`));
+    } else if (detail.grade && detail.grade.particles) {
+      const gap = detail.grade.particles;
+      const lines = gap.missing.map((word) =>
+        t('particleMissing', `<code>${escape(word)}</code>`, escape(particleHelp(word))))
+        .concat(gap.extra.map((word) =>
+          t('particleExtra', `<code>${escape(word)}</code>`, escape(particleHelp(word)))));
+      sheet.append(el(`<p class="reason">${lines.join('<br>')}</p>`));
     } else if (detail.grade && detail.grade.order) {
       sheet.append(el(`<p class="reason">${escape(t('orderNote'))}</p>`));
     } else if (detail.grade && detail.grade.variant && !correct) {
@@ -2787,8 +2931,10 @@
 
     // Der eigene Satz zuerst — er ist der, über den gerade nachgedacht wird.
     const model = detail.speak && detail.speak !== detail.xray ? detail.speak : null;
+    const compare = Boolean(detail.xrayMine && model && !correct);
     if (detail.xray) {
-      const block = xrayBlock(detail.xray, detail.xrayMine ? t('yourSentence') : null);
+      const block = xrayBlock(detail.xray, detail.xrayMine ? t('yourSentence') : null,
+        compare ? spanKeys(model) : null);
       if (block) sheet.append(block);
     }
 
@@ -2799,7 +2945,8 @@
       sheet.append(line);
       // … und daneben, wie die Musterlösung gebaut ist.
       if (detail.xrayMine && model) {
-        const block = xrayBlock(model, t('modelSentence'));
+        const block = xrayBlock(model, t('modelSentence'),
+          compare ? spanKeys(detail.xray) : null);
         if (block) sheet.append(block);
       }
     }
