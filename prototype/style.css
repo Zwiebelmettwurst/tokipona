@@ -813,3 +813,10 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 }
 .playbox .play:active { transform: scale(0.96); }
 .playbox .hint { margin: 0; }
+
+/* Offene Frage: die Übersetzung unter der toki-pona-Frage */
+.ask {
+  margin: 0.15rem 0 0.9rem;
+  color: var(--ink-dim);
+  font-size: 0.9375rem;
+}

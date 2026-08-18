@@ -2,7 +2,7 @@
 // bauen statt erkennen, sofortige Rückmeldung mit Satzröntgen, sichtbarer
 // Fortschritt — ohne Herzen und ohne Bestenliste.
 
-(function (DATA, MUSI, TP) {
+(function (DATA, MUSI, OPEN, TP) {
   const KEY = 'o-toki-fortschritt-v1';
   const GOAL = 40;
 
@@ -66,6 +66,14 @@
       backupApply: 'Diesen Stand übernehmen',
       summary: (lvl, lessons, cards, xp) => `Stufe ${lvl}, ${lessons} Lektionen, ${cards} Karten, ${xp} XP`,
       langLabel: 'sprache', langOther: 'English',
+      askAnswer: 'antworte frei',
+      answerHint: 'Deine Antwort, dein Satz. Geprüft wird der Bau.',
+      answerNeeds: (what) => `Die Antwort braucht ${what}.`,
+      answerMissing: (what) => `Da fehlt noch ${what}.`,
+      answerEcho: 'Das ist die Frage selbst — antworte darauf.',
+      answerFree: 'Richtig gebaut — und deine eigene Antwort',
+      answerAlso: 'So hätten es andere gesagt:',
+      answerEmpty: 'Ein Wort reicht noch nicht.',
       listen: 'anhören', listenAgain: 'nochmal hören',
       askListen: 'was hörst du?',
       soundTitle: 'aussprache',
@@ -148,6 +156,14 @@
       backupApply: 'Use this progress',
       summary: (lvl, lessons, cards, xp) => `level ${lvl}, ${lessons} lessons, ${cards} cards, ${xp} XP`,
       langLabel: 'language', langOther: 'Deutsch',
+      askAnswer: 'answer freely',
+      answerHint: 'Your answer, your sentence. What gets checked is the build.',
+      answerNeeds: (what) => `The answer needs ${what}.`,
+      answerMissing: (what) => `Still missing: ${what}.`,
+      answerEcho: 'That is the question itself — answer it.',
+      answerFree: 'Well built — and your own answer',
+      answerAlso: 'Others would have said:',
+      answerEmpty: 'One word is not enough yet.',
       listen: 'listen', listenAgain: 'play again',
       askListen: 'what do you hear?',
       soundTitle: 'pronunciation',
@@ -375,6 +391,11 @@
       return TP.lexicon[rest] && hasGlyph(rest)
         ? { type: 'glyph', word: rest, lesson, concepts: [] } : null;
     }
+    if (kind === 'q') {
+      const prompt = OPEN.prompts.find((entry) => entry.id === rest);
+      return prompt ? { type: 'answer', prompt, lesson: lessonOf(prompt.stage) || lessons()[0],
+                        concepts: [] } : null;
+    }
     if (kind === 'c') {
       const compound = COMPOUNDS[Number(rest)];
       return compound ? { type: 'compound', compound, lesson: lessons()[0], concepts: [] } : null;
@@ -390,6 +411,7 @@
   }
 
   function keyOf(task) {
+    if (task.type === 'answer') return 'q:' + task.prompt.id;
     if (task.type === 'glyph') return 'g:' + task.word;
     if (task.type === 'word') return 'w:' + task.word;
     if (task.type === 'compound') return 'c:' + COMPOUNDS.indexOf(task.compound);
@@ -509,7 +531,13 @@
       tasks.push({ type: 'listen', item: heard, lesson, concepts: lessonConcepts(lesson) });
     }
 
-    if (builds[3]) tasks.push({ type: 'free', item: builds[3], lesson, concepts: lessonConcepts(lesson) });
+    // Eine offene Frage ersetzt das freie Übersetzen: beides ist Tippen, aber
+    // die eigene Antwort ist die interessantere Übung.
+    const prompt = shuffle(OPEN.prompts.filter((entry) => entry.stage <= lesson.number))[0];
+    if (prompt) tasks.push({ type: 'answer', prompt, lesson, concepts: lessonConcepts(lesson) });
+    else if (builds[3]) {
+      tasks.push({ type: 'free', item: builds[3], lesson, concepts: lessonConcepts(lesson) });
+    }
 
     return {
       lesson,
@@ -1050,6 +1078,7 @@
     else if (task.type === 'compound') app.append(compoundTask(task));
     else if (task.type === 'glyph') app.append(glyphTask(task));
     else if (task.type === 'listen') app.append(listenTask(task));
+    else if (task.type === 'answer') app.append(answerTask(task));
     else app.append(freeTask(task));
   }
 
@@ -1183,6 +1212,62 @@
       speak: task.item.tp,
       xray: task.item.tp,
     });
+    return screen;
+  }
+
+  // Offene Frage: eine Antwort, die es so noch nicht gibt.
+  function answerTask(task) {
+    const prompt = task.prompt;
+    const needs = (prompt.need || []).map(needLabel).join(' + ');
+
+    const screen = screenWith(`
+      <p class="prompt">${escape(t('askAnswer'))}</p>
+      <h2 class="question tp glossable"></h2>
+      <p class="ask">${escape((prompt[state.lang] || prompt.de)[0])}</p>
+      <input class="typed" autocomplete="off" autocapitalize="off" spellcheck="false"
+             placeholder="toki pona …" aria-label="toki pona">
+      <p class="live"></p>
+      <p class="hint">${needs ? t('answerNeeds', needs) : escape(t('answerHint'))}</p>
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
+
+    const asked = screen.querySelector('.question');
+    asked.append(glossed(prompt.tp, 'glossline'));
+    withSay(asked, prompt.tp);
+
+    const input = screen.querySelector('.typed');
+    const live = screen.querySelector('.live');
+    const button = screen.querySelector('.primary');
+
+    input.oninput = () => {
+      const text = input.value.trim();
+      button.disabled = !text;
+      if (!text) { live.textContent = ''; live.className = 'live'; return; }
+      const result = TP.parse(TP.splitUtterances(text)[0] || text);
+      if (result.isValid) {
+        live.textContent = t('structureLive');
+        live.className = 'live good';
+      } else {
+        live.textContent = '• ' + say(result.violations[0]);
+        live.className = 'live bad';
+      }
+    };
+    input.onkeydown = (event) => { if (event.key === 'Enter' && !button.disabled) button.click(); };
+
+    button.onclick = () => {
+      const text = input.value.trim();
+      const verdict = gradeAnswer(text, prompt);
+      const models = prompt.models.slice(0, 2).join('  ·  ');
+      finish(task, verdict.ok, {
+        solution: prompt.models[0],
+        speak: prompt.models[0],
+        xray: verdict.ok ? text : prompt.models[0],
+        open: verdict,
+        reason: verdict.ok
+          ? `${escape(t('answerAlso'))} <code>${escape(models)}</code>`
+          : null,
+      });
+    };
+    setTimeout(() => input.focus(), 50);
     return screen;
   }
 
@@ -1512,6 +1597,27 @@
 
   // Schichten aus Plan, Abschnitt 6: normalisieren, strukturell parsen,
   // gegen Musterlösung und Pflichtbausteine abgleichen.
+  // Steht auf beiden Seiten dasselbe, nur als Subjekt statt als Objekt?
+  // „soweli li moku e jan“ ist nicht „jan li moku e soweli“.
+  function swappedRoles(a, b) {
+    const heads = (text) => {
+      const result = TP.parse(text);
+      if (!result.isValid || !result.utterance) return null;
+      const spans = TP.xray(result.utterance);
+      const first = (role) => {
+        const span = spans.find((s) => s.role === role);
+        return span ? span.text.split(/\s+/)[0] : null;
+      };
+      return { subject: first('subject'), object: first('object') };
+    };
+    const mine = heads(a);
+    const model = heads(b);
+    if (!mine || !model) return false;
+    if (!mine.subject || !mine.object || !model.subject || !model.object) return false;
+    return mine.subject !== model.subject
+      && mine.subject === model.object && mine.object === model.subject;
+  }
+
   function grade(answer, item) {
     const normalise = (text) => TP.tokenize(text).map((t) => t.text).join(' ');
     const accepted = [item.tp, ...item.also].map(normalise);
@@ -1538,6 +1644,12 @@
     const missing = content.filter((word) => !mine.has(word));
 
     if (!missing.length) {
+      // Alle Wörter da heißt noch nicht dasselbe gesagt: wer Subjekt und
+      // Objekt vertauscht, dreht die Aussage um.
+      if ([item.tp, ...item.also].some((solution) => swappedRoles(answer, solution))) {
+        return { correct: false, exact: false, variant: true, violations: [],
+                 utterance: result.utterance };
+      }
       return { correct: true, exact: false, variant: true, violations: [], utterance: result.utterance };
     }
     return {
@@ -1545,6 +1657,39 @@
       missing,
     };
   }
+
+  // Freie Antwort: hier gibt es keine Musterlösung. Geprüft wird, was der
+  // Parser wirklich weiß — Bau in Ordnung, und die Satzteile da, nach denen
+  // gefragt war.
+  function gradeAnswer(text, prompt) {
+    const utterances = TP.splitUtterances(text).filter((part) => part.trim());
+    if (!utterances.length) return { ok: false, empty: true };
+
+    const violations = [];
+    const roles = new Set();
+    for (const part of utterances) {
+      const result = TP.parse(part);
+      violations.push(...result.violations);
+      TP.xray(result.utterance).forEach((span) => roles.add(span.role));
+    }
+    if (violations.length) return { ok: false, violations };
+
+    const words = TP.tokenize(text).filter((token) => token.word
+      && !token.word.roles.includes('particle'));
+    if (words.length < 2) return { ok: false, thin: true };
+
+    const norm = (value) => TP.tokenize(value).map((token) => token.text).join(' ');
+    if (norm(text) === norm(prompt.tp)) return { ok: false, echo: true };
+
+    const missing = (prompt.need || []).filter((role) => !roles.has(role));
+    if (missing.length) return { ok: false, missing };
+    return { ok: true };
+  }
+
+  const needLabel = (role) => {
+    const entry = OPEN.needs[role];
+    return entry ? (entry[state.lang] || entry.de) : role;
+  };
 
   function finish(task, correct, detail) {
     session.total += 1;
@@ -1585,7 +1730,8 @@
         <div class="verdict ${correct ? 'good' : 'bad'}">
           <span class="mark">${correct ? '✓' : '✕'}</span>
           <span>${escape(correct
-            ? (detail.grade && detail.grade.order ? t('orderRight')
+            ? (detail.open ? t('answerFree')
+              : detail.grade && detail.grade.order ? t('orderRight')
               : (detail.grade && detail.grade.variant ? t('variantRight') : t('good')))
             : t('notYet'))}</span>
         </div>
@@ -1598,6 +1744,12 @@
           ${escape(say(violation))}
           ${violation.correction ? `<br><code>→ ${escape(violation.correction)}</code>` : ''}
         </div>`));
+    } else if (detail.open && !detail.open.ok) {
+      const reason = detail.open.violations ? say(detail.open.violations[0])
+        : detail.open.echo ? t('answerEcho')
+          : detail.open.missing ? t('answerMissing', detail.open.missing.map(needLabel).join(' + '))
+            : t('answerEmpty');
+      sheet.append(el(`<p class="reason">${reason}</p>`));
     } else if (detail.grade && detail.grade.order) {
       sheet.append(el(`<p class="reason">${escape(t('orderNote'))}</p>`));
     } else if (detail.grade && detail.grade.variant && !correct) {
@@ -1610,7 +1762,7 @@
       sheet.append(el(`<p class="reason">${detail.reason}</p>`));
     }
 
-    if (!correct || (detail.grade && (detail.grade.variant || detail.grade.order))) {
+    if ((!correct && !detail.open) || (detail.grade && (detail.grade.variant || detail.grade.order))) {
       const line = el(`<p class="reason">${escape(t('model'))} </p>`);
       line.append(glossed(detail.solution, 'solution'));
       if (detail.speak) withSay(line, detail.speak);
@@ -1873,4 +2025,4 @@
 
   render();
   probeGlyphs();
-})(TOKIPONA_DATA, TOKIPONA_MUSI, TokiPona);
+})(TOKIPONA_DATA, TOKIPONA_MUSI, TOKIPONA_TOKI, TokiPona);
