@@ -5,6 +5,7 @@ const data = require('./data.js');
 const musi = require('./musi.js');
 const open = require('./toki.js');
 const lipu = require('./lipu.js');
+const fs = require('fs');
 const TokiPona = require('./tokipona.js');
 
 let failures = 0;
@@ -116,6 +117,53 @@ for (const pattern of musi.patterns) {
       }
     }
   }
+}
+
+// 8b. Zweisprachigkeit der Oberfläche: beide Tabellen tragen dieselben
+//     Schlüssel, und keine Beschriftung steht fest in einer Sprache im Code.
+const appSource = fs.readFileSync(`${__dirname}/app.js`, 'utf8');
+const inner = (marker) => {
+  const start = appSource.indexOf(marker);
+  if (start < 0) return '';
+  let depth = 1;
+  let index = start + marker.length;
+  while (depth > 0 && index < appSource.length) {
+    if (appSource[index] === '{') depth += 1;
+    else if (appSource[index] === '}') depth -= 1;
+    index += 1;
+  }
+  return appSource.slice(start + marker.length, index - 1);
+};
+const topKeys = (block) => {
+  const found = [];
+  let depth = 0;
+  for (const line of block.split('\n')) {
+    if (depth === 0) {
+      const match = line.trim().match(/^([A-Za-z_][A-Za-z0-9_]*)\s*:/);
+      if (match) found.push(match[1]);
+    }
+    depth += (line.match(/[{[]/g) || []).length - (line.match(/[}\]]/g) || []).length;
+  }
+  return found;
+};
+for (const table of ['const T = {', 'const CONCEPT_LABELS = {']) {
+  const block = inner(table);
+  const german = topKeys(inner.call(null, 'de: {') && block.slice(block.indexOf('de: {') + 5,
+    block.indexOf('en: {')));
+  const english = topKeys(block.slice(block.indexOf('en: {') + 5));
+  check(german.length > 0 && english.length > 0, `${table}: Tabellen nicht gefunden`);
+  for (const key of german) {
+    check(english.includes(key), `SPRACHE ${table} „${key}“ fehlt auf Englisch`);
+  }
+  for (const key of english) {
+    check(german.includes(key), `SPRACHE ${table} „${key}“ fehlt auf Deutsch`);
+  }
+}
+// Beschriftungen kommen aus der Tabelle, nicht aus dem Quelltext. Die einzige
+// Ausnahme ist „toki pona“ selbst — das heißt in jeder Sprache so.
+for (const match of appSource.matchAll(/(aria-label|placeholder|title)="([^"$][^"]*)"/g)) {
+  check(match[2].replace(/[\s…]+$/, '') === 'toki pona',
+    `SPRACHE feste Beschriftung im Quelltext: ${match[1]}="${match[2]}"`);
 }
 
 // 9. Offene Fragen: Frage, Beispielantworten und die geforderten Satzteile

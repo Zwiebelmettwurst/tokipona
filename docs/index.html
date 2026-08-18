@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" data-lang="de">
 <head>
 <meta charset="utf-8">
 <title>o toki! — toki pona lernen</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Prototyp und Produktplan einer App, die toki pona über Satzbau lehrt statt über Vokabellisten.">
+<meta name="description" content="Prototyp und Produktplan einer App, die toki pona über Satzbau lehrt statt über Vokabellisten. · Prototype and product plan of an app that teaches toki pona through sentence building.">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <link rel="icon" href="./icon-192.png">
@@ -168,9 +168,30 @@
     line-height: 1.7;
   }
   footer a { color: var(--ink-faint); }
+
+  /* Zweisprachig: es steht immer nur eine Fassung im Bild. */
+  html[data-lang="de"] [lang="en"],
+  html[data-lang="en"] [lang="de"] { display: none; }
+
+  .langswitch {
+    position: absolute;
+    top: 1.4rem;
+    right: 1.4rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+  }
+  .langswitch button {
+    border: 1px solid var(--rule-strong);
+    border-radius: 0.4rem;
+    background: none;
+    color: var(--ink-faint);
+    font: inherit;
+    padding: 0.25rem 0.6rem;
+  }
 </style>
 </head>
 <body>
+<div class="langswitch"><button type="button" id="lang">English</button></div>
 <div class="wrap">
 
   <div class="alphabet">
@@ -178,61 +199,136 @@
   </div>
 
   <h1>o toki!</h1>
-  <p class="standfirst">
+  <p class="standfirst" lang="de">
     Eine App, die toki pona über Satzbau lehrt statt über Vokabellisten —
     mit einem Parser, der jeden Satz wirklich versteht und erklärt, was daran
     nicht stimmt.
   </p>
+  <p class="standfirst" lang="en">
+    An app that teaches toki pona through sentence building rather than word
+    lists — with a parser that really reads every sentence and explains what is
+    off about it.
+  </p>
 
   <div class="cards">
     <a class="card primary" href="./prototype.html">
-      <b>Prototyp öffnen</b>
-      <span>Zwölf Lektionen, Wiederholungssystem, Sandkasten. Läuft offline.</span>
+      <b lang="de">Prototyp öffnen</b>
+      <b lang="en">Open the prototype</b>
+      <span lang="de">Zwölf Lektionen, Lesestrecke, Aussprache, Wiederholung. Läuft offline.</span>
+      <span lang="en">Twelve lessons, reading texts, pronunciation, review. Works offline.</span>
     </a>
     <a class="card" href="./lipu-sona-plan.html">
-      <b>Produktplan lesen</b>
-      <span>Curriculum, Übungstypen, Architektur, Roadmap — 18 Abschnitte.</span>
+      <b lang="de">Produktplan lesen</b>
+      <b lang="en">Read the product plan</b>
+      <span lang="de">Curriculum, Übungstypen, Architektur, Roadmap — 18 Abschnitte, auf Deutsch.</span>
+      <span lang="en">Curriculum, exercise types, architecture, roadmap — 18 sections, in German.</span>
     </a>
   </div>
 
-  <h2>auf dem handy installieren</h2>
-  <ol>
+  <h2 lang="de">auf dem handy installieren</h2>
+  <h2 lang="en">install it on your phone</h2>
+  <ol lang="de">
     <li><b>iPhone:</b> in Safari öffnen → Teilen-Symbol → <i>Zum Home-Bildschirm</i>.</li>
     <li><b>Android:</b> in Chrome öffnen → Menü → <i>App installieren</i>.</li>
   </ol>
-  <p>
+  <ol lang="en">
+    <li><b>iPhone:</b> open in Safari → share icon → <i>Add to Home Screen</i>.</li>
+    <li><b>Android:</b> open in Chrome → menu → <i>Install app</i>.</li>
+  </ol>
+  <p lang="de">
     Danach startet sie wie eine App, ohne Browserleiste, und funktioniert ohne Netz.
     Der Fortschritt liegt auf dem Gerät — kein Konto, keine Übertragung.
+    Die Oberfläche gibt es auf Deutsch und Englisch; umschalten lässt sie sich im Lernpfad.
+  </p>
+  <p lang="en">
+    After that it starts like an app, without a browser bar, and works without a
+    network. Progress stays on the device — no account, nothing transmitted.
+    The interface comes in German and English; switch it on the learning path.
   </p>
 
-  <h2>was der prototyp kann</h2>
-  <ul>
+  <h2 lang="de">was der prototyp kann</h2>
+  <h2 lang="en">what the prototype does</h2>
+  <ul lang="de">
     <li><b>Sätze bauen</b> statt Antworten erkennen — Wortkacheln, nicht Multiple Choice.</li>
     <li><b>Satzröntgen</b> nach jeder Antwort: welches Wort welche Rolle trägt.</li>
     <li><b>Fehlersuche</b> aus richtigen Sätzen erzeugt und vom Parser geprüft.</li>
-    <li><b>Umschreiben</b> — <span class="tp">tomo tawa</span> für Auto, <span class="tp">telo pimeja wawa</span> für Kaffee.</li>
-    <li><b>Freies Tippen</b> mit Prüfung im Tippen; andere Wortwahl ist erlaubt.</li>
+    <li><b>Freies Antworten</b> auf offene Fragen — geprüft wird der Bau, nicht der Wortlaut.</li>
+    <li><b>Lesen am Stück:</b> zehn Texte, Wörter antippbar, Übersetzung erst auf Wunsch.</li>
+    <li><b>Aussprache</b> über die Stimme des Geräts, dazu eine Höraufgabe je Lektion.</li>
+    <li><b><span class="tp">sitelen pona</span></b> lesen und mit dem Finger schreiben.</li>
+    <li><b>Alltagssätze</b> und ein Spaßmodus mit Sticheleien, die ohne Schimpfwörter auskommen.</li>
     <li><b>Wiederholung</b> nach Lernschritten: 10 Minuten, dann Tage.</li>
     <li><b>Sandkasten:</b> schreib irgendetwas, die App zerlegt es.</li>
   </ul>
+  <ul lang="en">
+    <li><b>Build sentences</b> instead of recognising answers — word tiles, not multiple choice.</li>
+    <li><b>Sentence x-ray</b> after every answer: which word carries which role.</li>
+    <li><b>Spot the mistake</b>, generated from correct sentences and confirmed by the parser.</li>
+    <li><b>Answer freely</b> to open questions — the build is checked, not the wording.</li>
+    <li><b>Reading at length:</b> ten texts, tappable words, translation only on request.</li>
+    <li><b>Pronunciation</b> through the device voice, plus one listening task per lesson.</li>
+    <li><b><span class="tp">sitelen pona</span></b> to read and to trace with your finger.</li>
+    <li><b>Everyday sentences</b> and a fun mode of taunts that manage without swear words.</li>
+    <li><b>Review</b> in learning steps: 10 minutes, then days.</li>
+    <li><b>Sandbox:</b> write anything and the app takes it apart.</li>
+  </ul>
 
-  <h2>was noch fehlt</h2>
-  <p>
-    Ton (137 Wortaufnahmen brauchen einen Sprecher), die Lesestrecke,
-    <span class="tp">sitelen pona</span> — und die eigentliche iOS-Fassung. Der
-    Sprachkern <code>TokiPonaKit</code> liegt als Swift-Paket im Repository; der
-    Prototyp hier ist seine Zeile-für-Zeile-Entsprechung in JavaScript und dient
-    als ausführbare Vorlage für die SwiftUI-Ansichten.
+  <h2 lang="de">was noch fehlt</h2>
+  <h2 lang="en">what is still missing</h2>
+  <p lang="de">
+    Echte Wortaufnahmen statt der Gerätestimme, mehr Lesetexte — und die
+    eigentliche iOS-Fassung. Der Sprachkern <code>TokiPonaKit</code> liegt als
+    Swift-Paket im Repository; der Prototyp hier ist seine
+    Zeile-für-Zeile-Entsprechung in JavaScript und dient als ausführbare
+    Vorlage für die SwiftUI-Ansichten.
+  </p>
+  <p lang="en">
+    Real recordings instead of the device voice, more reading texts — and the
+    actual iOS version. The language core <code>TokiPonaKit</code> sits in the
+    repository as a Swift package; the prototype here is its line-by-line
+    counterpart in JavaScript and serves as a runnable template for the SwiftUI
+    views.
   </p>
 
   <footer>
-    Übungssätze und Lektionsaufbau aus
-    <a href="https://lipu-sona.pona.la/de/">lipu sona pona</a>
-    (MIT-Lizenz, © 2020 /dev/urandom und Mitwirkende), übernommen und bearbeitet.<br>
-    Erklärtexte, Parser und Oberfläche sind eigenständig entstanden.<br>
+    <span lang="de">
+      Übungssätze und Lektionsaufbau aus
+      <a href="https://lipu-sona.pona.la/de/">lipu sona pona</a>
+      (MIT-Lizenz, © 2020 /dev/urandom und Mitwirkende), übernommen und bearbeitet.<br>
+      Erklärtexte, Parser und Oberfläche sind eigenständig entstanden.<br>
+    </span>
+    <span lang="en">
+      Exercise sentences and lesson structure from
+      <a href="https://lipu-sona.pona.la/en/">lipu sona pona</a>
+      (MIT licence, © 2020 /dev/urandom and contributors), adopted and edited.<br>
+      Explanations, parser and interface were written from scratch.<br>
+    </span>
     <span class="tp">o pona!</span>
   </footer>
 
 </div>
+
+<script>
+  // Sprache aus dem Browser vorschlagen, Wahl merken.
+  (function () {
+    var root = document.documentElement;
+    var button = document.getElementById('lang');
+    var stored = null;
+    try { stored = localStorage.getItem('o-toki-seite'); } catch (error) { /* egal */ }
+    var start = stored || ((navigator.language || 'de').toLowerCase().indexOf('de') === 0 ? 'de' : 'en');
+    var apply = function (lang) {
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', lang);
+      button.textContent = lang === 'de' ? 'English' : 'Deutsch';
+      document.title = lang === 'de' ? 'o toki! — toki pona lernen' : 'o toki! — learn toki pona';
+    };
+    apply(start);
+    button.onclick = function () {
+      var next = root.getAttribute('data-lang') === 'de' ? 'en' : 'de';
+      apply(next);
+      try { localStorage.setItem('o-toki-seite', next); } catch (error) { /* egal */ }
+    };
+  })();
+</script>
 </body>
 </html>

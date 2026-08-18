@@ -1,8 +1,8 @@
 {
-  "name": "o toki! — toki pona lernen",
+  "name": "o toki!",
   "short_name": "o toki!",
-  "description": "Sätze bauen statt Vokabeln abhaken: zwölf Lektionen toki pona mit echter Grammatikprüfung.",
-  "lang": "de",
+  "description": "Sätze bauen statt Vokabeln abhaken · Build sentences instead of ticking off vocabulary — toki pona with a real grammar check.",
+  "lang": "tok",
   "start_url": "./prototype.html",
   "scope": "./",
   "display": "standalone",
