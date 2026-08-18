@@ -4,7 +4,7 @@
   --sunk: #E6EAE6;
   --ink: #14181A;
   --ink-dim: #5A6461;
-  --ink-faint: #8A938F;
+  --ink-faint: #667069;
   --accent: #1C6F6A;
   --accent-ink: #FFFFFF;
   --accent-soft: rgba(28, 111, 106, 0.10);
@@ -32,7 +32,7 @@
     --sunk: #22282A;
     --ink: #E6EAE7;
     --ink-dim: #98A49F;
-    --ink-faint: #6E7A76;
+    --ink-faint: #97A29D;
     --accent: #5CC7BA;
     --accent-ink: #0B1211;
     --accent-soft: rgba(92, 199, 186, 0.14);
@@ -52,7 +52,7 @@
   --sunk: #22282A;
   --ink: #E6EAE7;
   --ink-dim: #98A49F;
-  --ink-faint: #6E7A76;
+  --ink-faint: #97A29D;
   --accent: #5CC7BA;
   --accent-ink: #0B1211;
   --accent-soft: rgba(92, 199, 186, 0.14);
@@ -646,6 +646,7 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 
 .search {
   width: 100%;
+  min-height: 2.75rem;
   padding: 0.6rem 0.8rem;
   border: 1px solid var(--rule-strong);
   border-radius: 0.55rem;
@@ -808,6 +809,13 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   font-size: 0.8125rem;
   line-height: 1;
   vertical-align: middle;
+}
+.say { position: relative; }
+/* Der Knopf sieht klein aus, greift aber auf 44 px — Daumen sind breiter als Symbole. */
+.say::after {
+  content: "";
+  position: absolute;
+  inset: -0.6rem;
 }
 .say:active { background: var(--accent-soft); }
 .word .say { margin-left: auto; }
@@ -1118,3 +1126,19 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.word .netopen {
+  flex: none;
+  position: relative;
+  margin-left: 0.35rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 0.4rem;
+  background: var(--surface);
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+}
+.word .netopen::after { content: ""; position: absolute; inset: -0.5rem; }
+.word[data-open="true"] .netopen { color: var(--accent); border-color: var(--accent); }
