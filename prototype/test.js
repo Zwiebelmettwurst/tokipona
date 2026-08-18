@@ -4,6 +4,7 @@
 const data = require('./data.js');
 const musi = require('./musi.js');
 const open = require('./toki.js');
+const lipu = require('./lipu.js');
 const TokiPona = require('./tokipona.js');
 
 let failures = 0;
@@ -159,7 +160,80 @@ for (const [role, labels] of Object.entries(open.needs)) {
   }
 }
 
-// 10. Gleichwertige Wortstellung: Beifügungen dürfen tauschen, Rollen nicht
+// 10. Fügungen: das Ziel muss beide Teile und das Fügewort enthalten
+for (const join of open.joins) {
+  const violations = TokiPona.splitUtterances(join.tp)
+    .flatMap((u) => TokiPona.parse(u).violations);
+  check(!violations.length,
+    `FÜGUNG ${join.id}  ${join.tp} → ${violations.map((v) => v.rule).join(', ')}`);
+  const words = TokiPona.tokenize(join.tp).map((token) => token.text);
+  check(words.includes(join.kind), `FÜGUNG ${join.id}: ohne ${join.kind}`);
+  check(join.parts.length === 2, `FÜGUNG ${join.id}: ${join.parts.length} Teile statt zwei`);
+  for (const part of join.parts) {
+    for (const token of TokiPona.tokenize(part)) {
+      check(words.includes(token.text),
+        `FÜGUNG ${join.id}: „${token.text}“ steht nicht im Zielsatz`);
+    }
+  }
+  for (const lang of Object.keys(data.languages)) {
+    check(Array.isArray(join[lang]) && join[lang][0], `FÜGUNG ${join.id}: keine Lesart für ${lang}`);
+  }
+}
+
+// 10b. Beispielsätze für die Wörter, die im Kurs nicht vorkommen
+for (const [word, extra] of Object.entries(open.extras)) {
+  check(Boolean(TokiPona.lexicon[word]), `BEISPIEL ${word}: steht nicht im Lexikon`);
+  const violations = TokiPona.splitUtterances(extra.tp)
+    .flatMap((u) => TokiPona.parse(u).violations);
+  check(!violations.length,
+    `BEISPIEL ${word}  ${extra.tp} → ${violations.map((v) => v.rule).join(', ')}`);
+  check(TokiPona.tokenize(extra.tp).some((token) => token.text === word),
+    `BEISPIEL ${word}: kommt im eigenen Satz nicht vor`);
+  for (const lang of Object.keys(data.languages)) {
+    check(extra[lang] && extra[lang].trim(), `BEISPIEL ${word}: keine Lesart für ${lang}`);
+  }
+}
+
+// 11. Lesetexte: jede Zeile und jede Frage muss durch den Parser
+let lines = 0;
+const textIds = new Set();
+for (const text of lipu.texts) {
+  check(!textIds.has(text.id), `TEXT ${text.id}: doppelte Kennung`);
+  textIds.add(text.id);
+  check(text.stage >= 1, `TEXT ${text.id}: ohne Stufe`);
+  for (const lang of Object.keys(data.languages)) {
+    check(text.title[lang] && text.about[lang], `TEXT ${text.id}: kein Titel für ${lang}`);
+  }
+  check(text.lines.length >= 4, `TEXT ${text.id}: nur ${text.lines.length} Zeilen`);
+  for (const line of text.lines) {
+    lines += 1;
+    const violations = TokiPona.splitUtterances(line.tp)
+      .flatMap((u) => TokiPona.parse(u).violations);
+    check(!violations.length,
+      `TEXT ${text.id}  ${line.tp} → ${violations.map((v) => v.rule).join(', ')}`);
+    for (const lang of Object.keys(data.languages)) {
+      check(line[lang] && line[lang].trim(), `TEXT ${text.id}  ${line.tp}: keine Lesart für ${lang}`);
+    }
+  }
+  check(text.questions.length >= 2, `TEXT ${text.id}: weniger als zwei Fragen`);
+  for (const question of text.questions) {
+    const violations = TokiPona.splitUtterances(question.tp)
+      .flatMap((u) => TokiPona.parse(u).violations);
+    check(!violations.length,
+      `TEXT ${text.id}  ${question.tp} → ${violations.map((v) => v.rule).join(', ')}`);
+    for (const lang of Object.keys(data.languages)) {
+      const options = question.options[lang];
+      check(Array.isArray(options) && options.length >= 3,
+        `TEXT ${text.id}  ${question.tp}: zu wenig Antworten für ${lang}`);
+      check(options && options[question.right],
+        `TEXT ${text.id}  ${question.tp}: richtige Antwort ${question.right} fehlt in ${lang}`);
+      check(question[lang] && question[lang].trim(),
+        `TEXT ${text.id}  ${question.tp}: keine Lesart für ${lang}`);
+    }
+  }
+}
+
+// 12. Gleichwertige Wortstellung: Beifügungen dürfen tauschen, Rollen nicht
 const ORDER_CASES = [
   ['jan mije lili sina li wawa.', 'jan lili mije sina li wawa.', true],
   ['mi jo e kili suwi loje.', 'mi jo e kili loje suwi.', true],
@@ -180,13 +254,13 @@ check(TokiPona.canonical('mi mije suli li lape.') === null
       'STELLUNG: Vergleichsform sortiert nicht alphabetisch');
 check(TokiPona.canonical('jan sina li') === null, 'STELLUNG: kaputter Satz hat keine Vergleichsform');
 
-// 11. Satzröntgen
+// 13. Satzröntgen
 const spans = TokiPona.xray(TokiPona.parse('jan suli li pana e lipu tawa mi.').utterance);
 check(JSON.stringify(spans.map((s) => s.role))
       === JSON.stringify(['subject', 'predicateMarker', 'verb', 'object', 'preposition', 'complement']),
       'Satzröntgen: ' + spans.map((s) => `${s.text}=${s.role}`).join(' '));
 
-// 12. Rollennamen: in jeder Sprache vorhanden, und wirklich übersetzt.
+// 14. Rollennamen: in jeder Sprache vorhanden, und wirklich übersetzt.
 // Auf Englisch ist die Beschriftung mit dem Schlüssel identisch — das ist
 // kein Fehler, deshalb prüft der Vergleich gegen die deutsche Fassung.
 for (const span of spans) {
@@ -205,5 +279,8 @@ console.log(`Kurs:    ${externalOk}/${data.corpus.external.length} fehlerfrei`);
 console.log(`Import:  ${items} Musterlösungen in ${Object.keys(data.languages).length} Sprachen geprüft`);
 console.log(`musi:    ${musi.lines.length} Zeilen, ${combos} gewürfelte Sätze geprüft`);
 console.log(`offen:   ${open.prompts.length} Fragen, ${answers} Beispielantworten geprüft`);
+console.log(`fügen:   ${open.joins.length} Fügungen geprüft`);
+console.log(`lesen:   ${lipu.texts.length} Texte, ${lines} Zeilen, `
+  + `${lipu.texts.reduce((n, text) => n + text.questions.length, 0)} Fragen geprüft`);
 console.log(failures ? `\n✗ ${failures} Abweichung(en)` : '\n✓ alle Prüfungen bestanden');
 process.exit(failures ? 1 : 0);

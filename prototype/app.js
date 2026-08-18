@@ -2,9 +2,9 @@
 // bauen statt erkennen, sofortige Rückmeldung mit Satzröntgen, sichtbarer
 // Fortschritt — ohne Herzen und ohne Bestenliste.
 
-(function (DATA, MUSI, OPEN, TP) {
+(function (DATA, MUSI, OPEN, LIPU, TP) {
   const KEY = 'o-toki-fortschritt-v1';
-  const GOAL = 40;
+  const GOALS = [20, 40, 60];
 
   // Alles, was die Oberfläche sagt, steht hier — die Lektionen selbst kommen
   // aus den Kursdaten, die in derselben Sprache vorliegen.
@@ -66,6 +66,32 @@
       backupApply: 'Diesen Stand übernehmen',
       summary: (lvl, lessons, cards, xp) => `Stufe ${lvl}, ${lessons} Lektionen, ${cards} Karten, ${xp} XP`,
       langLabel: 'sprache', langOther: 'English',
+      askTrace: 'zeichne das zeichen',
+      traceClear: 'nochmal',
+      traceHint: 'Fahr mit dem Finger über die Vorlage. Mehrere Striche sind erlaubt.',
+      traceGood: 'Getroffen',
+      traceThin: 'Da fehlt noch ein Stück der Vorlage.',
+      traceWide: 'Zu viel daneben — bleib auf der Linie.',
+      traceScore: (hit, clean) => `Vorlage ${hit}% getroffen, ${clean}% deiner Linie sitzt drauf.`,
+      readTitle: 'lipu — lesen',
+      readHint: 'Zusammenhängende Texte. Tipp auf eine Zeile, dann steht die '
+        + 'Übersetzung da; erst raten lohnt sich.',
+      readReveal: 'Übersetzung',
+      readLocked: (stage) => `ab Lektion ${stage}`,
+      readQuestions: 'Fragen zum Text',
+      readBack: 'zurück',
+      askQuiz: 'zum text',
+      askJoin: 'mach einen satz daraus',
+      joinParts: 'aus:',
+      joinLa: '<b>la</b> stellt den Rahmen voran: erst der Rahmen, dann <b>la</b>, dann der Satz.',
+      joinPi: '<b>pi</b> gruppiert um: alles hinter <b>pi</b> gehört zusammen zum Kopfwort davor.',
+      weekTitle: 'diese woche',
+      weekDays: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
+      weekSum: (xp, days) => `${xp} XP in sieben Tagen · ${days} Tag(e) am Ziel`,
+      goalTitle: 'tagesziel',
+      goalHint: 'Wie viel willst du dir an einem Tag vornehmen? Eine Aufgabe bringt zehn Punkte.',
+      goalPick: (xp) => `${xp} XP`,
+      example: 'Beispiel',
       askAnswer: 'antworte frei',
       answerHint: 'Deine Antwort, dein Satz. Geprüft wird der Bau.',
       answerNeeds: (what) => `Die Antwort braucht ${what}.`,
@@ -156,6 +182,32 @@
       backupApply: 'Use this progress',
       summary: (lvl, lessons, cards, xp) => `level ${lvl}, ${lessons} lessons, ${cards} cards, ${xp} XP`,
       langLabel: 'language', langOther: 'Deutsch',
+      askTrace: 'draw the glyph',
+      traceClear: 'again',
+      traceHint: 'Trace the template with your finger. Several strokes are fine.',
+      traceGood: 'On the line',
+      traceThin: 'Part of the template is still missing.',
+      traceWide: 'Too much beside it — stay on the line.',
+      traceScore: (hit, clean) => `${hit}% of the template covered, ${clean}% of your line sits on it.`,
+      readTitle: 'lipu — reading',
+      readHint: 'Texts that hang together. Tap a line and the translation appears; '
+        + 'guessing first pays off.',
+      readReveal: 'translation',
+      readLocked: (stage) => `from lesson ${stage}`,
+      readQuestions: 'Questions about the text',
+      readBack: 'back',
+      askQuiz: 'about the text',
+      askJoin: 'make one sentence out of these',
+      joinParts: 'from:',
+      joinLa: '<b>la</b> puts the frame up front: frame first, then <b>la</b>, then the sentence.',
+      joinPi: '<b>pi</b> regroups: everything after <b>pi</b> belongs to the head word before it.',
+      weekTitle: 'this week',
+      weekDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      weekSum: (xp, days) => `${xp} XP in seven days · ${days} day(s) on target`,
+      goalTitle: 'daily goal',
+      goalHint: 'How much do you want to take on in a day? One exercise is worth ten points.',
+      goalPick: (xp) => `${xp} XP`,
+      example: 'Example',
       askAnswer: 'answer freely',
       answerHint: 'Your answer, your sentence. What gets checked is the build.',
       answerNeeds: (what) => `The answer needs ${what}.`,
@@ -271,7 +323,8 @@
   const today = () => new Date().toISOString().slice(0, 10);
 
   const blank = {
-    xp: 0, streak: 0, lastDay: null, dayXp: 0, done: {}, mastery: {}, seenWords: {}, srs: {},
+    xp: 0, streak: 0, lastDay: null, dayXp: 0, goal: 40, days: {}, read: {},
+    done: {}, mastery: {}, seenWords: {}, srs: {},
     sitelen: false,
     sound: true,
     lang: (navigator.language || 'de').toLowerCase().startsWith('de') ? 'de' : 'en',
@@ -326,6 +379,7 @@
 
   let state = load();
   let session = null;
+  let reading = null;
   let tab = 'pfad';
 
   function load() {
@@ -344,6 +398,10 @@
   function level() { return Math.floor(state.xp / 100) + 1; }
   function levelProgress() { return state.xp % 100; }
 
+  const goal = () => state.goal || 40;
+  // Datum von vor n Tagen, als Zeichenkette — die Tagesschlüssel sind sortierbar.
+  const weekStart = (back) => new Date(Date.now() - back * 86400000).toISOString().slice(0, 10);
+
   function award(points) {
     const day = today();
     if (state.lastDay !== day) {
@@ -355,6 +413,12 @@
     }
     state.xp += points;
     state.dayXp += points;
+    // Für die Wochenübersicht: die letzten Tage bleiben stehen, ältere fliegen raus.
+    state.days = state.days || {};
+    state.days[day] = state.dayXp;
+    for (const key of Object.keys(state.days)) {
+      if (key < weekStart(13)) delete state.days[key];
+    }
     save();
   }
 
@@ -386,10 +450,27 @@
       const lesson = lessons().find((l) => l.words.includes(rest)) || lessons()[0];
       return TP.lexicon[rest] ? { type: 'word', word: rest, lesson, concepts: [] } : null;
     }
+    if (kind === 't') {
+      const lesson = lessons().find((l) => l.words.includes(rest)) || lessons()[0];
+      return TP.lexicon[rest] && hasGlyph(rest)
+        ? { type: 'trace', word: rest, lesson, concepts: [] } : null;
+    }
     if (kind === 'g') {
       const lesson = lessons().find((l) => l.words.includes(rest)) || lessons()[0];
       return TP.lexicon[rest] && hasGlyph(rest)
         ? { type: 'glyph', word: rest, lesson, concepts: [] } : null;
+    }
+    if (kind === 's') {
+      const join = OPEN.joins.find((entry) => entry.id === rest);
+      if (join) return joinTask(join, lessonOf(join.stage) || lessons()[0]);
+    }
+
+    if (kind === 'r') {
+      const [textId, index] = rest.split('-');
+      const text = LIPU.texts.find((entry) => entry.id === textId);
+      const question = text && text.questions[Number(index)];
+      return question ? { type: 'quiz', question, text, index: Number(index),
+                          lesson: lessonOf(text.stage) || lessons()[0], concepts: [] } : null;
     }
     if (kind === 'q') {
       const prompt = OPEN.prompts.find((entry) => entry.id === rest);
@@ -411,7 +492,9 @@
   }
 
   function keyOf(task) {
+    if (task.type === 'quiz') return 'r:' + task.text.id + '-' + task.index;
     if (task.type === 'answer') return 'q:' + task.prompt.id;
+    if (task.type === 'trace') return 't:' + task.word;
     if (task.type === 'glyph') return 'g:' + task.word;
     if (task.type === 'word') return 'w:' + task.word;
     if (task.type === 'compound') return 'c:' + COMPOUNDS.indexOf(task.compound);
@@ -524,6 +607,8 @@
     const glyphWord = words.find(hasGlyph);
     if (state.sitelen && glyphWord) {
       tasks.push({ type: 'glyph', word: glyphWord, lesson, concepts: [] });
+      const traceWord = words.filter(hasGlyph)[1] || glyphWord;
+      tasks.push({ type: 'trace', word: traceWord, lesson, concepts: [] });
     }
 
     const heard = reads[2] || builds[4];
@@ -533,6 +618,9 @@
 
     // Eine offene Frage ersetzt das freie Übersetzen: beides ist Tippen, aber
     // die eigene Antwort ist die interessantere Übung.
+    const join = shuffle(OPEN.joins.filter((entry) => entry.stage <= lesson.number))[0];
+    if (join) tasks.push(joinTask(join, lesson));
+
     const prompt = shuffle(OPEN.prompts.filter((entry) => entry.stage <= lesson.number))[0];
     if (prompt) tasks.push({ type: 'answer', prompt, lesson, concepts: lessonConcepts(lesson) });
     else if (builds[3]) {
@@ -594,6 +682,19 @@
     }
     return { lesson, musi: true, queue: tasks, index: 0, correct: 0, total: 0, xp: 0,
              retried: new Set() };
+  }
+
+  // Eine Fügung ist eine Bauaufgabe mit anderer Aufschrift: die beiden Teile
+  // stehen da, gebaut wird der eine Satz.
+  function joinTask(join, lesson) {
+    return {
+      type: 'build',
+      join,
+      lesson,
+      concepts: [join.kind === 'pi' ? 'c_pi' : 'c_la'],
+      item: { id: join.id, direction: 'de_tp', tp: join.tp, also: [],
+              target: join[state.lang] || join.de },
+    };
   }
 
   function buildReviewSession() {
@@ -680,6 +781,7 @@
     hideGloss();
     app.innerHTML = '';
     if (session) { renderSession(); clearStrayFocus(); return; }
+    if (reading) { app.append(readerScreen(reading)); clearStrayFocus(); return; }
     app.append(topbar());
     if (tab === 'pfad') app.append(pathScreen());
     else if (tab === 'nimi') app.append(wordScreen());
@@ -694,10 +796,10 @@
       <div>
         <div class="topbar">
           <div class="level"><div class="ring">${level()}</div><span>${escape(t('level'))}</span></div>
-          <div class="metric spacer gold">${escape(t('xpToday', state.dayXp, GOAL))}</div>
+          <div class="metric spacer gold">${escape(t('xpToday', state.dayXp, goal()))}</div>
           <div class="metric"><b>${state.streak}</b> ${escape(t('days'))}</div>
         </div>
-        <div class="goalbar"><span style="width:${Math.min(100, (state.dayXp / GOAL) * 100)}%"></span></div>
+        <div class="goalbar"><span style="width:${Math.min(100, (state.dayXp / goal()) * 100)}%"></span></div>
       </div>`);
     return bar;
   }
@@ -777,6 +879,9 @@
       screen.append(card);
     }
 
+    screen.append(readingCard());
+    screen.append(weekCard());
+    screen.append(goalCard());
     screen.append(languageCard());
     screen.append(soundCard());
     screen.append(sitelenCard());
@@ -787,6 +892,136 @@
         `<a href="https://lipu-sona.pona.la/${state.lang}/">lipu sona pona</a>`)}
         ${window.OTOKI_VERSION ? `<br><span class="version">${escape(t('versionLabel', window.OTOKI_VERSION))}</span>` : ''}</p>`));
     return screen;
+  }
+
+  function readingCard() {
+    const card = el(`
+      <div class="card">
+        <h2>${escape(t('readTitle'))}</h2>
+        <p class="hint">${escape(t('readHint'))}</p>
+        <div class="lipulist"></div>
+      </div>`);
+    const list = card.querySelector('.lipulist');
+    LIPU.texts.forEach((text) => {
+      const open = unlocked(text.stage);
+      const done = Boolean(state.read && state.read[text.id]);
+      const row = el(`
+        <button class="lipurow" data-state="${done ? 'done' : (open ? 'open' : 'locked')}">
+          <span class="body">
+            <b>${escape(text.title[state.lang] || text.title.de)}</b>
+            <span>${escape(text.about[state.lang] || text.about.de)}</span>
+          </span>
+          <span class="mark">${done ? '✓' : (open ? '›' : '·')}</span>
+        </button>`);
+      if (open) row.onclick = () => { reading = text; render(); };
+      else {
+        row.disabled = true;
+        row.querySelector('.body span').textContent = t('readLocked', text.stage);
+      }
+      list.append(row);
+    });
+    return card;
+  }
+
+  // Der Text selbst: Zeile für Zeile, Übersetzung erst auf Tippen.
+  function readerScreen(text) {
+    const screen = screenWith(`
+      <div class="exbar">
+        <button aria-label="${escape(t('readBack'))}">✕</button>
+        <span class="track"></span>
+        <span class="metric">lipu</span>
+      </div>
+      <h1 class="lipu-title">${escape(text.title[state.lang] || text.title.de)}</h1>
+      <p class="ask">${escape(text.about[state.lang] || text.about.de)}</p>
+      <div class="lipulines"></div>
+      <div class="actions"><button class="primary">${escape(t('readQuestions'))}</button></div>`);
+
+    screen.querySelector('.exbar button').onclick = () => { reading = null; render(); };
+
+    const lines = screen.querySelector('.lipulines');
+    text.lines.forEach((line) => {
+      const row = el('<div class="lipuline"></div>');
+      const tp = el('<p class="tp glossable"></p>');
+      tp.append(glossed(line.tp, 'glossline'));
+      withSay(tp, line.tp);
+      row.append(tp);
+      const meaning = el(`<p class="meaning" hidden>${escape(line[state.lang] || line.de)}</p>`);
+      row.append(meaning);
+      // Aufdecken über einen eigenen Knopf — ein Tipp auf ein Wort schlägt
+      // dieses Wort nach, das darf sich nicht in die Quere kommen.
+      const reveal = el(`<button class="reveal" type="button"
+        aria-label="${escape(t('readReveal'))}">${escape(t('readReveal'))}</button>`);
+      const toggle = () => {
+        meaning.hidden = !meaning.hidden;
+        reveal.hidden = !meaning.hidden;
+      };
+      reveal.onclick = (event) => { event.stopPropagation(); toggle(); };
+      row.append(reveal);
+      row.onclick = (event) => {
+        if (event.target.closest('.gloss-word') || event.target.closest('.say')) return;
+        toggle();
+      };
+      lines.append(row);
+    });
+
+    screen.querySelector('.primary').onclick = () => {
+      session = buildQuizSession(text);
+      reading = null;
+      render();
+    };
+    return screen;
+  }
+
+  function buildQuizSession(text) {
+    const tasks = text.questions.map((question, index) => ({
+      type: 'quiz', question, text, index, lesson: lessonOf(text.stage) || lessons()[0],
+      concepts: [],
+    }));
+    return { lesson: null, quiz: text, queue: tasks, index: 0, correct: 0, total: 0, xp: 0,
+             retried: new Set() };
+  }
+
+  // Sieben Tage als Balken. Kein Vergleich mit anderen, nur mit gestern.
+  function weekCard() {
+    const days = [];
+    for (let back = 6; back >= 0; back -= 1) {
+      const key = weekStart(back);
+      const date = new Date(Date.now() - back * 86400000);
+      days.push({ key, xp: (state.days && state.days[key]) || 0, weekday: (date.getDay() + 6) % 7 });
+    }
+    const highest = Math.max(goal(), ...days.map((day) => day.xp));
+    const names = t('weekDays');
+    const total = days.reduce((sum, day) => sum + day.xp, 0);
+    const reached = days.filter((day) => day.xp >= goal()).length;
+
+    const card = el(`
+      <div class="card">
+        <h2>${escape(t('weekTitle'))}</h2>
+        <div class="week">${days.map((day, index) => `
+          <div class="day" data-today="${index === days.length - 1}" data-done="${day.xp >= goal()}">
+            <span class="bar"><i style="height:${Math.round((day.xp / highest) * 100)}%"></i></span>
+            <span class="tick">${escape(names[day.weekday])}</span>
+          </div>`).join('')}</div>
+        <p class="hint">${escape(t('weekSum', total, reached))}</p>
+      </div>`);
+    return card;
+  }
+
+  function goalCard() {
+    const card = el(`
+      <div class="card">
+        <h2>${escape(t('goalTitle'))}</h2>
+        <p class="hint">${escape(t('goalHint'))}</p>
+        <div class="row"></div>
+      </div>`);
+    const row = card.querySelector('.row');
+    GOALS.forEach((value) => {
+      const button = el(`<button class="ghost" data-picked="${value === goal()}"
+        >${escape(t('goalPick', value))}</button>`);
+      button.onclick = () => { state.goal = value; save(); render(); };
+      row.append(button);
+    });
+    return card;
   }
 
   function languageCard() {
@@ -1079,6 +1314,8 @@
     else if (task.type === 'glyph') app.append(glyphTask(task));
     else if (task.type === 'listen') app.append(listenTask(task));
     else if (task.type === 'answer') app.append(answerTask(task));
+    else if (task.type === 'quiz') app.append(quizTask(task));
+    else if (task.type === 'trace') app.append(traceTask(task));
     else app.append(freeTask(task));
   }
 
@@ -1211,6 +1448,216 @@
       solution: task.item.tp,
       speak: task.item.tp,
       xray: task.item.tp,
+    });
+    return screen;
+  }
+
+  // sitelen pona selbst schreiben. Bewertet wird mit zwei Zahlen: wie viel
+  // der Vorlage getroffen wurde, und wie viel der eigenen Linie auf der
+  // Vorlage sitzt. Beides zählt — nur Kritzeln füllt zwar die Vorlage, sitzt
+  // aber daneben.
+  const TRACE = { size: 260, pen: 16, slack: 9, needHit: 0.55, needClean: 0.5 };
+
+  function traceTask(task) {
+    const screen = screenWith(`
+      <p class="prompt">${escape(t('askTrace'))}</p>
+      <h2 class="question tp">${escape(task.word)}</h2>
+      <p class="ask">${escape(glossesOf(task.word).slice(0, 3).join(', '))}</p>
+      <div class="tracebox">
+        <canvas class="trace" width="${TRACE.size}" height="${TRACE.size}"
+          aria-label="${escape(t('askTrace'))}"></canvas>
+      </div>
+      <div class="row"><button class="ghost">${escape(t('traceClear'))}</button></div>
+      <p class="hint">${escape(t('traceHint'))}</p>
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
+
+    const canvas = screen.querySelector('.trace');
+    const ctx = canvas.getContext('2d');
+    const button = screen.querySelector('.primary');
+
+    // Vorlage und ihre großzügige Umgebung liegen in eigenen Flächen.
+    const mask = (thick) => {
+      const off = document.createElement('canvas');
+      off.width = TRACE.size;
+      off.height = TRACE.size;
+      const pen = off.getContext('2d');
+      pen.textAlign = 'center';
+      pen.textBaseline = 'middle';
+      pen.font = `${Math.round(TRACE.size * 0.78)}px "linja pimeja", monospace`;
+      pen.fillStyle = '#000';
+      const middle = TRACE.size / 2;
+      if (!thick) pen.fillText(task.word, middle, middle);
+      else {
+        for (let angle = 0; angle < 360; angle += 30) {
+          const rad = (angle * Math.PI) / 180;
+          pen.fillText(task.word, middle + Math.cos(rad) * thick, middle + Math.sin(rad) * thick);
+        }
+        pen.fillText(task.word, middle, middle);
+      }
+      return pen.getImageData(0, 0, TRACE.size, TRACE.size).data;
+    };
+
+    const template = mask(0);
+    const templateWide = mask(TRACE.slack);
+
+    const strokes = [];
+    let current = null;
+
+    const paint = () => {
+      ctx.clearRect(0, 0, TRACE.size, TRACE.size);
+      // Vorlage blass im Hintergrund
+      ctx.save();
+      ctx.globalAlpha = 0.16;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = `${Math.round(TRACE.size * 0.78)}px "linja pimeja", monospace`;
+      ctx.fillStyle = getComputedStyle(canvas).color;
+      ctx.fillText(task.word, TRACE.size / 2, TRACE.size / 2);
+      ctx.restore();
+
+      ctx.lineWidth = TRACE.pen;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = getComputedStyle(canvas).color;
+      for (const stroke of strokes) {
+        if (!stroke.length) continue;
+        ctx.beginPath();
+        ctx.moveTo(stroke[0].x, stroke[0].y);
+        for (const point of stroke.slice(1)) ctx.lineTo(point.x, point.y);
+        if (stroke.length === 1) ctx.lineTo(stroke[0].x + 0.1, stroke[0].y + 0.1);
+        ctx.stroke();
+      }
+    };
+
+    // Die eigene Linie als Fläche, einmal dünn und einmal großzügig.
+    const drawn = (thick) => {
+      const off = document.createElement('canvas');
+      off.width = TRACE.size;
+      off.height = TRACE.size;
+      const pen = off.getContext('2d');
+      pen.lineWidth = TRACE.pen + thick * 2;
+      pen.lineCap = 'round';
+      pen.lineJoin = 'round';
+      pen.strokeStyle = '#000';
+      for (const stroke of strokes) {
+        if (!stroke.length) continue;
+        pen.beginPath();
+        pen.moveTo(stroke[0].x, stroke[0].y);
+        for (const point of stroke.slice(1)) pen.lineTo(point.x, point.y);
+        if (stroke.length === 1) pen.lineTo(stroke[0].x + 0.1, stroke[0].y + 0.1);
+        pen.stroke();
+      }
+      return pen.getImageData(0, 0, TRACE.size, TRACE.size).data;
+    };
+
+    const score = () => {
+      const mine = drawn(0);
+      const mineWide = drawn(TRACE.slack);
+      let ink = 0;
+      let inkHit = 0;
+      let line = 0;
+      let lineClean = 0;
+      for (let i = 3; i < template.length; i += 4) {
+        const isInk = template[i] > 40;
+        const isLine = mine[i] > 40;
+        if (isInk) { ink += 1; if (mineWide[i] > 40) inkHit += 1; }
+        if (isLine) { line += 1; if (templateWide[i] > 40) lineClean += 1; }
+      }
+      return {
+        hit: ink ? inkHit / ink : 0,
+        clean: line ? lineClean / line : 0,
+      };
+    };
+
+    const place = (event) => {
+      const box = canvas.getBoundingClientRect();
+      return {
+        x: ((event.clientX - box.left) / box.width) * TRACE.size,
+        y: ((event.clientY - box.top) / box.height) * TRACE.size,
+      };
+    };
+
+    canvas.addEventListener('pointerdown', (event) => {
+      event.preventDefault();
+      current = [place(event)];
+      strokes.push(current);
+      button.disabled = false;
+      paint();
+    });
+    canvas.addEventListener('pointermove', (event) => {
+      if (!current) return;
+      current.push(place(event));
+      paint();
+    });
+    const stop = () => { current = null; };
+    canvas.addEventListener('pointerup', stop);
+    canvas.addEventListener('pointercancel', stop);
+    canvas.addEventListener('pointerleave', stop);
+
+    screen.querySelector('.ghost').onclick = () => {
+      strokes.length = 0;
+      current = null;
+      button.disabled = true;
+      paint();
+    };
+
+    button.onclick = () => {
+      const marks = score();
+      const hit = Math.round(marks.hit * 100);
+      const clean = Math.round(marks.clean * 100);
+      const correct = marks.hit >= TRACE.needHit && marks.clean >= TRACE.needClean;
+      state.seenWords[task.word] = true;
+      finish(task, correct, {
+        solution: task.word,
+        speak: task.word,
+        xray: null,
+        reason: `${escape(t('traceScore', hit, clean))}`
+          + (correct ? '' : ` ${escape(marks.hit < TRACE.needHit ? t('traceThin') : t('traceWide'))}`),
+      });
+    };
+
+    // Erst zeichnen, wenn die Schrift wirklich da ist — sonst steht die
+    // Vorlage als lateinische Buchstabe da.
+    paint();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(paint);
+    return screen;
+  }
+
+  // Frage zum gelesenen Text.
+  function quizTask(task) {
+    const question = task.question;
+    const options = question.options[state.lang] || question.options.de;
+    const right = options[question.right];
+
+    const screen = screenWith(`
+      <p class="prompt">${escape(t('askQuiz'))}</p>
+      <h2 class="question tp glossable"></h2>
+      <p class="ask">${escape(question[state.lang] || question.de)}</p>
+      <div class="choices"></div>
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
+
+    const asked = screen.querySelector('.question');
+    asked.append(glossed(question.tp, 'glossline'));
+    withSay(asked, question.tp);
+
+    let picked = null;
+    const list = screen.querySelector('.choices');
+    const button = screen.querySelector('.primary');
+    shuffle(options.slice()).forEach((option) => {
+      const choice = el(`<button class="choice">${escape(option)}</button>`);
+      choice.onclick = () => {
+        picked = option;
+        list.querySelectorAll('.choice').forEach((c) => { c.dataset.picked = 'false'; });
+        choice.dataset.picked = 'true';
+        button.disabled = false;
+      };
+      list.append(choice);
+    });
+
+    button.onclick = () => finish(task, picked === right, {
+      solution: right,
+      speak: question.tp,
+      xray: question.tp,
     });
     return screen;
   }
@@ -1388,8 +1835,10 @@
     const wordOf = new Map(bank.map((chip) => [chip.id, chip.word]));
 
     const screen = screenWith(`
-      <p class="prompt">${escape(t('askBuild'))}</p>
+      <p class="prompt">${escape(task.join ? t('askJoin') : t('askBuild'))}</p>
       <h2 class="question">${escape(task.item.target[0])}</h2>
+      ${task.join ? `<p class="parts"><span>${escape(t('joinParts'))}</span>
+        ${task.join.parts.map((part) => `<code>${escape(part)}</code>`).join('')}</p>` : ''}
       <div class="slot"></div>
       <p class="hint">${escape(t('hintBuild'))}</p>
       <div class="bank"></div>
@@ -1545,6 +1994,7 @@
         speak: task.item.tp,
         xray: answer || task.item.tp,
         grade: verdict.exact ? null : verdict,
+        reason: task.join && correct ? t(task.join.kind === 'pi' ? 'joinPi' : 'joinLa') : null,
       });
     };
     return screen;
@@ -1793,6 +2243,11 @@
     const lesson = session.lesson;
     const review = Boolean(session.review);
     const musi = Boolean(session.musi);
+    const quiz = session.quiz || null;
+    if (quiz) {
+      state.read = state.read || {};
+      state.read[quiz.id] = true;
+    }
     // Der Spaßmodus hakt keine Lektion ab — der Kursfortschritt bleibt seiner.
     if (lesson && !musi) {
       state.done[lesson.number] = true;
@@ -1803,17 +2258,19 @@
     const screen = el(`
       <div class="screen done">
         <div class="burst">pona!</div>
-        <h2>${escape(review ? t('reviewDone') : lesson.title)}</h2>
-        <p>${escape(review ? t('reviewNote')
-          : (musi ? t('musiLead') : lesson.note.replace(/<[^>]+>/g, '')))}</p>
+        <h2>${escape(quiz ? (quiz.title[state.lang] || quiz.title.de)
+          : (review ? t('reviewDone') : lesson.title))}</h2>
+        <p>${escape(quiz ? (quiz.about[state.lang] || quiz.about.de)
+          : (review ? t('reviewNote')
+            : (musi ? t('musiLead') : lesson.note.replace(/<[^>]+>/g, ''))))}</p>
         <div class="tally">
           <div><b>+${session.xp}</b><span>${escape(t('xp'))}</span></div>
           <div><b>${session.correct}</b><span>${escape(t('correct'))}</span></div>
-          <div><b>${review || musi ? session.queue.length : lesson.words.length}</b><span>${escape(t(review || musi ? 'cards' : 'words'))}</span></div>
+          <div><b>${review || musi || quiz ? session.queue.length : lesson.words.length}</b><span>${escape(t(review || musi || quiz ? 'cards' : 'words'))}</span></div>
         </div>
         <div class="actions">
           <button class="primary">${escape(t('next'))}</button>
-          ${review ? '' : `<button class="ghost">${escape(t('again'))}</button>`}
+          ${review || quiz ? '' : `<button class="ghost">${escape(t('again'))}</button>`}
         </div>
       </div>`);
 
@@ -1822,7 +2279,7 @@
       tab = musi ? 'musi' : 'pfad';
       render();
     };
-    if (!review) {
+    if (!review && !quiz) {
       screen.querySelector('.ghost').onclick = () => {
         session = musi ? buildMusiSession() : buildSession(lesson);
         render();
@@ -1918,6 +2375,33 @@
 
   // ------------------------------------------------------------ Wörter
 
+  // Zu jedem Wort ein Satz, in dem es vorkommt — der kürzeste, den der Kurs
+  // (oder der Spaßmodus) hergibt, samt Übersetzung.
+  let exampleCache = null;
+  function examples() {
+    if (exampleCache && exampleCache.lang === state.lang) return exampleCache.map;
+    const pool = [];
+    for (const lesson of lessons()) {
+      for (const item of lesson.items) pool.push({ tp: item.tp, say: item.target[0] });
+    }
+    for (const line of MUSI.lines) {
+      pool.push({ tp: line.tp, say: (line[state.lang] || line.de)[0] });
+    }
+    pool.sort((a, b) => a.tp.length - b.tp.length);
+    const map = new Map();
+    // Wörter, die im Kurs nicht vorkommen, haben ihren eigenen Satz.
+    for (const [word, extra] of Object.entries(OPEN.extras)) {
+      map.set(word, { tp: extra.tp, say: extra[state.lang] || extra.de });
+    }
+    for (const sentence of pool) {
+      for (const token of TP.tokenize(sentence.tp)) {
+        if (TP.lexicon[token.text] && !map.has(token.text)) map.set(token.text, sentence);
+      }
+    }
+    exampleCache = { lang: state.lang, map };
+    return map;
+  }
+
   function wordScreen() {
     const screen = screenWith(`
       <input class="search" placeholder="${escape(t('search'))}" aria-label="${escape(t('search'))}">
@@ -1927,6 +2411,7 @@
 
     const draw = (query) => {
       list.innerHTML = '';
+      const shown = examples();
       const term = query.trim().toLowerCase();
       Object.keys(TP.lexicon).sort().forEach((word) => {
         const entry = TP.lexicon[word];
@@ -1941,6 +2426,11 @@
             <em>${entry.book === 'pu' ? 'pu' : 'ku'}${state.seenWords[word] ? ' ✓' : ''}</em>
           </div>`);
         withSay(row, word);
+        const example = shown.get(word);
+        if (example) {
+          row.append(el(`<p class="example"><code>${escape(example.tp)}</code>
+            ${escape(example.say)}</p>`));
+        }
         list.append(row);
       });
     };
@@ -2025,4 +2515,4 @@
 
   render();
   probeGlyphs();
-})(TOKIPONA_DATA, TOKIPONA_MUSI, TOKIPONA_TOKI, TokiPona);
+})(TOKIPONA_DATA, TOKIPONA_MUSI, TOKIPONA_TOKI, TOKIPONA_LIPU, TokiPona);

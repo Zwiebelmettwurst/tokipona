@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="o toki!">
-<script>window.OTOKI_VERSION = '3069d132ee';</script>
+<script>window.OTOKI_VERSION = '5043335d04';</script>
 
 <style>
 /* linja pimeja 1.9 — jan Inkepa, CC0. Siehe prototype/SCHRIFT.md.
@@ -841,6 +841,136 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   font-size: 0.9375rem;
 }
 
+/* ------------------------------------------------------------- Woche */
+.week {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.35rem;
+  height: 4.5rem;
+  margin-bottom: 0.5rem;
+}
+.week .day { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; }
+.week .bar {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  background: var(--sunk);
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+.week .bar i { display: block; width: 100%; min-height: 2px; background: var(--rule-strong); }
+.week .day[data-done="true"] .bar i { background: var(--gold); }
+.week .day[data-today="true"] .bar i { background: var(--accent); }
+.week .tick { font-size: 0.625rem; color: var(--ink-faint); padding-top: 0.3rem; }
+.week .day[data-today="true"] .tick { color: var(--accent); }
+
+.row .ghost[data-picked="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* Beispielsatz unter dem Wort */
+.word { flex-wrap: wrap; }
+.word .example {
+  width: 100%;
+  margin: 0.2rem 0 0;
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  line-height: 1.5;
+}
+.word .example code {
+  font-family: var(--mono);
+  color: var(--accent);
+  margin-right: 0.35rem;
+}
+
+/* Fügeaufgabe: die beiden Teile über dem Baukasten */
+.parts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0 0 0.3rem;
+  font-size: 0.8125rem;
+  color: var(--ink-faint);
+}
+.parts code {
+  font-family: var(--mono);
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0.35rem;
+  padding: 0.1rem 0.35rem;
+}
+
+/* ------------------------------------------------------------- lipu */
+.lipulist { display: flex; flex-direction: column; }
+.lipurow {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  padding: 0.6rem 0.1rem;
+  border: 0;
+  border-top: 1px solid var(--rule);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+.lipurow:first-child { border-top: 0; }
+.lipurow .body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
+.lipurow .body b { font-family: var(--mono); font-weight: 500; color: var(--accent); }
+.lipurow .body span { font-size: 0.8125rem; color: var(--ink-dim); }
+.lipurow .mark { color: var(--ink-faint); font-size: 1rem; }
+.lipurow[data-state="done"] .mark { color: var(--gold); }
+.lipurow[data-state="locked"] { opacity: 0.45; }
+
+.lipu-title { font-family: var(--mono); font-size: 1.25rem; color: var(--accent); margin: 0.2rem 0 0; }
+.lipulines { display: flex; flex-direction: column; gap: 0.15rem; }
+.lipuline {
+  padding: 0.5rem 0.1rem;
+  border-bottom: 1px solid var(--rule);
+}
+.lipuline p { margin: 0; }
+.lipuline .tp {
+  font-family: var(--mono);
+  color: var(--accent);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.lipuline .meaning { font-size: 0.875rem; color: var(--ink-dim); margin-top: 0.15rem; }
+
+.lipuline .reveal {
+  margin-top: 0.15rem;
+  padding: 0.1rem 0.45rem;
+  border: 1px dashed var(--rule-strong);
+  border-radius: 0.4rem;
+  background: none;
+  color: var(--ink-faint);
+  font: inherit;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+}
+
+/* --------------------------------------------------- sitelen zeichnen */
+.tracebox {
+  display: flex;
+  justify-content: center;
+  padding: 0.6rem 0;
+}
+.trace {
+  width: min(260px, 72vw);
+  height: min(260px, 72vw);
+  border: 1px dashed var(--rule-strong);
+  border-radius: 0.9rem;
+  background: var(--surface);
+  color: var(--accent);
+  touch-action: none;   /* sonst scrollt die Seite beim Zeichnen */
+}
+
 </style>
 
 <div id="app"></div>
@@ -1125,6 +1255,208 @@ const TOKIPONA_TOKI = {
     { id: 'q16', stage: 11, tp: 'sina jo e ijo mute anu ijo lili?',
       de: ['Hast du viel oder wenig?'], en: ['Do you have much or little?'], need: ['object'],
       models: ['mi jo e ijo lili.', 'mi jo e lipu tu.'] },
+  ],
+
+  // Wörter, die in keiner Kursaufgabe vorkommen, brauchen trotzdem einen
+  // Beispielsatz in der Wortliste.
+  extras: {
+    anu: { tp: 'sina moku e kili anu telo?', de: 'Isst du Obst oder Wasser?',
+           en: 'Do you consume fruit or water?' },
+    en: { tp: 'mi en sina li pona.', de: 'Du und ich sind gut.', en: 'You and I are good.' },
+    ko: { tp: 'ko li lon noka mi.', de: 'Matsch ist an meinem Fuß.', en: 'Goo is on my foot.' },
+    len: { tp: 'len mi li laso.', de: 'Meine Kleidung ist blau.', en: 'My clothing is blue.' },
+    mani: { tp: 'mi jo e mani lili.', de: 'Ich habe wenig Geld.', en: 'I have little money.' },
+    mu: { tp: 'soweli li mu.', de: 'Das Tier macht Tierlaute.', en: 'The animal makes animal noise.' },
+    noka: { tp: 'noka mi li wawa.', de: 'Meine Beine sind stark.', en: 'My legs are strong.' },
+    palisa: { tp: 'palisa li kiwen.', de: 'Der Stock ist hart.', en: 'The stick is hard.' },
+    poki: { tp: 'moku li lon poki.', de: 'Das Essen ist in der Schüssel.',
+            en: 'The food is in the container.' },
+    selo: { tp: 'selo kili li loje.', de: 'Die Schale der Frucht ist rot.',
+            en: 'The skin of the fruit is red.' },
+    sin: { tp: 'mi jo e lipu sin.', de: 'Ich habe ein neues Buch.', en: 'I have a new book.' },
+    unpa: { tp: 'jan tu li unpa.', de: 'Zwei Menschen haben Sex.', en: 'Two people have sex.' },
+    waso: { tp: 'waso li tawa sewi.', de: 'Der Vogel fliegt nach oben.', en: 'The bird goes upward.' },
+    epiku: { tp: 'musi ni li epiku.', de: 'Dieses Spiel ist episch.', en: 'This game is epic.' },
+    jasima: { tp: 'mi lukin e jasima.', de: 'Ich schaue in den Spiegel.',
+              en: 'I look into the mirror.' },
+    kijetesantakalu: { tp: 'kijetesantakalu li soweli pona.',
+                       de: 'Der Waschbär ist ein nettes Tier.', en: 'The raccoon is a fine animal.' },
+    kin: { tp: 'mi kin li tawa.', de: 'Ich gehe auch.', en: 'I am going too.' },
+    kipisi: { tp: 'mi kipisi e pan.', de: 'Ich schneide das Brot.', en: 'I cut the bread.' },
+    kokosila: { tp: 'o kokosila ala!', de: 'Sprich hier nicht die andere Sprache!',
+                en: 'Do not speak the other language here!' },
+    ku: { tp: 'lipu ku li suli.', de: 'Das ku-Buch ist dick.', en: 'The ku book is thick.' },
+    lanpan: { tp: 'jan li lanpan e mani mi.', de: 'Jemand nimmt mir das Geld weg.',
+              en: 'Someone takes my money.' },
+    leko: { tp: 'leko li lon supa.', de: 'Der Klotz liegt auf dem Tisch.',
+            en: 'The block is on the table.' },
+    meso: { tp: 'moku ni li meso.', de: 'Dieses Essen ist mittelmäßig.', en: 'This food is mediocre.' },
+    misikeke: { tp: 'mi moku e misikeke.', de: 'Ich nehme Medizin.', en: 'I take medicine.' },
+    monsuta: { tp: 'monsuta li lon tomo pimeja.', de: 'Ein Monster ist im dunklen Haus.',
+               en: 'A monster is in the dark house.' },
+    namako: { tp: 'mi pana e namako tawa moku.', de: 'Ich gebe Gewürz ans Essen.',
+              en: 'I add spice to the food.' },
+    oko: { tp: 'oko mi li lape.', de: 'Meine Augen schlafen.', en: 'My eyes are asleep.' },
+    soko: { tp: 'soko li lon ma kasi.', de: 'Der Pilz ist im Wald.', en: 'The mushroom is in the forest.' },
+    tonsi: { tp: 'jan tonsi li pona.', de: 'Die nichtbinäre Person ist gut.',
+             en: 'The nonbinary person is good.' },
+    n: { tp: 'n. mi wile lukin.', de: 'Hm. Ich will nachsehen.', en: 'Hm. I want to look.' },
+  },
+
+  // Zwei kurze Gedanken, ein Satz. Genau die Stelle, an der es hakt: „la“
+  // stellt einen Rahmen voran, „pi“ gruppiert eine mehrwortige Beifügung um.
+  joins: [
+    { id: 'j01', stage: 9, kind: 'la', parts: ['tenpo pini', 'mi moku e kili'],
+      tp: 'tenpo pini la mi moku e kili.',
+      de: ['Früher habe ich Obst gegessen.'], en: ['Earlier I ate fruit.'] },
+    { id: 'j02', stage: 9, kind: 'la', parts: ['tenpo suno ni', 'mi pali mute'],
+      tp: 'tenpo suno ni la mi pali mute.',
+      de: ['Heute arbeite ich viel.'], en: ['Today I work a lot.'] },
+    { id: 'j03', stage: 9, kind: 'la', parts: ['sina lape', 'sina wawa'],
+      tp: 'sina lape la sina wawa.',
+      de: ['Wenn du schläfst, bist du stark.'], en: ['If you sleep, you are strong.'] },
+    { id: 'j04', stage: 9, kind: 'la', parts: ['ma li lete', 'mi awen lon tomo'],
+      tp: 'ma li lete la mi awen lon tomo.',
+      de: ['Wenn es draußen kalt ist, bleibe ich zu Hause.'],
+      en: ['When it is cold outside, I stay at home.'] },
+    { id: 'j05', stage: 9, kind: 'la', parts: ['tenpo kama', 'mi kama sona e toki pona'],
+      tp: 'tenpo kama la mi kama sona e toki pona.',
+      de: ['Bald lerne ich toki pona.'], en: ['Soon I will learn toki pona.'] },
+    { id: 'j06', stage: 9, kind: 'pi', parts: ['jan', 'toki pona'],
+      tp: 'jan pi toki pona li toki.',
+      de: ['Der toki-pona-Sprecher redet.'], en: ['The toki pona speaker is talking.'] },
+    { id: 'j07', stage: 9, kind: 'pi', parts: ['tomo', 'pali mute'],
+      tp: 'tomo pi pali mute li suli.',
+      de: ['Das Haus der vielen Arbeit ist groß.'], en: ['The house of much work is big.'] },
+    { id: 'j08', stage: 9, kind: 'pi', parts: ['jan', 'pana sona'],
+      tp: 'jan pi pana sona li pona.',
+      de: ['Die Lehrerin ist gut.'], en: ['The teacher is good.'] },
+    { id: 'j09', stage: 9, kind: 'pi', parts: ['lipu', 'toki mute'],
+      tp: 'mi lukin e lipu pi toki mute.',
+      de: ['Ich lese ein Buch mit vielen Sprachen.'], en: ['I read a book of many languages.'] },
+    { id: 'j10', stage: 10, kind: 'la', parts: ['mi wile lape', 'mi tawa tomo mi'],
+      tp: 'mi wile lape la mi tawa tomo mi.',
+      de: ['Wenn ich schlafen will, gehe ich nach Hause.'],
+      en: ['When I want to sleep, I go home.'] },
+  ],
+};
+
+
+</script>
+<script>
+// Lesen am Stück: kurze zusammenhängende Texte statt lauter Einzelsätze.
+//
+// Jede Zeile ist ein gültiger Satz (geprüft in prototype/test.js), die
+// Übersetzung liegt darunter und wird erst auf Tippen sichtbar — erst raten,
+// dann nachsehen. Danach ein paar Fragen zum Text.
+const TOKIPONA_LIPU = {
+  texts: [
+    {
+      id: 'lipu1', stage: 3,
+      title: { de: 'soweli lili', en: 'soweli lili' },
+      about: { de: 'Ein kleines Tier und sein Hunger.', en: 'A small animal and its hunger.' },
+      lines: [
+        { tp: 'soweli lili li lon ma.', de: 'Ein kleines Tier ist auf dem Land.',
+          en: 'A small animal is in the land.' },
+        { tp: 'ona li wile moku.', de: 'Es will essen.', en: 'It wants to eat.' },
+        { tp: 'soweli li lukin e kili.', de: 'Das Tier sieht eine Frucht.',
+          en: 'The animal sees a fruit.' },
+        { tp: 'kili li suli.', de: 'Die Frucht ist groß.', en: 'The fruit is big.' },
+        { tp: 'soweli li moku e kili.', de: 'Das Tier isst die Frucht.',
+          en: 'The animal eats the fruit.' },
+        { tp: 'soweli li pona.', de: 'Dem Tier geht es gut.', en: 'The animal is well.' },
+      ],
+      questions: [
+        { tp: 'soweli li moku e seme?', de: 'Was isst das Tier?', en: 'What does the animal eat?',
+          options: { de: ['die Frucht', 'das Land', 'Wasser'],
+                     en: ['the fruit', 'the land', 'water'] }, right: 0 },
+        { tp: 'kili li suli anu lili?', de: 'Ist die Frucht groß oder klein?',
+          en: 'Is the fruit big or small?',
+          options: { de: ['groß', 'klein', 'das steht nicht da'],
+                     en: ['big', 'small', 'it does not say'] }, right: 0 },
+      ],
+    },
+    {
+      id: 'lipu2', stage: 6,
+      title: { de: 'tomo mi', en: 'tomo mi' },
+      about: { de: 'Ein Tag zwischen Haus und Stadt.', en: 'A day between house and town.' },
+      lines: [
+        { tp: 'mi lon tomo mi.', de: 'Ich bin in meinem Haus.', en: 'I am in my house.' },
+        { tp: 'tomo mi li lili taso li pona.', de: 'Mein Haus ist klein, aber gut.',
+          en: 'My house is small but good.' },
+        { tp: 'tenpo suno la mi tawa ma tomo.', de: 'Am Tag gehe ich in die Stadt.',
+          en: 'During the day I go to town.' },
+        { tp: 'mi kepeken e tomo tawa.', de: 'Ich benutze ein Auto.', en: 'I use a car.' },
+        { tp: 'jan pona mi li lon ma tomo.', de: 'Mein Freund ist in der Stadt.',
+          en: 'My friend is in town.' },
+        { tp: 'mi moku lon tomo pi jan pona mi.', de: 'Ich esse im Haus meines Freundes.',
+          en: 'I eat at my friend’s house.' },
+        { tp: 'tenpo pimeja la mi tawa tomo mi.', de: 'In der Nacht gehe ich nach Hause.',
+          en: 'At night I go back to my house.' },
+      ],
+      questions: [
+        { tp: 'mi tawa seme lon tenpo suno?', de: 'Wohin geht die Erzählerin am Tag?',
+          en: 'Where does the narrator go during the day?',
+          options: { de: ['in die Stadt', 'ins Bett', 'aufs Land'],
+                     en: ['to town', 'to bed', 'to the countryside'] }, right: 0 },
+        { tp: 'mi moku lon seme?', de: 'Wo wird gegessen?', en: 'Where is the eating done?',
+          options: { de: ['im Haus des Freundes', 'im eigenen Haus', 'im Auto'],
+                     en: ['at the friend’s house', 'at home', 'in the car'] }, right: 0 },
+      ],
+    },
+    {
+      id: 'lipu3', stage: 9,
+      title: { de: 'jan pi toki pona', en: 'jan pi toki pona' },
+      about: { de: 'Warum jemand diese Sprache lernt.', en: 'Why someone learns this language.' },
+      lines: [
+        { tp: 'jan Ana li jan pi toki pona.', de: 'Ana ist ein toki-pona-Mensch.',
+          en: 'Ana is a toki pona person.' },
+        { tp: 'tenpo pini la ona li sona ala e nimi.', de: 'Früher kannte sie die Wörter nicht.',
+          en: 'Earlier she did not know the words.' },
+        { tp: 'ona li kama sona e nimi mute.', de: 'Sie lernte viele Wörter.',
+          en: 'She learned many words.' },
+        { tp: 'nimi li lili taso toki li suli.', de: 'Die Wörter sind wenige, aber die Sprache ist groß.',
+          en: 'The words are few but the language is large.' },
+        { tp: 'tenpo ni la ona li toki e ijo ale.', de: 'Jetzt sagt sie alles.',
+          en: 'Now she says everything.' },
+        { tp: 'toki pona li pona tawa ona.', de: 'toki pona gefällt ihr.',
+          en: 'She likes toki pona.' },
+      ],
+      questions: [
+        { tp: 'jan Ana li kama sona e seme?', de: 'Was hat Ana gelernt?', en: 'What did Ana learn?',
+          options: { de: ['viele Wörter', 'ein Lied', 'gar nichts'],
+                     en: ['many words', 'a song', 'nothing at all'] }, right: 0 },
+        { tp: 'nimi li mute anu lili?', de: 'Sind es viele Wörter oder wenige?',
+          en: 'Are the words many or few?',
+          options: { de: ['wenige', 'viele', 'das steht nicht da'],
+                     en: ['few', 'many', 'it does not say'] }, right: 0 },
+      ],
+    },
+    {
+      id: 'lipu4', stage: 11,
+      title: { de: 'tenpo mute', en: 'tenpo mute' },
+      about: { de: 'Zählen, warten, weitermachen.', en: 'Counting, waiting, carrying on.' },
+      lines: [
+        { tp: 'mi jo e soweli tu.', de: 'Ich habe zwei Tiere.', en: 'I have two animals.' },
+        { tp: 'soweli wan li suli. soweli wan li lili.',
+          de: 'Ein Tier ist groß. Ein Tier ist klein.',
+          en: 'One animal is big. One animal is small.' },
+        { tp: 'tenpo suno luka la mi pana e moku tawa ona.',
+          de: 'Fünf Tage lang gebe ich ihnen Essen.',
+          en: 'For five days I give them food.' },
+        { tp: 'ona li kama suli.', de: 'Sie werden groß.', en: 'They grow big.' },
+        { tp: 'tenpo kama la mi jo e soweli mute.',
+          de: 'Später habe ich viele Tiere.', en: 'Later I will have many animals.' },
+      ],
+      questions: [
+        { tp: 'mi jo e soweli mute seme?', de: 'Wie viele Tiere sind es am Anfang?',
+          en: 'How many animals are there at the start?',
+          options: { de: ['zwei', 'fünf', 'viele'], en: ['two', 'five', 'many'] }, right: 0 },
+        { tp: 'mi pana e seme tawa soweli?', de: 'Was bekommen die Tiere?',
+          en: 'What do the animals get?',
+          options: { de: ['Essen', 'Wasser', 'ein Haus'], en: ['food', 'water', 'a house'] }, right: 0 },
+      ],
+    },
   ],
 };
 
@@ -1926,9 +2258,9 @@ const TokiPona = (function (data) {
 // bauen statt erkennen, sofortige Rückmeldung mit Satzröntgen, sichtbarer
 // Fortschritt — ohne Herzen und ohne Bestenliste.
 
-(function (DATA, MUSI, OPEN, TP) {
+(function (DATA, MUSI, OPEN, LIPU, TP) {
   const KEY = 'o-toki-fortschritt-v1';
-  const GOAL = 40;
+  const GOALS = [20, 40, 60];
 
   // Alles, was die Oberfläche sagt, steht hier — die Lektionen selbst kommen
   // aus den Kursdaten, die in derselben Sprache vorliegen.
@@ -1990,6 +2322,32 @@ const TokiPona = (function (data) {
       backupApply: 'Diesen Stand übernehmen',
       summary: (lvl, lessons, cards, xp) => `Stufe ${lvl}, ${lessons} Lektionen, ${cards} Karten, ${xp} XP`,
       langLabel: 'sprache', langOther: 'English',
+      askTrace: 'zeichne das zeichen',
+      traceClear: 'nochmal',
+      traceHint: 'Fahr mit dem Finger über die Vorlage. Mehrere Striche sind erlaubt.',
+      traceGood: 'Getroffen',
+      traceThin: 'Da fehlt noch ein Stück der Vorlage.',
+      traceWide: 'Zu viel daneben — bleib auf der Linie.',
+      traceScore: (hit, clean) => `Vorlage ${hit}% getroffen, ${clean}% deiner Linie sitzt drauf.`,
+      readTitle: 'lipu — lesen',
+      readHint: 'Zusammenhängende Texte. Tipp auf eine Zeile, dann steht die '
+        + 'Übersetzung da; erst raten lohnt sich.',
+      readReveal: 'Übersetzung',
+      readLocked: (stage) => `ab Lektion ${stage}`,
+      readQuestions: 'Fragen zum Text',
+      readBack: 'zurück',
+      askQuiz: 'zum text',
+      askJoin: 'mach einen satz daraus',
+      joinParts: 'aus:',
+      joinLa: '<b>la</b> stellt den Rahmen voran: erst der Rahmen, dann <b>la</b>, dann der Satz.',
+      joinPi: '<b>pi</b> gruppiert um: alles hinter <b>pi</b> gehört zusammen zum Kopfwort davor.',
+      weekTitle: 'diese woche',
+      weekDays: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
+      weekSum: (xp, days) => `${xp} XP in sieben Tagen · ${days} Tag(e) am Ziel`,
+      goalTitle: 'tagesziel',
+      goalHint: 'Wie viel willst du dir an einem Tag vornehmen? Eine Aufgabe bringt zehn Punkte.',
+      goalPick: (xp) => `${xp} XP`,
+      example: 'Beispiel',
       askAnswer: 'antworte frei',
       answerHint: 'Deine Antwort, dein Satz. Geprüft wird der Bau.',
       answerNeeds: (what) => `Die Antwort braucht ${what}.`,
@@ -2080,6 +2438,32 @@ const TokiPona = (function (data) {
       backupApply: 'Use this progress',
       summary: (lvl, lessons, cards, xp) => `level ${lvl}, ${lessons} lessons, ${cards} cards, ${xp} XP`,
       langLabel: 'language', langOther: 'Deutsch',
+      askTrace: 'draw the glyph',
+      traceClear: 'again',
+      traceHint: 'Trace the template with your finger. Several strokes are fine.',
+      traceGood: 'On the line',
+      traceThin: 'Part of the template is still missing.',
+      traceWide: 'Too much beside it — stay on the line.',
+      traceScore: (hit, clean) => `${hit}% of the template covered, ${clean}% of your line sits on it.`,
+      readTitle: 'lipu — reading',
+      readHint: 'Texts that hang together. Tap a line and the translation appears; '
+        + 'guessing first pays off.',
+      readReveal: 'translation',
+      readLocked: (stage) => `from lesson ${stage}`,
+      readQuestions: 'Questions about the text',
+      readBack: 'back',
+      askQuiz: 'about the text',
+      askJoin: 'make one sentence out of these',
+      joinParts: 'from:',
+      joinLa: '<b>la</b> puts the frame up front: frame first, then <b>la</b>, then the sentence.',
+      joinPi: '<b>pi</b> regroups: everything after <b>pi</b> belongs to the head word before it.',
+      weekTitle: 'this week',
+      weekDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      weekSum: (xp, days) => `${xp} XP in seven days · ${days} day(s) on target`,
+      goalTitle: 'daily goal',
+      goalHint: 'How much do you want to take on in a day? One exercise is worth ten points.',
+      goalPick: (xp) => `${xp} XP`,
+      example: 'Example',
       askAnswer: 'answer freely',
       answerHint: 'Your answer, your sentence. What gets checked is the build.',
       answerNeeds: (what) => `The answer needs ${what}.`,
@@ -2195,7 +2579,8 @@ const TokiPona = (function (data) {
   const today = () => new Date().toISOString().slice(0, 10);
 
   const blank = {
-    xp: 0, streak: 0, lastDay: null, dayXp: 0, done: {}, mastery: {}, seenWords: {}, srs: {},
+    xp: 0, streak: 0, lastDay: null, dayXp: 0, goal: 40, days: {}, read: {},
+    done: {}, mastery: {}, seenWords: {}, srs: {},
     sitelen: false,
     sound: true,
     lang: (navigator.language || 'de').toLowerCase().startsWith('de') ? 'de' : 'en',
@@ -2250,6 +2635,7 @@ const TokiPona = (function (data) {
 
   let state = load();
   let session = null;
+  let reading = null;
   let tab = 'pfad';
 
   function load() {
@@ -2268,6 +2654,10 @@ const TokiPona = (function (data) {
   function level() { return Math.floor(state.xp / 100) + 1; }
   function levelProgress() { return state.xp % 100; }
 
+  const goal = () => state.goal || 40;
+  // Datum von vor n Tagen, als Zeichenkette — die Tagesschlüssel sind sortierbar.
+  const weekStart = (back) => new Date(Date.now() - back * 86400000).toISOString().slice(0, 10);
+
   function award(points) {
     const day = today();
     if (state.lastDay !== day) {
@@ -2279,6 +2669,12 @@ const TokiPona = (function (data) {
     }
     state.xp += points;
     state.dayXp += points;
+    // Für die Wochenübersicht: die letzten Tage bleiben stehen, ältere fliegen raus.
+    state.days = state.days || {};
+    state.days[day] = state.dayXp;
+    for (const key of Object.keys(state.days)) {
+      if (key < weekStart(13)) delete state.days[key];
+    }
     save();
   }
 
@@ -2310,10 +2706,27 @@ const TokiPona = (function (data) {
       const lesson = lessons().find((l) => l.words.includes(rest)) || lessons()[0];
       return TP.lexicon[rest] ? { type: 'word', word: rest, lesson, concepts: [] } : null;
     }
+    if (kind === 't') {
+      const lesson = lessons().find((l) => l.words.includes(rest)) || lessons()[0];
+      return TP.lexicon[rest] && hasGlyph(rest)
+        ? { type: 'trace', word: rest, lesson, concepts: [] } : null;
+    }
     if (kind === 'g') {
       const lesson = lessons().find((l) => l.words.includes(rest)) || lessons()[0];
       return TP.lexicon[rest] && hasGlyph(rest)
         ? { type: 'glyph', word: rest, lesson, concepts: [] } : null;
+    }
+    if (kind === 's') {
+      const join = OPEN.joins.find((entry) => entry.id === rest);
+      if (join) return joinTask(join, lessonOf(join.stage) || lessons()[0]);
+    }
+
+    if (kind === 'r') {
+      const [textId, index] = rest.split('-');
+      const text = LIPU.texts.find((entry) => entry.id === textId);
+      const question = text && text.questions[Number(index)];
+      return question ? { type: 'quiz', question, text, index: Number(index),
+                          lesson: lessonOf(text.stage) || lessons()[0], concepts: [] } : null;
     }
     if (kind === 'q') {
       const prompt = OPEN.prompts.find((entry) => entry.id === rest);
@@ -2335,7 +2748,9 @@ const TokiPona = (function (data) {
   }
 
   function keyOf(task) {
+    if (task.type === 'quiz') return 'r:' + task.text.id + '-' + task.index;
     if (task.type === 'answer') return 'q:' + task.prompt.id;
+    if (task.type === 'trace') return 't:' + task.word;
     if (task.type === 'glyph') return 'g:' + task.word;
     if (task.type === 'word') return 'w:' + task.word;
     if (task.type === 'compound') return 'c:' + COMPOUNDS.indexOf(task.compound);
@@ -2448,6 +2863,8 @@ const TokiPona = (function (data) {
     const glyphWord = words.find(hasGlyph);
     if (state.sitelen && glyphWord) {
       tasks.push({ type: 'glyph', word: glyphWord, lesson, concepts: [] });
+      const traceWord = words.filter(hasGlyph)[1] || glyphWord;
+      tasks.push({ type: 'trace', word: traceWord, lesson, concepts: [] });
     }
 
     const heard = reads[2] || builds[4];
@@ -2457,6 +2874,9 @@ const TokiPona = (function (data) {
 
     // Eine offene Frage ersetzt das freie Übersetzen: beides ist Tippen, aber
     // die eigene Antwort ist die interessantere Übung.
+    const join = shuffle(OPEN.joins.filter((entry) => entry.stage <= lesson.number))[0];
+    if (join) tasks.push(joinTask(join, lesson));
+
     const prompt = shuffle(OPEN.prompts.filter((entry) => entry.stage <= lesson.number))[0];
     if (prompt) tasks.push({ type: 'answer', prompt, lesson, concepts: lessonConcepts(lesson) });
     else if (builds[3]) {
@@ -2518,6 +2938,19 @@ const TokiPona = (function (data) {
     }
     return { lesson, musi: true, queue: tasks, index: 0, correct: 0, total: 0, xp: 0,
              retried: new Set() };
+  }
+
+  // Eine Fügung ist eine Bauaufgabe mit anderer Aufschrift: die beiden Teile
+  // stehen da, gebaut wird der eine Satz.
+  function joinTask(join, lesson) {
+    return {
+      type: 'build',
+      join,
+      lesson,
+      concepts: [join.kind === 'pi' ? 'c_pi' : 'c_la'],
+      item: { id: join.id, direction: 'de_tp', tp: join.tp, also: [],
+              target: join[state.lang] || join.de },
+    };
   }
 
   function buildReviewSession() {
@@ -2604,6 +3037,7 @@ const TokiPona = (function (data) {
     hideGloss();
     app.innerHTML = '';
     if (session) { renderSession(); clearStrayFocus(); return; }
+    if (reading) { app.append(readerScreen(reading)); clearStrayFocus(); return; }
     app.append(topbar());
     if (tab === 'pfad') app.append(pathScreen());
     else if (tab === 'nimi') app.append(wordScreen());
@@ -2618,10 +3052,10 @@ const TokiPona = (function (data) {
       <div>
         <div class="topbar">
           <div class="level"><div class="ring">${level()}</div><span>${escape(t('level'))}</span></div>
-          <div class="metric spacer gold">${escape(t('xpToday', state.dayXp, GOAL))}</div>
+          <div class="metric spacer gold">${escape(t('xpToday', state.dayXp, goal()))}</div>
           <div class="metric"><b>${state.streak}</b> ${escape(t('days'))}</div>
         </div>
-        <div class="goalbar"><span style="width:${Math.min(100, (state.dayXp / GOAL) * 100)}%"></span></div>
+        <div class="goalbar"><span style="width:${Math.min(100, (state.dayXp / goal()) * 100)}%"></span></div>
       </div>`);
     return bar;
   }
@@ -2701,6 +3135,9 @@ const TokiPona = (function (data) {
       screen.append(card);
     }
 
+    screen.append(readingCard());
+    screen.append(weekCard());
+    screen.append(goalCard());
     screen.append(languageCard());
     screen.append(soundCard());
     screen.append(sitelenCard());
@@ -2711,6 +3148,136 @@ const TokiPona = (function (data) {
         `<a href="https://lipu-sona.pona.la/${state.lang}/">lipu sona pona</a>`)}
         ${window.OTOKI_VERSION ? `<br><span class="version">${escape(t('versionLabel', window.OTOKI_VERSION))}</span>` : ''}</p>`));
     return screen;
+  }
+
+  function readingCard() {
+    const card = el(`
+      <div class="card">
+        <h2>${escape(t('readTitle'))}</h2>
+        <p class="hint">${escape(t('readHint'))}</p>
+        <div class="lipulist"></div>
+      </div>`);
+    const list = card.querySelector('.lipulist');
+    LIPU.texts.forEach((text) => {
+      const open = unlocked(text.stage);
+      const done = Boolean(state.read && state.read[text.id]);
+      const row = el(`
+        <button class="lipurow" data-state="${done ? 'done' : (open ? 'open' : 'locked')}">
+          <span class="body">
+            <b>${escape(text.title[state.lang] || text.title.de)}</b>
+            <span>${escape(text.about[state.lang] || text.about.de)}</span>
+          </span>
+          <span class="mark">${done ? '✓' : (open ? '›' : '·')}</span>
+        </button>`);
+      if (open) row.onclick = () => { reading = text; render(); };
+      else {
+        row.disabled = true;
+        row.querySelector('.body span').textContent = t('readLocked', text.stage);
+      }
+      list.append(row);
+    });
+    return card;
+  }
+
+  // Der Text selbst: Zeile für Zeile, Übersetzung erst auf Tippen.
+  function readerScreen(text) {
+    const screen = screenWith(`
+      <div class="exbar">
+        <button aria-label="${escape(t('readBack'))}">✕</button>
+        <span class="track"></span>
+        <span class="metric">lipu</span>
+      </div>
+      <h1 class="lipu-title">${escape(text.title[state.lang] || text.title.de)}</h1>
+      <p class="ask">${escape(text.about[state.lang] || text.about.de)}</p>
+      <div class="lipulines"></div>
+      <div class="actions"><button class="primary">${escape(t('readQuestions'))}</button></div>`);
+
+    screen.querySelector('.exbar button').onclick = () => { reading = null; render(); };
+
+    const lines = screen.querySelector('.lipulines');
+    text.lines.forEach((line) => {
+      const row = el('<div class="lipuline"></div>');
+      const tp = el('<p class="tp glossable"></p>');
+      tp.append(glossed(line.tp, 'glossline'));
+      withSay(tp, line.tp);
+      row.append(tp);
+      const meaning = el(`<p class="meaning" hidden>${escape(line[state.lang] || line.de)}</p>`);
+      row.append(meaning);
+      // Aufdecken über einen eigenen Knopf — ein Tipp auf ein Wort schlägt
+      // dieses Wort nach, das darf sich nicht in die Quere kommen.
+      const reveal = el(`<button class="reveal" type="button"
+        aria-label="${escape(t('readReveal'))}">${escape(t('readReveal'))}</button>`);
+      const toggle = () => {
+        meaning.hidden = !meaning.hidden;
+        reveal.hidden = !meaning.hidden;
+      };
+      reveal.onclick = (event) => { event.stopPropagation(); toggle(); };
+      row.append(reveal);
+      row.onclick = (event) => {
+        if (event.target.closest('.gloss-word') || event.target.closest('.say')) return;
+        toggle();
+      };
+      lines.append(row);
+    });
+
+    screen.querySelector('.primary').onclick = () => {
+      session = buildQuizSession(text);
+      reading = null;
+      render();
+    };
+    return screen;
+  }
+
+  function buildQuizSession(text) {
+    const tasks = text.questions.map((question, index) => ({
+      type: 'quiz', question, text, index, lesson: lessonOf(text.stage) || lessons()[0],
+      concepts: [],
+    }));
+    return { lesson: null, quiz: text, queue: tasks, index: 0, correct: 0, total: 0, xp: 0,
+             retried: new Set() };
+  }
+
+  // Sieben Tage als Balken. Kein Vergleich mit anderen, nur mit gestern.
+  function weekCard() {
+    const days = [];
+    for (let back = 6; back >= 0; back -= 1) {
+      const key = weekStart(back);
+      const date = new Date(Date.now() - back * 86400000);
+      days.push({ key, xp: (state.days && state.days[key]) || 0, weekday: (date.getDay() + 6) % 7 });
+    }
+    const highest = Math.max(goal(), ...days.map((day) => day.xp));
+    const names = t('weekDays');
+    const total = days.reduce((sum, day) => sum + day.xp, 0);
+    const reached = days.filter((day) => day.xp >= goal()).length;
+
+    const card = el(`
+      <div class="card">
+        <h2>${escape(t('weekTitle'))}</h2>
+        <div class="week">${days.map((day, index) => `
+          <div class="day" data-today="${index === days.length - 1}" data-done="${day.xp >= goal()}">
+            <span class="bar"><i style="height:${Math.round((day.xp / highest) * 100)}%"></i></span>
+            <span class="tick">${escape(names[day.weekday])}</span>
+          </div>`).join('')}</div>
+        <p class="hint">${escape(t('weekSum', total, reached))}</p>
+      </div>`);
+    return card;
+  }
+
+  function goalCard() {
+    const card = el(`
+      <div class="card">
+        <h2>${escape(t('goalTitle'))}</h2>
+        <p class="hint">${escape(t('goalHint'))}</p>
+        <div class="row"></div>
+      </div>`);
+    const row = card.querySelector('.row');
+    GOALS.forEach((value) => {
+      const button = el(`<button class="ghost" data-picked="${value === goal()}"
+        >${escape(t('goalPick', value))}</button>`);
+      button.onclick = () => { state.goal = value; save(); render(); };
+      row.append(button);
+    });
+    return card;
   }
 
   function languageCard() {
@@ -3003,6 +3570,8 @@ const TokiPona = (function (data) {
     else if (task.type === 'glyph') app.append(glyphTask(task));
     else if (task.type === 'listen') app.append(listenTask(task));
     else if (task.type === 'answer') app.append(answerTask(task));
+    else if (task.type === 'quiz') app.append(quizTask(task));
+    else if (task.type === 'trace') app.append(traceTask(task));
     else app.append(freeTask(task));
   }
 
@@ -3135,6 +3704,216 @@ const TokiPona = (function (data) {
       solution: task.item.tp,
       speak: task.item.tp,
       xray: task.item.tp,
+    });
+    return screen;
+  }
+
+  // sitelen pona selbst schreiben. Bewertet wird mit zwei Zahlen: wie viel
+  // der Vorlage getroffen wurde, und wie viel der eigenen Linie auf der
+  // Vorlage sitzt. Beides zählt — nur Kritzeln füllt zwar die Vorlage, sitzt
+  // aber daneben.
+  const TRACE = { size: 260, pen: 16, slack: 9, needHit: 0.55, needClean: 0.5 };
+
+  function traceTask(task) {
+    const screen = screenWith(`
+      <p class="prompt">${escape(t('askTrace'))}</p>
+      <h2 class="question tp">${escape(task.word)}</h2>
+      <p class="ask">${escape(glossesOf(task.word).slice(0, 3).join(', '))}</p>
+      <div class="tracebox">
+        <canvas class="trace" width="${TRACE.size}" height="${TRACE.size}"
+          aria-label="${escape(t('askTrace'))}"></canvas>
+      </div>
+      <div class="row"><button class="ghost">${escape(t('traceClear'))}</button></div>
+      <p class="hint">${escape(t('traceHint'))}</p>
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
+
+    const canvas = screen.querySelector('.trace');
+    const ctx = canvas.getContext('2d');
+    const button = screen.querySelector('.primary');
+
+    // Vorlage und ihre großzügige Umgebung liegen in eigenen Flächen.
+    const mask = (thick) => {
+      const off = document.createElement('canvas');
+      off.width = TRACE.size;
+      off.height = TRACE.size;
+      const pen = off.getContext('2d');
+      pen.textAlign = 'center';
+      pen.textBaseline = 'middle';
+      pen.font = `${Math.round(TRACE.size * 0.78)}px "linja pimeja", monospace`;
+      pen.fillStyle = '#000';
+      const middle = TRACE.size / 2;
+      if (!thick) pen.fillText(task.word, middle, middle);
+      else {
+        for (let angle = 0; angle < 360; angle += 30) {
+          const rad = (angle * Math.PI) / 180;
+          pen.fillText(task.word, middle + Math.cos(rad) * thick, middle + Math.sin(rad) * thick);
+        }
+        pen.fillText(task.word, middle, middle);
+      }
+      return pen.getImageData(0, 0, TRACE.size, TRACE.size).data;
+    };
+
+    const template = mask(0);
+    const templateWide = mask(TRACE.slack);
+
+    const strokes = [];
+    let current = null;
+
+    const paint = () => {
+      ctx.clearRect(0, 0, TRACE.size, TRACE.size);
+      // Vorlage blass im Hintergrund
+      ctx.save();
+      ctx.globalAlpha = 0.16;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = `${Math.round(TRACE.size * 0.78)}px "linja pimeja", monospace`;
+      ctx.fillStyle = getComputedStyle(canvas).color;
+      ctx.fillText(task.word, TRACE.size / 2, TRACE.size / 2);
+      ctx.restore();
+
+      ctx.lineWidth = TRACE.pen;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = getComputedStyle(canvas).color;
+      for (const stroke of strokes) {
+        if (!stroke.length) continue;
+        ctx.beginPath();
+        ctx.moveTo(stroke[0].x, stroke[0].y);
+        for (const point of stroke.slice(1)) ctx.lineTo(point.x, point.y);
+        if (stroke.length === 1) ctx.lineTo(stroke[0].x + 0.1, stroke[0].y + 0.1);
+        ctx.stroke();
+      }
+    };
+
+    // Die eigene Linie als Fläche, einmal dünn und einmal großzügig.
+    const drawn = (thick) => {
+      const off = document.createElement('canvas');
+      off.width = TRACE.size;
+      off.height = TRACE.size;
+      const pen = off.getContext('2d');
+      pen.lineWidth = TRACE.pen + thick * 2;
+      pen.lineCap = 'round';
+      pen.lineJoin = 'round';
+      pen.strokeStyle = '#000';
+      for (const stroke of strokes) {
+        if (!stroke.length) continue;
+        pen.beginPath();
+        pen.moveTo(stroke[0].x, stroke[0].y);
+        for (const point of stroke.slice(1)) pen.lineTo(point.x, point.y);
+        if (stroke.length === 1) pen.lineTo(stroke[0].x + 0.1, stroke[0].y + 0.1);
+        pen.stroke();
+      }
+      return pen.getImageData(0, 0, TRACE.size, TRACE.size).data;
+    };
+
+    const score = () => {
+      const mine = drawn(0);
+      const mineWide = drawn(TRACE.slack);
+      let ink = 0;
+      let inkHit = 0;
+      let line = 0;
+      let lineClean = 0;
+      for (let i = 3; i < template.length; i += 4) {
+        const isInk = template[i] > 40;
+        const isLine = mine[i] > 40;
+        if (isInk) { ink += 1; if (mineWide[i] > 40) inkHit += 1; }
+        if (isLine) { line += 1; if (templateWide[i] > 40) lineClean += 1; }
+      }
+      return {
+        hit: ink ? inkHit / ink : 0,
+        clean: line ? lineClean / line : 0,
+      };
+    };
+
+    const place = (event) => {
+      const box = canvas.getBoundingClientRect();
+      return {
+        x: ((event.clientX - box.left) / box.width) * TRACE.size,
+        y: ((event.clientY - box.top) / box.height) * TRACE.size,
+      };
+    };
+
+    canvas.addEventListener('pointerdown', (event) => {
+      event.preventDefault();
+      current = [place(event)];
+      strokes.push(current);
+      button.disabled = false;
+      paint();
+    });
+    canvas.addEventListener('pointermove', (event) => {
+      if (!current) return;
+      current.push(place(event));
+      paint();
+    });
+    const stop = () => { current = null; };
+    canvas.addEventListener('pointerup', stop);
+    canvas.addEventListener('pointercancel', stop);
+    canvas.addEventListener('pointerleave', stop);
+
+    screen.querySelector('.ghost').onclick = () => {
+      strokes.length = 0;
+      current = null;
+      button.disabled = true;
+      paint();
+    };
+
+    button.onclick = () => {
+      const marks = score();
+      const hit = Math.round(marks.hit * 100);
+      const clean = Math.round(marks.clean * 100);
+      const correct = marks.hit >= TRACE.needHit && marks.clean >= TRACE.needClean;
+      state.seenWords[task.word] = true;
+      finish(task, correct, {
+        solution: task.word,
+        speak: task.word,
+        xray: null,
+        reason: `${escape(t('traceScore', hit, clean))}`
+          + (correct ? '' : ` ${escape(marks.hit < TRACE.needHit ? t('traceThin') : t('traceWide'))}`),
+      });
+    };
+
+    // Erst zeichnen, wenn die Schrift wirklich da ist — sonst steht die
+    // Vorlage als lateinische Buchstabe da.
+    paint();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(paint);
+    return screen;
+  }
+
+  // Frage zum gelesenen Text.
+  function quizTask(task) {
+    const question = task.question;
+    const options = question.options[state.lang] || question.options.de;
+    const right = options[question.right];
+
+    const screen = screenWith(`
+      <p class="prompt">${escape(t('askQuiz'))}</p>
+      <h2 class="question tp glossable"></h2>
+      <p class="ask">${escape(question[state.lang] || question.de)}</p>
+      <div class="choices"></div>
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
+
+    const asked = screen.querySelector('.question');
+    asked.append(glossed(question.tp, 'glossline'));
+    withSay(asked, question.tp);
+
+    let picked = null;
+    const list = screen.querySelector('.choices');
+    const button = screen.querySelector('.primary');
+    shuffle(options.slice()).forEach((option) => {
+      const choice = el(`<button class="choice">${escape(option)}</button>`);
+      choice.onclick = () => {
+        picked = option;
+        list.querySelectorAll('.choice').forEach((c) => { c.dataset.picked = 'false'; });
+        choice.dataset.picked = 'true';
+        button.disabled = false;
+      };
+      list.append(choice);
+    });
+
+    button.onclick = () => finish(task, picked === right, {
+      solution: right,
+      speak: question.tp,
+      xray: question.tp,
     });
     return screen;
   }
@@ -3312,8 +4091,10 @@ const TokiPona = (function (data) {
     const wordOf = new Map(bank.map((chip) => [chip.id, chip.word]));
 
     const screen = screenWith(`
-      <p class="prompt">${escape(t('askBuild'))}</p>
+      <p class="prompt">${escape(task.join ? t('askJoin') : t('askBuild'))}</p>
       <h2 class="question">${escape(task.item.target[0])}</h2>
+      ${task.join ? `<p class="parts"><span>${escape(t('joinParts'))}</span>
+        ${task.join.parts.map((part) => `<code>${escape(part)}</code>`).join('')}</p>` : ''}
       <div class="slot"></div>
       <p class="hint">${escape(t('hintBuild'))}</p>
       <div class="bank"></div>
@@ -3469,6 +4250,7 @@ const TokiPona = (function (data) {
         speak: task.item.tp,
         xray: answer || task.item.tp,
         grade: verdict.exact ? null : verdict,
+        reason: task.join && correct ? t(task.join.kind === 'pi' ? 'joinPi' : 'joinLa') : null,
       });
     };
     return screen;
@@ -3717,6 +4499,11 @@ const TokiPona = (function (data) {
     const lesson = session.lesson;
     const review = Boolean(session.review);
     const musi = Boolean(session.musi);
+    const quiz = session.quiz || null;
+    if (quiz) {
+      state.read = state.read || {};
+      state.read[quiz.id] = true;
+    }
     // Der Spaßmodus hakt keine Lektion ab — der Kursfortschritt bleibt seiner.
     if (lesson && !musi) {
       state.done[lesson.number] = true;
@@ -3727,17 +4514,19 @@ const TokiPona = (function (data) {
     const screen = el(`
       <div class="screen done">
         <div class="burst">pona!</div>
-        <h2>${escape(review ? t('reviewDone') : lesson.title)}</h2>
-        <p>${escape(review ? t('reviewNote')
-          : (musi ? t('musiLead') : lesson.note.replace(/<[^>]+>/g, '')))}</p>
+        <h2>${escape(quiz ? (quiz.title[state.lang] || quiz.title.de)
+          : (review ? t('reviewDone') : lesson.title))}</h2>
+        <p>${escape(quiz ? (quiz.about[state.lang] || quiz.about.de)
+          : (review ? t('reviewNote')
+            : (musi ? t('musiLead') : lesson.note.replace(/<[^>]+>/g, ''))))}</p>
         <div class="tally">
           <div><b>+${session.xp}</b><span>${escape(t('xp'))}</span></div>
           <div><b>${session.correct}</b><span>${escape(t('correct'))}</span></div>
-          <div><b>${review || musi ? session.queue.length : lesson.words.length}</b><span>${escape(t(review || musi ? 'cards' : 'words'))}</span></div>
+          <div><b>${review || musi || quiz ? session.queue.length : lesson.words.length}</b><span>${escape(t(review || musi || quiz ? 'cards' : 'words'))}</span></div>
         </div>
         <div class="actions">
           <button class="primary">${escape(t('next'))}</button>
-          ${review ? '' : `<button class="ghost">${escape(t('again'))}</button>`}
+          ${review || quiz ? '' : `<button class="ghost">${escape(t('again'))}</button>`}
         </div>
       </div>`);
 
@@ -3746,7 +4535,7 @@ const TokiPona = (function (data) {
       tab = musi ? 'musi' : 'pfad';
       render();
     };
-    if (!review) {
+    if (!review && !quiz) {
       screen.querySelector('.ghost').onclick = () => {
         session = musi ? buildMusiSession() : buildSession(lesson);
         render();
@@ -3842,6 +4631,33 @@ const TokiPona = (function (data) {
 
   // ------------------------------------------------------------ Wörter
 
+  // Zu jedem Wort ein Satz, in dem es vorkommt — der kürzeste, den der Kurs
+  // (oder der Spaßmodus) hergibt, samt Übersetzung.
+  let exampleCache = null;
+  function examples() {
+    if (exampleCache && exampleCache.lang === state.lang) return exampleCache.map;
+    const pool = [];
+    for (const lesson of lessons()) {
+      for (const item of lesson.items) pool.push({ tp: item.tp, say: item.target[0] });
+    }
+    for (const line of MUSI.lines) {
+      pool.push({ tp: line.tp, say: (line[state.lang] || line.de)[0] });
+    }
+    pool.sort((a, b) => a.tp.length - b.tp.length);
+    const map = new Map();
+    // Wörter, die im Kurs nicht vorkommen, haben ihren eigenen Satz.
+    for (const [word, extra] of Object.entries(OPEN.extras)) {
+      map.set(word, { tp: extra.tp, say: extra[state.lang] || extra.de });
+    }
+    for (const sentence of pool) {
+      for (const token of TP.tokenize(sentence.tp)) {
+        if (TP.lexicon[token.text] && !map.has(token.text)) map.set(token.text, sentence);
+      }
+    }
+    exampleCache = { lang: state.lang, map };
+    return map;
+  }
+
   function wordScreen() {
     const screen = screenWith(`
       <input class="search" placeholder="${escape(t('search'))}" aria-label="${escape(t('search'))}">
@@ -3851,6 +4667,7 @@ const TokiPona = (function (data) {
 
     const draw = (query) => {
       list.innerHTML = '';
+      const shown = examples();
       const term = query.trim().toLowerCase();
       Object.keys(TP.lexicon).sort().forEach((word) => {
         const entry = TP.lexicon[word];
@@ -3865,6 +4682,11 @@ const TokiPona = (function (data) {
             <em>${entry.book === 'pu' ? 'pu' : 'ku'}${state.seenWords[word] ? ' ✓' : ''}</em>
           </div>`);
         withSay(row, word);
+        const example = shown.get(word);
+        if (example) {
+          row.append(el(`<p class="example"><code>${escape(example.tp)}</code>
+            ${escape(example.say)}</p>`));
+        }
         list.append(row);
       });
     };
@@ -3949,7 +4771,7 @@ const TokiPona = (function (data) {
 
   render();
   probeGlyphs();
-})(TOKIPONA_DATA, TOKIPONA_MUSI, TOKIPONA_TOKI, TokiPona);
+})(TOKIPONA_DATA, TOKIPONA_MUSI, TOKIPONA_TOKI, TOKIPONA_LIPU, TokiPona);
 
 </script>
 
