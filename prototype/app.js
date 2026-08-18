@@ -91,8 +91,8 @@
       coinHint: 'Es gibt kein Wort dafür. Bau eins aus den Wörtern, die es gibt — '
         + 'zwei oder drei reichen.',
       coinGood: 'Geht — so kann man das sagen',
-      coinExact: 'Genau so sagt man es meistens',
-      coinUsual: (tp, lit) => `Verbreitet ist <code>${tp}</code> — wörtlich ${lit}.`,
+      coinExact: 'Genau die geläufige Fassung',
+      coinUsual: (tp, lit) => `Eine geläufige Fassung ist <code>${tp}</code> — wörtlich ${lit}.`,
       coinThin: 'Ein Wort allein umschreibt noch nichts.',
       unknownWords: (list) => `Kein toki-pona-Wort: ${list}`,
       coinBroken: 'Als Wortgruppe geht das noch nicht auf.',
@@ -103,6 +103,7 @@
       syllableBack: (part) => `Silbe ${part} — antippen nimmt sie zurück`,
       syllableHint: 'Jede Silbe hat die Form (K)V(n) — mehr Formen gibt es nicht.',
       syllableWord: (word, sense) => `${word} — ${sense}`,
+      netOpen: (word) => `Wortverband zu ${word} zeigen`,
       netAsHead: 'als Kopfwort', netAsMod: 'als Beifügung',
       netNone: 'Dazu steht im Korpus noch keine Verbindung.',
       netHint: 'Wortverbände aus allen Sätzen der App — so wird toki pona '
@@ -257,8 +258,8 @@
       coinHint: 'There is no word for this. Build one from the words there are — '
         + 'two or three will do.',
       coinGood: 'Works — you can say it like that',
-      coinExact: 'That is exactly how it is usually said',
-      coinUsual: (tp, lit) => `The common one is <code>${tp}</code> — literally ${lit}.`,
+      coinExact: 'Exactly the common version',
+      coinUsual: (tp, lit) => `A common version is <code>${tp}</code> — literally ${lit}.`,
       coinThin: 'One word alone does not describe anything yet.',
       unknownWords: (list) => `Not a toki pona word: ${list}`,
       coinBroken: 'That does not add up as a phrase yet.',
@@ -269,6 +270,7 @@
       syllableBack: (part) => `syllable ${part} — tap to take it back`,
       syllableHint: 'Every syllable has the shape (C)V(n) — there are no others.',
       syllableWord: (word, sense) => `${word} — ${sense}`,
+      netOpen: (word) => `show word partnerships for ${word}`,
       netAsHead: 'as head word', netAsMod: 'as modifier',
       netNone: 'No combinations for this one in the corpus yet.',
       netHint: 'Word partnerships from every sentence in the app — this is how '
@@ -416,8 +418,8 @@
       literal: { de: 'Mensch, der Wissen gibt', en: 'person who gives knowledge' } },
     { name: { de: 'Freund', en: 'Friend' }, tp: 'jan pona',
       literal: { de: 'guter Mensch', en: 'good person' } },
-    { name: { de: 'Fahrrad', en: 'Bicycle' }, tp: 'ilo tawa pi noka wawa',
-      literal: { de: 'Fahrgerät der starken Beine', en: 'moving tool of strong legs' } },
+    { name: { de: 'Fahrrad', en: 'Bicycle' }, tp: 'ilo tawa noka',
+      literal: { de: 'Bein-Fahrgerät', en: 'leg moving tool' } },
     { name: { de: 'Zug', en: 'Train' }, tp: 'tomo tawa linja',
       literal: { de: 'langgezogenes Fahrhaus', en: 'long moving house' } },
     { name: { de: 'Flugzeug', en: 'Aeroplane' }, tp: 'tomo tawa sewi',
@@ -444,10 +446,10 @@
       literal: { de: 'Wasser von oben', en: 'water from above' } },
     { name: { de: 'Bier', en: 'Beer' }, tp: 'telo nasa pan',
       literal: { de: 'wirres Kornwasser', en: 'strange grain water' } },
-    { name: { de: 'Käse', en: 'Cheese' }, tp: 'ko moku pi telo mama',
-      literal: { de: 'Essmasse aus Muttermilch', en: 'food stuff of mother water' } },
-    { name: { de: 'Katze', en: 'Cat' }, tp: 'soweli lili pi kalama musi',
-      literal: { de: 'kleines Tier mit lustigem Laut', en: 'small animal of funny sound' } },
+    { name: { de: 'Käse', en: 'Cheese' }, tp: 'moku pi telo mama',
+      literal: { de: 'Essen aus Milch', en: 'food of milk' } },
+    { name: { de: 'Schere', en: 'Scissors' }, tp: 'ilo kipisi',
+      literal: { de: 'Schneidegerät', en: 'cutting tool' } },
     { name: { de: 'Musik', en: 'Music' }, tp: 'kalama musi',
       literal: { de: 'lustiger Klang', en: 'playful sound' } },
     { name: { de: 'Zeitung', en: 'Newspaper' }, tp: 'lipu pi tenpo sin',
@@ -517,14 +519,62 @@
   }
 
   let state = load();
+  // Gleich zurückschreiben: dann steht im Speicher nur noch, was geprüft ist.
+  save();
   let session = null;
   let reading = null;
   let tab = 'pfad';
 
+  // Was aus dem Speicher oder aus einer Sicherungsdatei kommt, ist erst einmal
+  // fremder Text. Übernommen wird nur, was es geben darf, und nur in der Form,
+  // in der es sein muss — sonst reicht ein „__proto__“ in der Datei, um den
+  // Zustand zu verbiegen.
+  function sanitise(raw) {
+    const state = Object.assign({}, blank);
+    if (!raw || typeof raw !== 'object') return state;
+    const number = (value, fallback, max) => (typeof value === 'number' && Number.isFinite(value)
+      && value >= 0 && value <= max ? value : fallback);
+    const plain = (value, check) => {
+      const out = {};
+      if (!value || typeof value !== 'object') return out;
+      for (const key of Object.keys(value)) {
+        // Nur Schlüssel, wie die App sie selbst vergibt.
+        if (!/^[A-Za-z0-9_:.\-]{1,48}$/.test(key)) continue;
+        const kept = check(value[key]);
+        if (kept !== undefined) out[key] = kept;
+      }
+      return out;
+    };
+
+    state.xp = number(raw.xp, 0, 1e9);
+    state.dayXp = number(raw.dayXp, 0, 1e9);
+    state.streak = number(raw.streak, 0, 1e6);
+    state.goal = GOALS.includes(raw.goal) ? raw.goal : blank.goal;
+    state.lastDay = typeof raw.lastDay === 'string' ? raw.lastDay.slice(0, 10) : null;
+    state.lang = DATA.languages[raw.lang] ? raw.lang : blank.lang;
+    state.nameHead = typeof raw.nameHead === 'string' ? raw.nameHead.slice(0, 16) : blank.nameHead;
+    state.sitelen = raw.sitelen === true;
+    state.sound = raw.sound !== false;
+    state.done = plain(raw.done, (value) => (value ? true : undefined));
+    state.read = plain(raw.read, (value) => (value ? true : undefined));
+    state.seenWords = plain(raw.seenWords, (value) => (value ? true : undefined));
+    state.days = plain(raw.days, (value) => number(value, undefined, 1e9));
+    state.mastery = plain(raw.mastery, (value) => number(value, undefined, 1));
+    state.srs = plain(raw.srs, (card) => {
+      if (!card || typeof card !== 'object') return undefined;
+      return {
+        reps: number(card.reps, 0, 1e6),
+        interval: number(card.interval, 0, 1e13),
+        ease: number(card.ease, 2.5, 10),
+        due: number(card.due, Date.now(), 1e15),
+      };
+    });
+    return state;
+  }
+
   function load() {
     try {
-      const stored = JSON.parse(localStorage.getItem(KEY));
-      return stored ? Object.assign({}, blank, stored) : Object.assign({}, blank);
+      return sanitise(JSON.parse(localStorage.getItem(KEY)));
     } catch (error) {
       return Object.assign({}, blank);
     }
@@ -1435,8 +1485,9 @@
       throw new Error(t('backupForeign'));
     }
     return {
-      state: Object.assign({}, blank, found),
-      exported: payload && payload.exported ? payload.exported.slice(0, 10) : null,
+      state: sanitise(found),
+      exported: payload && typeof payload.exported === 'string'
+        ? payload.exported.slice(0, 10) : null,
     };
   }
 
@@ -2905,10 +2956,12 @@
         : detail.coin.unknown ? t('unknownWords', detail.coin.unknown.join(', '))
           : detail.coin.thin ? t('coinThin') : t('coinBroken'))}</p>`));
     } else if (detail.open && !detail.open.ok) {
-      const reason = detail.open.violations ? say(detail.open.violations[0])
-        : detail.open.echo ? t('answerEcho')
+      // Die Parsermeldung trägt das getippte Wort in sich — sie muss entschärft
+      // werden. Nur die Anforderungsnamen bringen eigene Auszeichnung mit.
+      const reason = detail.open.violations ? escape(say(detail.open.violations[0]))
+        : detail.open.echo ? escape(t('answerEcho'))
           : detail.open.missing ? t('answerMissing', detail.open.missing.map(needLabel).join(' + '))
-            : t('answerEmpty');
+            : escape(t('answerEmpty'));
       sheet.append(el(`<p class="reason">${reason}</p>`));
     } else if (detail.grade && detail.grade.particles) {
       const gap = detail.grade.particles;
@@ -3272,12 +3325,21 @@
             <em>${entry.book === 'pu' ? 'pu' : 'ku'}${state.seenWords[word] ? ' ✓' : ''}</em>
           </div>`);
         withSay(row, word);
-        // Antippen öffnet den Wortverband.
-        row.onclick = (event) => {
-          if (event.target.closest('.say')) return;
+        // Aufklappen geht per Knopf (auch mit der Tastatur) und per Tipp auf
+        // die Zeile — eine Zeile allein ist für Tastaturen unerreichbar.
+        const toggle = el(`<button class="netopen" type="button"
+          aria-expanded="false" aria-label="${escape(t('netOpen', word))}">nasin</button>`);
+        const flip = () => {
           const open = row.dataset.open === 'true';
           row.dataset.open = String(!open);
+          toggle.setAttribute('aria-expanded', String(!open));
           if (!open && !row.querySelector('.net')) row.append(netBox(word));
+        };
+        toggle.onclick = (event) => { event.stopPropagation(); flip(); };
+        row.append(toggle);
+        row.onclick = (event) => {
+          if (event.target.closest('.say') || event.target.closest('.netopen')) return;
+          flip();
         };
         const example = shown.get(word);
         if (example) {
