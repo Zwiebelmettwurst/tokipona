@@ -3,6 +3,7 @@
 
 const data = require('./data.js');
 const musi = require('./musi.js');
+const open = require('./toki.js');
 const TokiPona = require('./tokipona.js');
 
 let failures = 0;
@@ -116,7 +117,49 @@ for (const pattern of musi.patterns) {
   }
 }
 
-// 9. Gleichwertige Wortstellung: Beifügungen dürfen tauschen, Rollen nicht
+// 9. Offene Fragen: Frage, Beispielantworten und die geforderten Satzteile
+const roleSet = (text) => {
+  const parts = TokiPona.splitUtterances(text);
+  const violations = parts.flatMap((part) => TokiPona.parse(part).violations);
+  const roles = new Set(parts.flatMap((part) =>
+    TokiPona.xray(TokiPona.parse(part).utterance).map((span) => span.role)));
+  return { violations, roles };
+};
+const seenIds = new Set();
+let answers = 0;
+for (const prompt of open.prompts) {
+  check(!seenIds.has(prompt.id), `FRAGE ${prompt.id}: doppelte Kennung`);
+  seenIds.add(prompt.id);
+  const asked = roleSet(prompt.tp);
+  check(!asked.violations.length,
+    `FRAGE ${prompt.id}  ${prompt.tp} → ${asked.violations.map((v) => v.rule).join(', ')}`);
+  for (const lang of Object.keys(data.languages)) {
+    check(Array.isArray(prompt[lang]) && prompt[lang].length && prompt[lang][0].trim(),
+      `FRAGE ${prompt.id}: keine Übersetzung für ${lang}`);
+  }
+  for (const role of prompt.need) {
+    check(Boolean(open.needs[role]), `FRAGE ${prompt.id}: unbekannte Anforderung ${role}`);
+  }
+  check(prompt.models.length >= 1, `FRAGE ${prompt.id}: keine Beispielantwort`);
+  for (const model of prompt.models) {
+    answers += 1;
+    const given = roleSet(model);
+    check(!given.violations.length,
+      `ANTWORT ${prompt.id}  ${model} → ${given.violations.map((v) => v.rule).join(', ')}`);
+    // Jede Beispielantwort muss die eigene Anforderung erfüllen — sonst
+    // verlangt die Aufgabe etwas, das sie selbst nicht vormacht.
+    for (const role of prompt.need) {
+      check(given.roles.has(role), `ANTWORT ${prompt.id}  ${model}: ohne ${role}`);
+    }
+  }
+}
+for (const [role, labels] of Object.entries(open.needs)) {
+  for (const lang of Object.keys(data.languages)) {
+    check(labels[lang] && labels[lang].trim(), `ANFORDERUNG ${role}: keine Beschriftung für ${lang}`);
+  }
+}
+
+// 10. Gleichwertige Wortstellung: Beifügungen dürfen tauschen, Rollen nicht
 const ORDER_CASES = [
   ['jan mije lili sina li wawa.', 'jan lili mije sina li wawa.', true],
   ['mi jo e kili suwi loje.', 'mi jo e kili loje suwi.', true],
@@ -137,13 +180,13 @@ check(TokiPona.canonical('mi mije suli li lape.') === null
       'STELLUNG: Vergleichsform sortiert nicht alphabetisch');
 check(TokiPona.canonical('jan sina li') === null, 'STELLUNG: kaputter Satz hat keine Vergleichsform');
 
-// 10. Satzröntgen
+// 11. Satzröntgen
 const spans = TokiPona.xray(TokiPona.parse('jan suli li pana e lipu tawa mi.').utterance);
 check(JSON.stringify(spans.map((s) => s.role))
       === JSON.stringify(['subject', 'predicateMarker', 'verb', 'object', 'preposition', 'complement']),
       'Satzröntgen: ' + spans.map((s) => `${s.text}=${s.role}`).join(' '));
 
-// 11. Rollennamen: in jeder Sprache vorhanden, und wirklich übersetzt.
+// 12. Rollennamen: in jeder Sprache vorhanden, und wirklich übersetzt.
 // Auf Englisch ist die Beschriftung mit dem Schlüssel identisch — das ist
 // kein Fehler, deshalb prüft der Vergleich gegen die deutsche Fassung.
 for (const span of spans) {
@@ -161,5 +204,6 @@ console.log(`Golden:  ${data.corpus.valid.length} gültige, ${data.corpus.invali
 console.log(`Kurs:    ${externalOk}/${data.corpus.external.length} fehlerfrei`);
 console.log(`Import:  ${items} Musterlösungen in ${Object.keys(data.languages).length} Sprachen geprüft`);
 console.log(`musi:    ${musi.lines.length} Zeilen, ${combos} gewürfelte Sätze geprüft`);
+console.log(`offen:   ${open.prompts.length} Fragen, ${answers} Beispielantworten geprüft`);
 console.log(failures ? `\n✗ ${failures} Abweichung(en)` : '\n✓ alle Prüfungen bestanden');
 process.exit(failures ? 1 : 0);

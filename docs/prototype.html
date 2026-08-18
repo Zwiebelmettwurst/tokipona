@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="o toki!">
-<script>window.OTOKI_VERSION = '202baa083e';</script>
+<script>window.OTOKI_VERSION = '3069d132ee';</script>
 
 <style>
 /* linja pimeja 1.9 — jan Inkepa, CC0. Siehe prototype/SCHRIFT.md.
@@ -834,6 +834,13 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 .playbox .play:active { transform: scale(0.96); }
 .playbox .hint { margin: 0; }
 
+/* Offene Frage: die Übersetzung unter der toki-pona-Frage */
+.ask {
+  margin: 0.15rem 0 0.9rem;
+  color: var(--ink-dim);
+  font-size: 0.9375rem;
+}
+
 </style>
 
 <div id="app"></div>
@@ -1046,6 +1053,78 @@ const TOKIPONA_MUSI = {
          ['sona lili', 'mit wenig Wissen', 'of little knowledge']],
       ],
     },
+  ],
+};
+
+
+</script>
+<script>
+// Offene Aufgaben: eine Frage auf toki pona, eine freie Antwort.
+//
+// Hier gibt es keine Musterlösung zum Abgleichen. Geprüft wird, was der
+// Parser prüfen kann: Ist der Satz grammatisch, und trägt er das, wonach
+// gefragt war — ein Objekt mit e, ein Ziel nach der Präposition, ein
+// la-Vorfeld. Alles andere ist frei. Die Beispiele stehen erst danach da,
+// als Vergleich, nicht als Vorgabe.
+const TOKIPONA_TOKI = {
+  // Beschriftung der geforderten Satzteile (die Rollen kommen aus dem Röntgen)
+  needs: {
+    object: { de: 'ein Objekt mit <b>e</b>', en: 'an object with <b>e</b>' },
+    complement: { de: 'ein Ziel hinter der Präposition', en: 'a target after the preposition' },
+    context: { de: 'ein Vorfeld mit <b>la</b>', en: 'a context with <b>la</b>' },
+    subject: { de: 'ein Subjekt', en: 'a subject' },
+    preverb: { de: 'ein Präverb wie <b>wile</b> oder <b>ken</b>', en: 'a preverb such as <b>wile</b> or <b>ken</b>' },
+  },
+
+  prompts: [
+    { id: 'q01', stage: 1, tp: 'sina pona ala pona?',
+      de: ['Geht es dir gut?'], en: ['Are you well?'], need: [],
+      models: ['mi pona.', 'mi pona ala.', 'mi lape wile.'] },
+    { id: 'q02', stage: 2, tp: 'sina jan seme?',
+      de: ['Was für ein Mensch bist du?'], en: ['What kind of person are you?'], need: [],
+      models: ['mi jan pona.', 'mi jan pi toki pona.', 'mi jan lili.'] },
+    { id: 'q03', stage: 3, tp: 'sina moku e seme?',
+      de: ['Was isst du?'], en: ['What do you eat?'], need: ['object'],
+      models: ['mi moku e kili.', 'mi moku e telo.', 'mi moku e pan.'] },
+    { id: 'q04', stage: 3, tp: 'sina lukin e seme?',
+      de: ['Was siehst du?'], en: ['What do you see?'], need: ['object'],
+      models: ['mi lukin e lipu.', 'mi lukin e soweli suli.'] },
+    { id: 'q05', stage: 4, tp: 'sina pali e seme?',
+      de: ['Was machst du?'], en: ['What are you making?'], need: ['object'],
+      models: ['mi pali e tomo.', 'mi pali e moku pona.'] },
+    { id: 'q06', stage: 5, tp: 'ijo seme li pona tawa sina?',
+      de: ['Was magst du?'], en: ['What do you like?'], need: ['subject'],
+      models: ['soweli li pona tawa mi.', 'kasi li pona tawa mi.', 'toki pona li pona tawa mi.'] },
+    { id: 'q07', stage: 6, tp: 'sina lon seme?',
+      de: ['Wo bist du?'], en: ['Where are you?'], need: ['complement'],
+      models: ['mi lon tomo.', 'mi lon ma tomo.', 'mi lon poka pi jan pona mi.'] },
+    { id: 'q08', stage: 6, tp: 'sina tawa seme?',
+      de: ['Wohin gehst du?'], en: ['Where are you going?'], need: ['complement'],
+      models: ['mi tawa tomo moku.', 'mi tawa ma ante.'] },
+    { id: 'q09', stage: 7, tp: 'nimi sina li seme?',
+      de: ['Wie heißt du?'], en: ['What is your name?'], need: [],
+      models: ['mi jan Ana.', 'nimi mi li jan Mose.'] },
+    { id: 'q10', stage: 7, tp: 'o toki e ijo pona!',
+      de: ['Sag etwas Nettes!'], en: ['Say something kind!'], need: [],
+      models: ['sina pona tawa mi.', 'tenpo sina li pona.'] },
+    { id: 'q11', stage: 8, tp: 'kule seme li pona tawa sina?',
+      de: ['Welche Farbe magst du?'], en: ['Which colour do you like?'], need: ['subject'],
+      models: ['kule laso li pona tawa mi.', 'kule loje li pona tawa mi.'] },
+    { id: 'q12', stage: 9, tp: 'tenpo pini la sina pali e seme?',
+      de: ['Was hast du gemacht?'], en: ['What did you do?'], need: ['context', 'object'],
+      models: ['tenpo pini la mi pali e lipu.', 'tenpo pini la mi moku e kili.'] },
+    { id: 'q13', stage: 9, tp: 'sina jan pi pali seme?',
+      de: ['Was für Arbeit machst du?'], en: ['What kind of work do you do?'], need: [],
+      models: ['mi jan pi pali lipu.', 'mi jan pi pana sona.'] },
+    { id: 'q14', stage: 10, tp: 'sina wile pali e seme?',
+      de: ['Was willst du machen?'], en: ['What do you want to do?'], need: ['preverb', 'object'],
+      models: ['mi wile pali e tomo.', 'mi wile moku e pan.'] },
+    { id: 'q15', stage: 10, tp: 'tenpo kama la sina tawa seme?',
+      de: ['Wohin gehst du demnächst?'], en: ['Where will you go?'], need: ['context', 'complement'],
+      models: ['tenpo kama la mi tawa ma ante.', 'tenpo kama la mi tawa tomo pi jan pona mi.'] },
+    { id: 'q16', stage: 11, tp: 'sina jo e ijo mute anu ijo lili?',
+      de: ['Hast du viel oder wenig?'], en: ['Do you have much or little?'], need: ['object'],
+      models: ['mi jo e ijo lili.', 'mi jo e lipu tu.'] },
   ],
 };
 
@@ -1847,7 +1926,7 @@ const TokiPona = (function (data) {
 // bauen statt erkennen, sofortige Rückmeldung mit Satzröntgen, sichtbarer
 // Fortschritt — ohne Herzen und ohne Bestenliste.
 
-(function (DATA, MUSI, TP) {
+(function (DATA, MUSI, OPEN, TP) {
   const KEY = 'o-toki-fortschritt-v1';
   const GOAL = 40;
 
@@ -1911,6 +1990,14 @@ const TokiPona = (function (data) {
       backupApply: 'Diesen Stand übernehmen',
       summary: (lvl, lessons, cards, xp) => `Stufe ${lvl}, ${lessons} Lektionen, ${cards} Karten, ${xp} XP`,
       langLabel: 'sprache', langOther: 'English',
+      askAnswer: 'antworte frei',
+      answerHint: 'Deine Antwort, dein Satz. Geprüft wird der Bau.',
+      answerNeeds: (what) => `Die Antwort braucht ${what}.`,
+      answerMissing: (what) => `Da fehlt noch ${what}.`,
+      answerEcho: 'Das ist die Frage selbst — antworte darauf.',
+      answerFree: 'Richtig gebaut — und deine eigene Antwort',
+      answerAlso: 'So hätten es andere gesagt:',
+      answerEmpty: 'Ein Wort reicht noch nicht.',
       listen: 'anhören', listenAgain: 'nochmal hören',
       askListen: 'was hörst du?',
       soundTitle: 'aussprache',
@@ -1993,6 +2080,14 @@ const TokiPona = (function (data) {
       backupApply: 'Use this progress',
       summary: (lvl, lessons, cards, xp) => `level ${lvl}, ${lessons} lessons, ${cards} cards, ${xp} XP`,
       langLabel: 'language', langOther: 'Deutsch',
+      askAnswer: 'answer freely',
+      answerHint: 'Your answer, your sentence. What gets checked is the build.',
+      answerNeeds: (what) => `The answer needs ${what}.`,
+      answerMissing: (what) => `Still missing: ${what}.`,
+      answerEcho: 'That is the question itself — answer it.',
+      answerFree: 'Well built — and your own answer',
+      answerAlso: 'Others would have said:',
+      answerEmpty: 'One word is not enough yet.',
       listen: 'listen', listenAgain: 'play again',
       askListen: 'what do you hear?',
       soundTitle: 'pronunciation',
@@ -2220,6 +2315,11 @@ const TokiPona = (function (data) {
       return TP.lexicon[rest] && hasGlyph(rest)
         ? { type: 'glyph', word: rest, lesson, concepts: [] } : null;
     }
+    if (kind === 'q') {
+      const prompt = OPEN.prompts.find((entry) => entry.id === rest);
+      return prompt ? { type: 'answer', prompt, lesson: lessonOf(prompt.stage) || lessons()[0],
+                        concepts: [] } : null;
+    }
     if (kind === 'c') {
       const compound = COMPOUNDS[Number(rest)];
       return compound ? { type: 'compound', compound, lesson: lessons()[0], concepts: [] } : null;
@@ -2235,6 +2335,7 @@ const TokiPona = (function (data) {
   }
 
   function keyOf(task) {
+    if (task.type === 'answer') return 'q:' + task.prompt.id;
     if (task.type === 'glyph') return 'g:' + task.word;
     if (task.type === 'word') return 'w:' + task.word;
     if (task.type === 'compound') return 'c:' + COMPOUNDS.indexOf(task.compound);
@@ -2354,7 +2455,13 @@ const TokiPona = (function (data) {
       tasks.push({ type: 'listen', item: heard, lesson, concepts: lessonConcepts(lesson) });
     }
 
-    if (builds[3]) tasks.push({ type: 'free', item: builds[3], lesson, concepts: lessonConcepts(lesson) });
+    // Eine offene Frage ersetzt das freie Übersetzen: beides ist Tippen, aber
+    // die eigene Antwort ist die interessantere Übung.
+    const prompt = shuffle(OPEN.prompts.filter((entry) => entry.stage <= lesson.number))[0];
+    if (prompt) tasks.push({ type: 'answer', prompt, lesson, concepts: lessonConcepts(lesson) });
+    else if (builds[3]) {
+      tasks.push({ type: 'free', item: builds[3], lesson, concepts: lessonConcepts(lesson) });
+    }
 
     return {
       lesson,
@@ -2895,6 +3002,7 @@ const TokiPona = (function (data) {
     else if (task.type === 'compound') app.append(compoundTask(task));
     else if (task.type === 'glyph') app.append(glyphTask(task));
     else if (task.type === 'listen') app.append(listenTask(task));
+    else if (task.type === 'answer') app.append(answerTask(task));
     else app.append(freeTask(task));
   }
 
@@ -3028,6 +3136,62 @@ const TokiPona = (function (data) {
       speak: task.item.tp,
       xray: task.item.tp,
     });
+    return screen;
+  }
+
+  // Offene Frage: eine Antwort, die es so noch nicht gibt.
+  function answerTask(task) {
+    const prompt = task.prompt;
+    const needs = (prompt.need || []).map(needLabel).join(' + ');
+
+    const screen = screenWith(`
+      <p class="prompt">${escape(t('askAnswer'))}</p>
+      <h2 class="question tp glossable"></h2>
+      <p class="ask">${escape((prompt[state.lang] || prompt.de)[0])}</p>
+      <input class="typed" autocomplete="off" autocapitalize="off" spellcheck="false"
+             placeholder="toki pona …" aria-label="toki pona">
+      <p class="live"></p>
+      <p class="hint">${needs ? t('answerNeeds', needs) : escape(t('answerHint'))}</p>
+      <div class="actions"><button class="primary" disabled>${escape(t('check'))}</button></div>`);
+
+    const asked = screen.querySelector('.question');
+    asked.append(glossed(prompt.tp, 'glossline'));
+    withSay(asked, prompt.tp);
+
+    const input = screen.querySelector('.typed');
+    const live = screen.querySelector('.live');
+    const button = screen.querySelector('.primary');
+
+    input.oninput = () => {
+      const text = input.value.trim();
+      button.disabled = !text;
+      if (!text) { live.textContent = ''; live.className = 'live'; return; }
+      const result = TP.parse(TP.splitUtterances(text)[0] || text);
+      if (result.isValid) {
+        live.textContent = t('structureLive');
+        live.className = 'live good';
+      } else {
+        live.textContent = '• ' + say(result.violations[0]);
+        live.className = 'live bad';
+      }
+    };
+    input.onkeydown = (event) => { if (event.key === 'Enter' && !button.disabled) button.click(); };
+
+    button.onclick = () => {
+      const text = input.value.trim();
+      const verdict = gradeAnswer(text, prompt);
+      const models = prompt.models.slice(0, 2).join('  ·  ');
+      finish(task, verdict.ok, {
+        solution: prompt.models[0],
+        speak: prompt.models[0],
+        xray: verdict.ok ? text : prompt.models[0],
+        open: verdict,
+        reason: verdict.ok
+          ? `${escape(t('answerAlso'))} <code>${escape(models)}</code>`
+          : null,
+      });
+    };
+    setTimeout(() => input.focus(), 50);
     return screen;
   }
 
@@ -3357,6 +3521,27 @@ const TokiPona = (function (data) {
 
   // Schichten aus Plan, Abschnitt 6: normalisieren, strukturell parsen,
   // gegen Musterlösung und Pflichtbausteine abgleichen.
+  // Steht auf beiden Seiten dasselbe, nur als Subjekt statt als Objekt?
+  // „soweli li moku e jan“ ist nicht „jan li moku e soweli“.
+  function swappedRoles(a, b) {
+    const heads = (text) => {
+      const result = TP.parse(text);
+      if (!result.isValid || !result.utterance) return null;
+      const spans = TP.xray(result.utterance);
+      const first = (role) => {
+        const span = spans.find((s) => s.role === role);
+        return span ? span.text.split(/\s+/)[0] : null;
+      };
+      return { subject: first('subject'), object: first('object') };
+    };
+    const mine = heads(a);
+    const model = heads(b);
+    if (!mine || !model) return false;
+    if (!mine.subject || !mine.object || !model.subject || !model.object) return false;
+    return mine.subject !== model.subject
+      && mine.subject === model.object && mine.object === model.subject;
+  }
+
   function grade(answer, item) {
     const normalise = (text) => TP.tokenize(text).map((t) => t.text).join(' ');
     const accepted = [item.tp, ...item.also].map(normalise);
@@ -3383,6 +3568,12 @@ const TokiPona = (function (data) {
     const missing = content.filter((word) => !mine.has(word));
 
     if (!missing.length) {
+      // Alle Wörter da heißt noch nicht dasselbe gesagt: wer Subjekt und
+      // Objekt vertauscht, dreht die Aussage um.
+      if ([item.tp, ...item.also].some((solution) => swappedRoles(answer, solution))) {
+        return { correct: false, exact: false, variant: true, violations: [],
+                 utterance: result.utterance };
+      }
       return { correct: true, exact: false, variant: true, violations: [], utterance: result.utterance };
     }
     return {
@@ -3390,6 +3581,39 @@ const TokiPona = (function (data) {
       missing,
     };
   }
+
+  // Freie Antwort: hier gibt es keine Musterlösung. Geprüft wird, was der
+  // Parser wirklich weiß — Bau in Ordnung, und die Satzteile da, nach denen
+  // gefragt war.
+  function gradeAnswer(text, prompt) {
+    const utterances = TP.splitUtterances(text).filter((part) => part.trim());
+    if (!utterances.length) return { ok: false, empty: true };
+
+    const violations = [];
+    const roles = new Set();
+    for (const part of utterances) {
+      const result = TP.parse(part);
+      violations.push(...result.violations);
+      TP.xray(result.utterance).forEach((span) => roles.add(span.role));
+    }
+    if (violations.length) return { ok: false, violations };
+
+    const words = TP.tokenize(text).filter((token) => token.word
+      && !token.word.roles.includes('particle'));
+    if (words.length < 2) return { ok: false, thin: true };
+
+    const norm = (value) => TP.tokenize(value).map((token) => token.text).join(' ');
+    if (norm(text) === norm(prompt.tp)) return { ok: false, echo: true };
+
+    const missing = (prompt.need || []).filter((role) => !roles.has(role));
+    if (missing.length) return { ok: false, missing };
+    return { ok: true };
+  }
+
+  const needLabel = (role) => {
+    const entry = OPEN.needs[role];
+    return entry ? (entry[state.lang] || entry.de) : role;
+  };
 
   function finish(task, correct, detail) {
     session.total += 1;
@@ -3430,7 +3654,8 @@ const TokiPona = (function (data) {
         <div class="verdict ${correct ? 'good' : 'bad'}">
           <span class="mark">${correct ? '✓' : '✕'}</span>
           <span>${escape(correct
-            ? (detail.grade && detail.grade.order ? t('orderRight')
+            ? (detail.open ? t('answerFree')
+              : detail.grade && detail.grade.order ? t('orderRight')
               : (detail.grade && detail.grade.variant ? t('variantRight') : t('good')))
             : t('notYet'))}</span>
         </div>
@@ -3443,6 +3668,12 @@ const TokiPona = (function (data) {
           ${escape(say(violation))}
           ${violation.correction ? `<br><code>→ ${escape(violation.correction)}</code>` : ''}
         </div>`));
+    } else if (detail.open && !detail.open.ok) {
+      const reason = detail.open.violations ? say(detail.open.violations[0])
+        : detail.open.echo ? t('answerEcho')
+          : detail.open.missing ? t('answerMissing', detail.open.missing.map(needLabel).join(' + '))
+            : t('answerEmpty');
+      sheet.append(el(`<p class="reason">${reason}</p>`));
     } else if (detail.grade && detail.grade.order) {
       sheet.append(el(`<p class="reason">${escape(t('orderNote'))}</p>`));
     } else if (detail.grade && detail.grade.variant && !correct) {
@@ -3455,7 +3686,7 @@ const TokiPona = (function (data) {
       sheet.append(el(`<p class="reason">${detail.reason}</p>`));
     }
 
-    if (!correct || (detail.grade && (detail.grade.variant || detail.grade.order))) {
+    if ((!correct && !detail.open) || (detail.grade && (detail.grade.variant || detail.grade.order))) {
       const line = el(`<p class="reason">${escape(t('model'))} </p>`);
       line.append(glossed(detail.solution, 'solution'));
       if (detail.speak) withSay(line, detail.speak);
@@ -3718,7 +3949,7 @@ const TokiPona = (function (data) {
 
   render();
   probeGlyphs();
-})(TOKIPONA_DATA, TOKIPONA_MUSI, TokiPona);
+})(TOKIPONA_DATA, TOKIPONA_MUSI, TOKIPONA_TOKI, TokiPona);
 
 </script>
 
