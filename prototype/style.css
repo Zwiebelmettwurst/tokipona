@@ -956,3 +956,30 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   background: var(--accent-soft);
   border-radius: 0.4rem;
 }
+
+/* Überspringen: unauffälliger Knopf in der Aufgabenleiste */
+.exbar .skip {
+  flex: none;
+  border: 0;
+  background: none;
+  color: var(--ink-faint);
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.1rem 0.2rem 0.5rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(1.2rem + var(--safe-bottom));
+  z-index: 50;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.7rem;
+  background: var(--ink);
+  color: var(--ground);
+  font-size: 0.8125rem;
+  box-shadow: 0 0.5rem 1.4rem rgba(0, 0, 0, 0.25);
+}

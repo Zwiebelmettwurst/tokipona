@@ -73,6 +73,12 @@
       traceThin: 'Da fehlt noch ein Stück der Vorlage.',
       traceWide: 'Zu viel daneben — bleib auf der Linie.',
       traceScore: (hit, clean) => `Vorlage ${hit}% getroffen, ${clean}% deiner Linie sitzt drauf.`,
+      phraseTitle: 'toki lon — Sätze für draußen',
+      phraseHint: 'Was man wirklich sagt. Tipp ein Wort an, um es nachzuschlagen.',
+      phrasePractice: 'Alltagssätze üben',
+      phraseLiteral: 'wörtlich',
+      skip: 'überspringen',
+      skipNote: 'Übersprungen — kommt gleich wieder.',
       readTitle: 'lipu — lesen',
       readHint: 'Zusammenhängende Texte. Tipp auf eine Zeile, dann steht die '
         + 'Übersetzung da; erst raten lohnt sich.',
@@ -192,6 +198,12 @@
       traceThin: 'Part of the template is still missing.',
       traceWide: 'Too much beside it — stay on the line.',
       traceScore: (hit, clean) => `${hit}% of the template covered, ${clean}% of your line sits on it.`,
+      phraseTitle: 'toki lon — everyday sentences',
+      phraseHint: 'What people actually say. Tap a word to look it up.',
+      phrasePractice: 'practise everyday sentences',
+      phraseLiteral: 'literally',
+      skip: 'skip',
+      skipNote: 'Skipped — it will come back shortly.',
       readTitle: 'lipu — reading',
       readHint: 'Texts that hang together. Tap a line and the translation appears; '
         + 'guessing first pays off.',
@@ -487,7 +499,7 @@
       const compound = COMPOUNDS[Number(rest)];
       return compound ? { type: 'compound', compound, lesson: lessons()[0], concepts: [] } : null;
     }
-    for (const lesson of lessons().concat([musiLesson()])) {
+    for (const lesson of lessons().concat([musiLesson(), phraseLesson()])) {
       const item = lesson.items.find((i) => i.id === rest);
       if (item) {
         return { type: item.direction === 'de_tp' ? 'build' : 'choose', item, lesson,
@@ -1371,6 +1383,33 @@
 
   // ------------------------------------------------------------ Übungslauf
 
+  // Kurze Einblendung, die von selbst wieder verschwindet.
+  let toastTimer = null;
+  function toast(text) {
+    const old = document.querySelector('.toast');
+    if (old) old.remove();
+    const box = el(`<div class="toast" role="status">${escape(text)}</div>`);
+    document.body.append(box);
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => box.remove(), 2200);
+  }
+
+  function skipTask(task) {
+    const key = keyOf(task);
+    if (key) {
+      const card = state.srs[key] || { reps: 0, interval: 0, ease: 2.5, due: Date.now() };
+      // Kein Rückschritt bei den Wiederholungen: nur bald nochmal zeigen.
+      card.due = Date.now() + STEPS[0];
+      card.interval = Math.min(card.interval || STEPS[0], STEPS[0]);
+      state.srs[key] = card;
+    }
+    session.skipped = (session.skipped || 0) + 1;
+    session.index += 1;
+    save();
+    render();
+    toast(t('skipNote'));
+  }
+
   function renderSession() {
     if (session.index >= session.queue.length) { renderDone(); return; }
     const task = session.queue[session.index];
@@ -1382,6 +1421,11 @@
         <span class="metric">✓ <b>${session.correct}</b></span>
       </div>`);
     head.querySelector('button').onclick = () => { session = null; render(); };
+    // Manchmal ist keine Zeit für Fingerarbeit. Überspringen kostet keine
+    // Punkte und straft nicht ab — die Karte ist gleich wieder dran.
+    const skip = el(`<button class="skip">${escape(t('skip'))}</button>`);
+    skip.onclick = () => skipTask(task);
+    head.append(skip);
     app.append(head);
 
     if (task.type === 'word') app.append(wordTask(task));
@@ -1699,6 +1743,71 @@
     paint();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(paint);
     return screen;
+  }
+
+  function phraseCard() {
+    const card = el(`
+      <div class="card" style="margin-top:1rem">
+        <h2>${escape(t('phraseTitle'))}</h2>
+        <p class="hint">${escape(t('phraseHint'))}</p>
+        <div class="row"><button class="primary">${escape(t('phrasePractice'))}</button></div>
+      </div>`);
+    card.querySelector('.primary').onclick = () => { session = buildPhraseSession(); render(); };
+    return card;
+  }
+
+  function phraseGroup(group) {
+    const card = el(`
+      <div class="card">
+        <h2>${escape(t('musiSection', group.name[state.lang] || group.name.de, group.lines.length))}</h2>
+        <div class="musilines"></div>
+      </div>`);
+    const list = card.querySelector('.musilines');
+    group.lines.forEach((line) => {
+      const row = el('<div class="musiline"></div>');
+      const tp = el('<p class="tp glossable"></p>');
+      tp.append(glossed(line.tp, 'glossline'));
+      withSay(tp, line.tp);
+      row.append(tp);
+      row.append(el(`<p class="meaning">${escape(line[state.lang] || line.de)}</p>`));
+      row.append(el(`<p class="hint">${escape(t('phraseLiteral'))}: `
+        + `${escape(line.lit[state.lang] || line.lit.de)}</p>`));
+      list.append(row);
+    });
+    return card;
+  }
+
+  // Alltagssätze als Übungsrunde — dieselbe Maschine wie der Kurs.
+  const phraseItems = () => OPEN.phrases.flatMap((group) => group.lines.map((line) => ({
+    id: line.id, direction: 'tp_de', tp: line.tp, also: [],
+    target: [line[state.lang] || line.de], lit: line.lit[state.lang] || line.lit.de,
+  })));
+
+  let phraseCache = null;
+  function phraseLesson() {
+    if (phraseCache && phraseCache.lang === state.lang) return phraseCache.lesson;
+    const items = phraseItems();
+    const lesson = {
+      number: 98,
+      phrases: true,
+      title: t('phraseTitle'),
+      note: '',
+      words: [...new Set(items.flatMap((item) => TP.tokenize(item.tp).map((token) => token.text))
+        .filter((word) => TP.lexicon[word]))],
+      items,
+    };
+    phraseCache = { lang: state.lang, lesson };
+    return lesson;
+  }
+
+  function buildPhraseSession() {
+    const lesson = phraseLesson();
+    const picks = shuffle(lesson.items).slice(0, 6);
+    const tasks = picks.map((item, index) => ({
+      type: index % 2 ? 'build' : 'choose', item, lesson, concepts: [],
+    }));
+    return { lesson, musi: true, home: 'toki', restart: buildPhraseSession,
+             queue: tasks, index: 0, correct: 0, total: 0, xp: 0, retried: new Set() };
   }
 
   // Frage zum gelesenen Text.
@@ -2354,16 +2463,15 @@
         </div>
       </div>`);
 
+    const home = session.home || (musi ? 'musi' : 'pfad');
+    const restart = session.restart || (musi ? buildMusiSession : () => buildSession(lesson));
     screen.querySelector('.primary').onclick = () => {
       session = null;
-      tab = musi ? 'musi' : 'pfad';
+      tab = home;
       render();
     };
     if (!review && !quiz) {
-      screen.querySelector('.ghost').onclick = () => {
-        session = musi ? buildMusiSession() : buildSession(lesson);
-        render();
-      };
+      screen.querySelector('.ghost').onclick = () => { session = restart(); render(); };
     }
     app.append(topbar());
     app.append(screen);
@@ -2466,6 +2574,12 @@
     }
     for (const line of MUSI.lines) {
       pool.push({ tp: line.tp, say: (line[state.lang] || line.de)[0] });
+    }
+    for (const group of OPEN.phrases) {
+      for (const line of group.lines) pool.push({ tp: line.tp, say: line[state.lang] || line.de });
+    }
+    for (const text of LIPU.texts) {
+      for (const line of text.lines) pool.push({ tp: line.tp, say: line[state.lang] || line.de });
     }
     pool.sort((a, b) => a.tp.length - b.tp.length);
     const map = new Map();
@@ -2574,6 +2688,9 @@
         ${escape(t('sandboxTry'))} <code>mi li moku.</code> · <code>jan pi pona li lape.</code> ·
         <code>soweli moku e kili.</code> · <code>jan Claude li pona.</code>
       </p>`));
+
+    screen.append(phraseCard());
+    OPEN.phrases.forEach((group) => screen.append(phraseGroup(group)));
     return screen;
   }
 

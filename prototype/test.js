@@ -180,6 +180,30 @@ for (const join of open.joins) {
   }
 }
 
+// 10a. Alltagssätze: jede Zeile parst, hat beide Lesarten und eine eigene Kennung
+const phraseIds = new Set();
+let phrases = 0;
+for (const group of open.phrases) {
+  for (const lang of Object.keys(data.languages)) {
+    check(group.name[lang] && group.name[lang].trim(), `GRUPPE ${group.id}: kein Name für ${lang}`);
+  }
+  check(group.lines.length >= 5, `GRUPPE ${group.id}: nur ${group.lines.length} Sätze`);
+  for (const line of group.lines) {
+    phrases += 1;
+    check(!phraseIds.has(line.id), `ALLTAG ${line.id}: doppelte Kennung`);
+    phraseIds.add(line.id);
+    const violations = TokiPona.splitUtterances(line.tp)
+      .flatMap((u) => TokiPona.parse(u).violations);
+    check(!violations.length,
+      `ALLTAG ${line.id}  ${line.tp} → ${violations.map((v) => v.rule).join(', ')}`);
+    for (const lang of Object.keys(data.languages)) {
+      check(line[lang] && line[lang].trim(), `ALLTAG ${line.id}: keine Lesart für ${lang}`);
+      check(line.lit && line.lit[lang] && line.lit[lang].trim(),
+        `ALLTAG ${line.id}: keine wörtliche Lesart für ${lang}`);
+    }
+  }
+}
+
 // 10b. Beispielsätze für die Wörter, die im Kurs nicht vorkommen
 for (const [word, extra] of Object.entries(open.extras)) {
   check(Boolean(TokiPona.lexicon[word]), `BEISPIEL ${word}: steht nicht im Lexikon`);
@@ -307,6 +331,7 @@ console.log(`Import:  ${items} Musterlösungen in ${Object.keys(data.languages).
 console.log(`musi:    ${musi.lines.length} Zeilen, ${combos} gewürfelte Sätze geprüft`);
 console.log(`offen:   ${open.prompts.length} Fragen, ${answers} Beispielantworten geprüft`);
 console.log(`fügen:   ${open.joins.length} Fügungen geprüft`);
+console.log(`alltag:  ${phrases} Sätze in ${open.phrases.length} Gruppen geprüft`);
 console.log(`lesen:   ${lipu.texts.length} Texte, ${lines} Zeilen, `
   + `${lipu.texts.reduce((n, text) => n + text.questions.length, 0)} Fragen geprüft`);
 console.log(failures ? `\n✗ ${failures} Abweichung(en)` : '\n✓ alle Prüfungen bestanden');
