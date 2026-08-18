@@ -774,3 +774,42 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   margin-top: 0.6rem;
 }
 .forged .hint code { font-family: var(--mono); color: var(--ink-faint); }
+
+/* --------------------------------------------------------- Aussprache */
+.say {
+  flex: none;
+  margin-left: 0.4rem;
+  width: 1.65rem;
+  height: 1.65rem;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--accent);
+  font-size: 0.8125rem;
+  line-height: 1;
+  vertical-align: middle;
+}
+.say:active { background: var(--accent-soft); }
+.word .say { margin-left: auto; }
+
+.playbox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.2rem 0 0.6rem;
+}
+.playbox .play {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  border: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 2rem;
+  line-height: 1;
+  box-shadow: 0 0.4rem 1.2rem var(--accent-soft);
+}
+.playbox .play:active { transform: scale(0.96); }
+.playbox .hint { margin: 0; }
