@@ -42,6 +42,9 @@ TEMPLATE = """<title>o toki!</title>
 /*__TOKI__*/
 </script>
 <script>
+/*__LIPU__*/
+</script>
+<script>
 /*__PARSER__*/
 </script>
 <script>
@@ -132,15 +135,18 @@ def main():
     worker = (HERE / "sw.js").read_text()
     musi = (HERE / "musi.js").read_text()
     open_tasks = (HERE / "toki.js").read_text()
+    reader = (HERE / "lipu.js").read_text()
 
     # Der Prototyp lädt nichts nach; die Node-Zeilen fliegen raus.
     for needle in ["if (typeof module !== 'undefined') { module.exports = TOKIPONA_DATA; }\n",
                    "if (typeof module !== 'undefined') { module.exports = TOKIPONA_MUSI; }\n",
                    "if (typeof module !== 'undefined') { module.exports = TOKIPONA_TOKI; }\n",
+                   "if (typeof module !== 'undefined') { module.exports = TOKIPONA_LIPU; }\n",
                    "if (typeof module !== 'undefined') { module.exports = TokiPona; }\n"]:
         data = data.replace(needle, "")
         musi = musi.replace(needle, "")
         open_tasks = open_tasks.replace(needle, "")
+        reader = reader.replace(needle, "")
         parser = parser.replace(needle, "")
     parser = parser.replace(
         "})(typeof TOKIPONA_DATA !== 'undefined' ? TOKIPONA_DATA : require('./data.js'));",
@@ -153,13 +159,13 @@ def main():
     # Quelltext ergibt immer dieselbe Nummer, sonst schlüge die Drift-Prüfung
     # in der Werkbank bei jedem Lauf an.
     fingerprint = hashlib.sha256()
-    for part in (TEMPLATE, FONT, style, data, musi, open_tasks, parser, app, worker):
+    for part in (TEMPLATE, FONT, style, data, musi, open_tasks, reader, parser, app, worker):
         fingerprint.update(part.encode())
     version = fingerprint.hexdigest()[:10]
 
     page = TEMPLATE.replace("__VERSION__", version)
     for marker, payload in (("/*__FONT__*/", font), ("/*__STYLE__*/", style), ("/*__DATA__*/", data),
-                            ("/*__MUSI__*/", musi), ("/*__TOKI__*/", open_tasks),
+                            ("/*__MUSI__*/", musi), ("/*__TOKI__*/", open_tasks), ("/*__LIPU__*/", reader),
                             ("/*__PARSER__*/", parser), ("/*__APP__*/", app)):
         page = page.replace(marker, payload)
 

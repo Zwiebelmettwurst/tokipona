@@ -820,3 +820,133 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   color: var(--ink-dim);
   font-size: 0.9375rem;
 }
+
+/* ------------------------------------------------------------- Woche */
+.week {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.35rem;
+  height: 4.5rem;
+  margin-bottom: 0.5rem;
+}
+.week .day { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; }
+.week .bar {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  background: var(--sunk);
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+.week .bar i { display: block; width: 100%; min-height: 2px; background: var(--rule-strong); }
+.week .day[data-done="true"] .bar i { background: var(--gold); }
+.week .day[data-today="true"] .bar i { background: var(--accent); }
+.week .tick { font-size: 0.625rem; color: var(--ink-faint); padding-top: 0.3rem; }
+.week .day[data-today="true"] .tick { color: var(--accent); }
+
+.row .ghost[data-picked="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* Beispielsatz unter dem Wort */
+.word { flex-wrap: wrap; }
+.word .example {
+  width: 100%;
+  margin: 0.2rem 0 0;
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  line-height: 1.5;
+}
+.word .example code {
+  font-family: var(--mono);
+  color: var(--accent);
+  margin-right: 0.35rem;
+}
+
+/* Fügeaufgabe: die beiden Teile über dem Baukasten */
+.parts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0 0 0.3rem;
+  font-size: 0.8125rem;
+  color: var(--ink-faint);
+}
+.parts code {
+  font-family: var(--mono);
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0.35rem;
+  padding: 0.1rem 0.35rem;
+}
+
+/* ------------------------------------------------------------- lipu */
+.lipulist { display: flex; flex-direction: column; }
+.lipurow {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  padding: 0.6rem 0.1rem;
+  border: 0;
+  border-top: 1px solid var(--rule);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+.lipurow:first-child { border-top: 0; }
+.lipurow .body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
+.lipurow .body b { font-family: var(--mono); font-weight: 500; color: var(--accent); }
+.lipurow .body span { font-size: 0.8125rem; color: var(--ink-dim); }
+.lipurow .mark { color: var(--ink-faint); font-size: 1rem; }
+.lipurow[data-state="done"] .mark { color: var(--gold); }
+.lipurow[data-state="locked"] { opacity: 0.45; }
+
+.lipu-title { font-family: var(--mono); font-size: 1.25rem; color: var(--accent); margin: 0.2rem 0 0; }
+.lipulines { display: flex; flex-direction: column; gap: 0.15rem; }
+.lipuline {
+  padding: 0.5rem 0.1rem;
+  border-bottom: 1px solid var(--rule);
+}
+.lipuline p { margin: 0; }
+.lipuline .tp {
+  font-family: var(--mono);
+  color: var(--accent);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.lipuline .meaning { font-size: 0.875rem; color: var(--ink-dim); margin-top: 0.15rem; }
+
+.lipuline .reveal {
+  margin-top: 0.15rem;
+  padding: 0.1rem 0.45rem;
+  border: 1px dashed var(--rule-strong);
+  border-radius: 0.4rem;
+  background: none;
+  color: var(--ink-faint);
+  font: inherit;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+}
+
+/* --------------------------------------------------- sitelen zeichnen */
+.tracebox {
+  display: flex;
+  justify-content: center;
+  padding: 0.6rem 0;
+}
+.trace {
+  width: min(260px, 72vw);
+  height: min(260px, 72vw);
+  border: 1px dashed var(--rule-strong);
+  border-radius: 0.9rem;
+  background: var(--surface);
+  color: var(--accent);
+  touch-action: none;   /* sonst scrollt die Seite beim Zeichnen */
+}
