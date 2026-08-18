@@ -657,6 +657,120 @@ const TokiPona = (function (data) {
   };
   const phraseText = (phrase) => phraseTokens(phrase).map((t) => t.text).join(' ');
 
+  // --------------------------------------------------- Namen und Fremdwörter
+
+  // toki pona hat 14 Buchstaben und nur Silben der Form (K)V(n). Fremde Namen
+  // werden nicht übersetzt, sondern nachgesprochen: Deutschland wird zu
+  // ma Tosi, Klaus zu jan Kalusi. Das hier ist die Nachsprech-Maschine —
+  // sie liefert garantiert etwas, das die Lautlehre besteht (unten geprüft).
+  const FOLD = {
+    'ä': 'a', 'à': 'a', 'á': 'a', 'â': 'a', 'å': 'a', 'ã': 'a', 'æ': 'e',
+    'ë': 'e', 'è': 'e', 'é': 'e', 'ê': 'e',
+    'ï': 'i', 'ì': 'i', 'í': 'i', 'î': 'i',
+    'ö': 'o', 'ò': 'o', 'ó': 'o', 'ô': 'o', 'õ': 'o', 'ø': 'o',
+    'ü': 'u', 'ù': 'u', 'ú': 'u', 'û': 'u',
+    'ß': 's', 'ç': 's', 'ñ': 'n', 'ý': 'i', 'ÿ': 'i', 'ł': 'l', 'đ': 't',
+  };
+
+  // Buchstabenpaare zuerst: sch klingt wie s, ch wie k, x wie ks.
+  const DIGRAPHS = [
+    ['tsch', 's'], ['sch', 's'], ['sh', 's'], ['ch', 'k'], ['ck', 'k'],
+    ['ph', 'p'], ['th', 't'], ['gh', 'k'], ['qu', 'ku'], ['x', 'ks'],
+  ];
+
+  const SINGLE = {
+    b: 'p', c: 'k', d: 't', f: 'p', g: 'k', h: '', q: 'k', r: 'l', v: 'w',
+    y: 'i', z: 's',
+  };
+
+  const VOWELS_TP = 'aeiou';
+  const CONSONANTS_TP = 'jklmnpstw';
+
+  function foreignName(input) {
+    let text = String(input || '').toLowerCase().normalize('NFD')
+      .replace(/[̀-ͯ]/g, '');
+    text = text.replace(/[^a-zäöüßçñøåæýÿłđ]/g, ' ').trim();
+    if (!text) return null;
+
+    const parts = text.split(/\s+/).map((word) => {
+      let letters = word.split('').map((c) => FOLD[c] || c).join('');
+      // c vor hellen Vokalen klingt wie s (Cecilia), sonst wie k (Carla).
+      letters = letters.replace(/c(?=[ei])/g, 's');
+      for (const [from, to] of DIGRAPHS) letters = letters.split(from).join(to);
+      letters = letters.split('').map((c) => (SINGLE[c] !== undefined ? SINGLE[c] : c)).join('');
+      letters = letters.split('').filter((c) => VOWELS_TP.includes(c) || CONSONANTS_TP.includes(c)).join('');
+      if (!letters) return '';
+
+      // Nächster Vokal im Wort — er füllt eingeschobene Silben.
+      const nextVowel = (from) => {
+        for (let i = from; i < letters.length; i += 1) {
+          if (VOWELS_TP.includes(letters[i])) return letters[i];
+        }
+        return null;
+      };
+
+      const syllables = [];
+      let index = 0;
+      let last = 'a';
+      while (index < letters.length) {
+        let onset = '';
+        if (CONSONANTS_TP.includes(letters[index])) {
+          onset = letters[index];
+          index += 1;
+          // Doppelkonsonant: nn, ll … der zweite fällt weg.
+          while (index < letters.length && letters[index] === onset) index += 1;
+        }
+        let vowel;
+        if (index < letters.length && VOWELS_TP.includes(letters[index])) {
+          vowel = letters[index];
+          index += 1;
+          // Vokalfolgen ziehen sich zusammen: au wird a, ei wird e.
+          while (index < letters.length && VOWELS_TP.includes(letters[index])) index += 1;
+        } else if (onset) {
+          vowel = nextVowel(index) || last;      // eingeschobener Vokal
+        } else {
+          index += 1;
+          continue;
+        }
+        last = vowel;
+
+        // Ein n darf die Silbe schließen — aber nicht vor n oder m.
+        let coda = '';
+        if (letters[index] === 'n') {
+          const after = letters[index + 1];
+          if (!after || (CONSONANTS_TP.includes(after) && after !== 'n' && after !== 'm')) {
+            coda = 'n';
+            index += 1;
+          }
+        }
+        // Silben ohne Anlaut gibt es nur am Wortanfang.
+        if (!onset && syllables.length) onset = 'k';
+        // Vier Silben gibt es nicht: ti ji wo wu. Ersetzt wird der Anlaut,
+        // damit die Silbe nicht ihren Halt verliert — nur ganz am Anfang darf
+        // sie auch ohne Anlaut stehen.
+        if (onset === 't' && vowel === 'i') onset = 's';
+        else if (onset === 'w' && (vowel === 'o' || vowel === 'u')) onset = 'p';
+        else if (onset === 'j' && vowel === 'i') onset = syllables.length ? 's' : '';
+        if (!onset && syllables.length) onset = 'k';
+        syllables.push(onset + vowel + coda);
+      }
+
+      let built = syllables.join('');
+      // Letzter Rettungsanker: solange kürzen, bis die Lautlehre zufrieden ist.
+      let guard = 0;
+      while (built && phonoCheck(built) && guard < 12) {
+        built = built.slice(0, -1);
+        guard += 1;
+      }
+      return built;
+    }).filter(Boolean);
+
+    if (!parts.length) return null;
+    const joined = parts.join(' ').split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    return joined;
+  }
+
   // ------------------------------------------------- gleichwertige Stellung
 
   // Beifügungen desselben Kopfworts dürfen die Plätze tauschen, ohne dass sich
@@ -782,7 +896,7 @@ const TokiPona = (function (data) {
 
   return {
     parse, tokenize, splitUtterances, xray, phonoCheck, suggest, editDistance, describe, roleLabel,
-    lookup, phraseText, canonical, sameMeaning, lexicon: LEX,
+    lookup, phraseText, canonical, sameMeaning, foreignName, lexicon: LEX,
   };
 })(typeof TOKIPONA_DATA !== 'undefined' ? TOKIPONA_DATA : require('./data.js'));
 
