@@ -116,6 +116,7 @@ for (const pattern of musi.patterns) {
   }
 }
 
+<<<<<<< HEAD
 // 9. Gleichwertige Wortstellung: Beifügungen dürfen tauschen, Rollen nicht
 const ORDER_CASES = [
   ['jan mije lili sina li wawa.', 'jan lili mije sina li wawa.', true],
@@ -138,12 +139,19 @@ check(TokiPona.canonical('mi mije suli li lape.') === null
 check(TokiPona.canonical('jan sina li') === null, 'STELLUNG: kaputter Satz hat keine Vergleichsform');
 
 // 10. Satzröntgen
+=======
+// 9. Satzröntgen
+>>>>>>> origin/main
 const spans = TokiPona.xray(TokiPona.parse('jan suli li pana e lipu tawa mi.').utterance);
 check(JSON.stringify(spans.map((s) => s.role))
       === JSON.stringify(['subject', 'predicateMarker', 'verb', 'object', 'preposition', 'complement']),
       'Satzröntgen: ' + spans.map((s) => `${s.text}=${s.role}`).join(' '));
 
+<<<<<<< HEAD
 // 11. Rollennamen: in jeder Sprache vorhanden, und wirklich übersetzt.
+=======
+// 10. Rollennamen: in jeder Sprache vorhanden, und wirklich übersetzt.
+>>>>>>> origin/main
 // Auf Englisch ist die Beschriftung mit dem Schlüssel identisch — das ist
 // kein Fehler, deshalb prüft der Vergleich gegen die deutsche Fassung.
 for (const span of spans) {
