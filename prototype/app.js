@@ -66,6 +66,7 @@
       backupApply: 'Diesen Stand übernehmen',
       summary: (lvl, lessons, cards, xp) => `Stufe ${lvl}, ${lessons} Lektionen, ${cards} Karten, ${xp} XP`,
       langLabel: 'sprache', langOther: 'English',
+<<<<<<< HEAD
       askAnswer: 'antworte frei',
       answerHint: 'Deine Antwort, dein Satz. Geprüft wird der Bau.',
       answerNeeds: (what) => `Die Antwort braucht ${what}.`,
@@ -74,6 +75,8 @@
       answerFree: 'Richtig gebaut — und deine eigene Antwort',
       answerAlso: 'So hätten es andere gesagt:',
       answerEmpty: 'Ein Wort reicht noch nicht.',
+=======
+>>>>>>> origin/main
       listen: 'anhören', listenAgain: 'nochmal hören',
       askListen: 'was hörst du?',
       soundTitle: 'aussprache',
@@ -156,6 +159,7 @@
       backupApply: 'Use this progress',
       summary: (lvl, lessons, cards, xp) => `level ${lvl}, ${lessons} lessons, ${cards} cards, ${xp} XP`,
       langLabel: 'language', langOther: 'Deutsch',
+<<<<<<< HEAD
       askAnswer: 'answer freely',
       answerHint: 'Your answer, your sentence. What gets checked is the build.',
       answerNeeds: (what) => `The answer needs ${what}.`,
@@ -164,6 +168,8 @@
       answerFree: 'Well built — and your own answer',
       answerAlso: 'Others would have said:',
       answerEmpty: 'One word is not enough yet.',
+=======
+>>>>>>> origin/main
       listen: 'listen', listenAgain: 'play again',
       askListen: 'what do you hear?',
       soundTitle: 'pronunciation',
@@ -531,6 +537,7 @@
       tasks.push({ type: 'listen', item: heard, lesson, concepts: lessonConcepts(lesson) });
     }
 
+<<<<<<< HEAD
     // Eine offene Frage ersetzt das freie Übersetzen: beides ist Tippen, aber
     // die eigene Antwort ist die interessantere Übung.
     const prompt = shuffle(OPEN.prompts.filter((entry) => entry.stage <= lesson.number))[0];
@@ -538,6 +545,9 @@
     else if (builds[3]) {
       tasks.push({ type: 'free', item: builds[3], lesson, concepts: lessonConcepts(lesson) });
     }
+=======
+    if (builds[3]) tasks.push({ type: 'free', item: builds[3], lesson, concepts: lessonConcepts(lesson) });
+>>>>>>> origin/main
 
     return {
       lesson,
@@ -1078,7 +1088,10 @@
     else if (task.type === 'compound') app.append(compoundTask(task));
     else if (task.type === 'glyph') app.append(glyphTask(task));
     else if (task.type === 'listen') app.append(listenTask(task));
+<<<<<<< HEAD
     else if (task.type === 'answer') app.append(answerTask(task));
+=======
+>>>>>>> origin/main
     else app.append(freeTask(task));
   }
 
@@ -1215,6 +1228,7 @@
     return screen;
   }
 
+<<<<<<< HEAD
   // Offene Frage: eine Antwort, die es so noch nicht gibt.
   function answerTask(task) {
     const prompt = task.prompt;
@@ -1271,6 +1285,8 @@
     return screen;
   }
 
+=======
+>>>>>>> origin/main
   function fixTask(task) {
     const screen = screenWith(`
       <p class="prompt">${escape(t('askFix'))}</p>
