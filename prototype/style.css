@@ -766,11 +766,13 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 .version { opacity: 0.75; }
 
 /* ---------------------------------------------------------------- musi */
-.musilines { display: flex; flex-direction: column; }
-.musiline { padding: 0.55rem 0; border-top: 1px solid var(--rule); }
-.musiline:first-child { border-top: 0; padding-top: 0.1rem; }
-.musiline p { margin: 0; }
+.musilines, .stylelist { display: flex; flex-direction: column; }
+.musiline, .styleline { padding: 0.55rem 0; border-top: 1px solid var(--rule); }
+.musiline:first-child, .styleline:first-child { border-top: 0; padding-top: 0.1rem; }
+.musiline p, .styleline p { margin: 0; }
+.styleline .tp { margin-top: 0.25rem; }
 .musiline .tp,
+.styleline .tp,
 .forged .tp {
   font-family: var(--mono);
   color: var(--accent);
@@ -781,6 +783,7 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 .musiline .meaning,
 .forged .meaning { font-size: 0.9375rem; margin-top: 0.1rem; }
 .musiline .hint,
+.styleline .hint,
 .forged .hint { font-size: 0.75rem; margin-top: 0.15rem; }
 .sting { color: var(--gold); letter-spacing: 0.08em; margin-left: 0.35rem; white-space: nowrap; }
 
@@ -1044,3 +1047,35 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   color: var(--accent);
   overflow-wrap: anywhere;
 }
+
+/* ------------------------------------------------------- Wortverbände */
+.word { cursor: pointer; }
+.word .net { width: 100%; margin-top: 0.4rem; }
+.word[data-open="true"] { background: var(--accent-soft); border-radius: 0.5rem; }
+.word:not([data-open="true"]) .net { display: none; }
+.netline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0 0 0.3rem;
+}
+.netlabel {
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  flex: 0 0 100%;        /* eigene Zeile, sonst quetschen die Kacheln sie */
+  margin: 0 0 0.1rem;
+}
+.netline code {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--accent);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 0.35rem;
+  padding: 0.1rem 0.4rem;
+}
+.netline code i { font-style: normal; color: var(--ink-faint); margin-left: 0.3rem; }

@@ -166,6 +166,40 @@ for (const match of appSource.matchAll(/(aria-label|placeholder|title)="([^"$][^
     `SPRACHE feste Beschriftung im Quelltext: ${match[1]}="${match[2]}"`);
 }
 
+// 8a. Silben: jedes Wort zerfällt in (K)V(n) und wieder zusammen
+for (const word of Object.keys(TokiPona.lexicon)) {
+  const parts = TokiPona.syllables(word);
+  check(Array.isArray(parts) && parts.join('') === word,
+    `SILBEN ${word}: ${JSON.stringify(parts)}`);
+  for (const part of parts || []) {
+    // „n“ ist das einzige Wort ohne Vokal — ein Brummen, keine Silbe.
+    check(part === 'n' || /^[jklmnpstw]?[aeiou]n?$/.test(part),
+      `SILBEN ${word}: „${part}“ ist keine Silbe`);
+  }
+}
+check(TokiPona.syllables('linja').join('-') === 'lin-ja', 'SILBEN linja falsch getrennt');
+check(TokiPona.syllables('kijetesantakalu').length === 7, 'SILBEN kijetesantakalu falsch getrennt');
+check(TokiPona.syllables('x') === null, 'SILBEN: fremde Buchstaben ergeben Silben');
+
+// 8b. Stilpaare: beide Wege müssen gültig sein und beide Sprachen tragen
+for (const entry of open.styles) {
+  check(entry.options.length >= 2, `STIL ${entry.id}: weniger als zwei Wege`);
+  check(Boolean(entry.options[entry.right]), `STIL ${entry.id}: right zeigt ins Leere`);
+  for (const lang of Object.keys(data.languages)) {
+    check(entry.topic[lang] && entry.ask[lang], `STIL ${entry.id}: kein Text für ${lang}`);
+  }
+  for (const option of entry.options) {
+    const violations = TokiPona.splitUtterances(option.tp)
+      .flatMap((u) => TokiPona.parse(u).violations);
+    check(!violations.length,
+      `STIL ${entry.id}  ${option.tp} → ${violations.map((v) => v.rule).join(', ')}`);
+    for (const lang of Object.keys(data.languages)) {
+      check(option.note[lang] && option.note[lang].trim(),
+        `STIL ${entry.id}  ${option.tp}: keine Erklärung für ${lang}`);
+    }
+  }
+}
+
 // 8c. Namen nachsprechen: was herauskommt, muss die Lautlehre bestehen —
 //     bei jedem Namen, auch bei absurden.
 const NAMES = ['Klaus', 'Anna', 'Deutschland', 'Berlin', 'Christian', 'Zwiebelmettwurst',
@@ -405,6 +439,7 @@ console.log(`offen:   ${open.prompts.length} Fragen, ${answers} Beispielantworte
 console.log(`fügen:   ${open.joins.length} Fügungen geprüft`);
 console.log(`alltag:  ${phrases} Sätze in ${open.phrases.length} Gruppen geprüft`);
 console.log(`namen:   ${NAMES.length} Namen nachgesprochen und lautlich geprüft`);
+console.log(`stil:    ${open.styles.length} Stilpaare geprüft`);
 console.log(`lesen:   ${lipu.texts.length} Texte, ${lines} Zeilen, `
   + `${lipu.texts.reduce((n, text) => n + text.questions.length, 0)} Fragen geprüft`);
 console.log(failures ? `\n✗ ${failures} Abweichung(en)` : '\n✓ alle Prüfungen bestanden');

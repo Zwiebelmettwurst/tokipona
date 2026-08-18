@@ -657,6 +657,48 @@ const TokiPona = (function (data) {
   };
   const phraseText = (phrase) => phraseTokens(phrase).map((t) => t.text).join(' ');
 
+  // ------------------------------------------------------------- Silben
+
+  // Jedes Wort zerfällt in Silben der Form (K)V(n). Ein n gehört zur Silbe,
+  // wenn danach kein Vokal kommt: lin-ja, mon-su-ta, aber a-ni? gibt es nicht.
+  function syllables(word) {
+    const letters = String(word || '').toLowerCase();
+    const out = [];
+    let index = 0;
+    while (index < letters.length) {
+      let syllable = '';
+      if ('jklmnpstw'.includes(letters[index])) { syllable += letters[index]; index += 1; }
+      if ('aeiou'.includes(letters[index])) { syllable += letters[index]; index += 1; }
+      if (letters[index] === 'n'
+          && (index + 1 >= letters.length || !'aeiou'.includes(letters[index + 1]))) {
+        syllable += 'n';
+        index += 1;
+      }
+      if (!syllable) return null;                 // kein toki-pona-Wort
+      out.push(syllable);
+    }
+    return out.length ? out : null;
+  }
+
+  // ---------------------------------------------------------- Wortverbände
+
+  // Welche Wörter treten mit welchen zusammen auf? Das liest der Parser aus
+  // fertigen Sätzen — Kopfwort und seine einfachen Beifügungen.
+  function phrasesIn(text) {
+    const found = [];
+    for (const part of splitUtterances(text)) {
+      const result = parse(part);
+      if (!result.isValid || !result.utterance) continue;
+      for (const phrase of collectPhrases(result.utterance)) {
+        const words = phraseTokens(phrase)
+          .filter((token) => token.word && token.kind === 'known')
+          .map((token) => token.text);
+        if (words.length > 1) found.push(words);
+      }
+    }
+    return found;
+  }
+
   // --------------------------------------------------- Namen und Fremdwörter
 
   // toki pona hat 14 Buchstaben und nur Silben der Form (K)V(n). Fremde Namen
@@ -896,7 +938,8 @@ const TokiPona = (function (data) {
 
   return {
     parse, tokenize, splitUtterances, xray, phonoCheck, suggest, editDistance, describe, roleLabel,
-    lookup, phraseText, canonical, sameMeaning, foreignName, lexicon: LEX,
+    lookup, phraseText, canonical, sameMeaning, foreignName, syllables, phrasesIn,
+    lexicon: LEX,
   };
 })(typeof TOKIPONA_DATA !== 'undefined' ? TOKIPONA_DATA : require('./data.js'));
 
