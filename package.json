@@ -1,0 +1,14 @@
+{
+  "name": "o-toki",
+  "version": "0.1.0",
+  "private": true,
+  "description": "toki pona lernen — Prototyp, Sprachkern und Prüfungen",
+  "scripts": {
+    "build": "python3 prototype/build.py",
+    "test": "node prototype/test.js",
+    "test:ui": "node tests/run.js"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

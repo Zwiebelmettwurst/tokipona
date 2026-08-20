@@ -40,3 +40,19 @@ jobs:
             exit 1
           fi
           echo "docs/ ist deckungsgleich."
+
+      - name: Browser besorgen
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Oberfläche im Browser prüfen
+        run: node tests/run.js
+
+      - name: Bildschirmfotos der gescheiterten Prüfungen
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bildschirmfotos
+          path: tests/shots/
+          if-no-files-found: ignore
