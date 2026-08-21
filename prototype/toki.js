@@ -15,6 +15,128 @@ const TOKIPONA_TOKI = {
     preverb: { de: 'ein Präverb wie <b>wile</b> oder <b>ken</b>', en: 'a preverb such as <b>wile</b> or <b>ken</b>' },
   },
 
+  // ---------------------------------------------------------- Lektion 0
+  //
+  // Der Kurs fängt bei den Wörtern an — hier fängt er beim Satz an. Vier
+  // Regeln, jede mit einem Beispiel, einem Gegenbeispiel und danach zwei
+  // Aufgaben, die genau sie brauchen.
+  //
+  // Die Gegenbeispiele sind von zweierlei Art, und der Unterschied ist der
+  // halbe Lerninhalt: `falsch` verletzt eine Regel — der Parser weist es ab.
+  // `anders` ist tadellose Sprache und heißt nur etwas anderes; genau daran
+  // sieht man, was li und e eigentlich tun. prototype/test.js prüft beides.
+  nasin: {
+    title: { de: 'Wie ein Satz gebaut ist', en: 'How a sentence is built' },
+    note: {
+      de: 'Zwei kleine Wörter tragen den ganzen Satzbau: <b>li</b> trennt '
+        + 'Subjekt und Prädikat, <b>e</b> kündigt das Objekt an. Ab jetzt siehst '
+        + 'du beide in jedem Satz.',
+      en: 'Two little words carry the whole structure: <b>li</b> separates '
+        + 'subject and predicate, <b>e</b> announces the object. From here on you '
+        + 'will see both in every sentence.',
+    },
+    words: ['mi', 'sina', 'ona', 'jan', 'soweli', 'li', 'e',
+            'pona', 'moku', 'lukin', 'kili', 'telo', 'lape'],
+
+    rules: [
+      { id: 'r1', tp: 'soweli li pona.',
+        de: 'Das Tier ist gut.', en: 'The animal is good.',
+        concepts: ['c_li'],
+        point: {
+          de: 'Ein Satz hat zwei Teile: wovon die Rede ist, und was darüber '
+            + 'gesagt wird. Dazwischen steht <b>li</b>. Es ist kein Wort mit '
+            + 'Bedeutung, sondern die Naht.',
+          en: 'A sentence has two parts: what is being talked about, and what is '
+            + 'said about it. Between them stands <b>li</b>. It carries no meaning '
+            + 'of its own — it is the seam.',
+        },
+        bad: { kind: 'anders', tp: 'soweli pona.',
+               de: 'Auch richtige Sprache — nur kein Satz. Ohne <b>li</b> wird '
+                 + '<i>pona</i> zur Beifügung: „ein gutes Tier“.',
+               en: 'Perfectly good language — just not a sentence. Without '
+                 + '<b>li</b>, <i>pona</i> becomes a modifier: “a good animal”.' } },
+
+      { id: 'r2', tp: 'mi pona.',
+        de: 'Mir geht es gut.', en: 'I am well.',
+        concepts: ['c_li', 'c_mi_sina'],
+        point: {
+          de: 'Eine Ausnahme, und nur diese eine: steht <b>mi</b> oder <b>sina</b> '
+            + 'allein als Subjekt, fällt <b>li</b> weg. Kommt noch ein Wort dazu — '
+            + '<i>mi mute li pona</i> —, steht es wieder da.',
+          en: 'One exception, and only this one: when <b>mi</b> or <b>sina</b> '
+            + 'stands alone as the subject, <b>li</b> drops out. Add another word — '
+            + '<i>mi mute li pona</i> — and it is back.',
+        },
+        bad: { kind: 'falsch', tp: 'mi li pona.',
+               de: 'Nach <b>mi</b> allein steht nie <b>li</b>.',
+               en: 'After <b>mi</b> alone there is never a <b>li</b>.' } },
+
+      { id: 'r3', tp: 'soweli li moku e kili.',
+        de: 'Das Tier isst eine Frucht.', en: 'The animal eats a fruit.',
+        concepts: ['c_e_objekt'],
+        point: {
+          de: 'Was wird gegessen? Das sagt <b>e</b>. Es steht vor dem Objekt und '
+            + 'gehört ihm — ohne <b>e</b> gibt es kein Objekt, egal wie die Wörter '
+            + 'stehen.',
+          en: 'What is being eaten? <b>e</b> says so. It stands before the object '
+            + 'and belongs to it — without <b>e</b> there is no object, no matter '
+            + 'how the words are arranged.',
+        },
+        bad: { kind: 'anders', tp: 'soweli li moku kili.',
+               de: 'Ein sauberer Satz — er sagt nur nicht, <i>was</i> gegessen '
+                 + 'wird. Ohne <b>e</b> beschreibt <i>kili</i> nur das <i>moku</i>: '
+                 + 'etwa „isst auf Frucht-Art“.',
+               en: 'A sound sentence — it just never says <i>what</i> is eaten. '
+                 + 'Without <b>e</b>, <i>kili</i> only describes the <i>moku</i>: '
+                 + 'something like “eats fruit-wise”.' } },
+
+      { id: 'r4', tp: 'mi lukin e sina.',
+        de: 'Ich sehe dich.', en: 'I see you.',
+        concepts: ['c_li', 'c_e_objekt'],
+        point: {
+          de: 'Beide Regeln zusammen: nach <b>mi</b> allein kein <b>li</b>, vor dem '
+            + 'Objekt aber sehr wohl <b>e</b>. Die Reihenfolge liegt fest — '
+            + 'Subjekt, <b>li</b>, Prädikat, <b>e</b>, Objekt.',
+          en: 'Both rules at once: no <b>li</b> after <b>mi</b> alone, but <b>e</b> '
+            + 'before the object all the same. The order is fixed — subject, '
+            + '<b>li</b>, predicate, <b>e</b>, object.',
+        },
+        bad: { kind: 'falsch', tp: 'mi li lukin e sina.',
+               de: 'Das <b>li</b> ist zu viel, das <b>e</b> nicht.',
+               en: 'The <b>li</b> is one too many; the <b>e</b> is not.' } },
+    ],
+
+    items: [
+      { id: 'n01', rule: 'r1', direction: 'tp_de', tp: 'jan li pona.',
+        de: ['Der Mensch ist gut.'], en: ['The person is good.'] },
+      { id: 'n02', rule: 'r1', direction: 'de_tp', tp: 'soweli li lape.',
+        de: ['Das Tier schläft.'], en: ['The animal sleeps.'] },
+      { id: 'n03', rule: 'r1', direction: 'de_tp', tp: 'ona li moku.',
+        de: ['Sie isst.'], en: ['She eats.'] },
+
+      { id: 'n04', rule: 'r2', direction: 'tp_de', tp: 'sina lukin.',
+        de: ['Du siehst.'], en: ['You see.'] },
+      { id: 'n05', rule: 'r2', direction: 'de_tp', tp: 'mi lape.',
+        de: ['Ich schlafe.'], en: ['I sleep.'] },
+      { id: 'n06', rule: 'r2', direction: 'de_tp', tp: 'sina pona.',
+        de: ['Dir geht es gut.'], en: ['You are well.'] },
+
+      { id: 'n07', rule: 'r3', direction: 'tp_de', tp: 'jan li moku e telo.',
+        de: ['Der Mensch trinkt Wasser.'], en: ['The person drinks water.'] },
+      { id: 'n08', rule: 'r3', direction: 'de_tp', tp: 'soweli li lukin e kili.',
+        de: ['Das Tier sieht eine Frucht.'], en: ['The animal sees a fruit.'] },
+      { id: 'n09', rule: 'r3', direction: 'de_tp', tp: 'ona li moku e kili.',
+        de: ['Sie isst eine Frucht.'], en: ['She eats a fruit.'] },
+
+      { id: 'n10', rule: 'r4', direction: 'tp_de', tp: 'mi moku e telo.',
+        de: ['Ich trinke Wasser.'], en: ['I drink water.'] },
+      { id: 'n11', rule: 'r4', direction: 'de_tp', tp: 'sina lukin e soweli.',
+        de: ['Du siehst das Tier.'], en: ['You see the animal.'] },
+      { id: 'n12', rule: 'r4', direction: 'de_tp', tp: 'mi lukin e jan.',
+        de: ['Ich sehe den Menschen.'], en: ['I see the person.'] },
+    ],
+  },
+
   prompts: [
     { id: 'q01', stage: 1, tp: 'sina pona ala pona?',
       de: ['Geht es dir gut?'], en: ['Are you well?'], need: [],

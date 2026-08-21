@@ -46,7 +46,7 @@ async function fixWrong(page) {
     JSON.stringify({ lang: 'de', sound: false, size: 'lang' })));
   await page.reload();
   await page.waitForSelector('.lesson');
-  await page.locator('.lesson').first().click();
+  await page.locator('.lesson:not(.intro):not(.review)').first().click();
   await page.waitForSelector('.exbar');
   for (let i = 0; i < 25 && !(await page.locator('.pickline').count()); i += 1) {
     if (await page.locator('.done').count()) return null;

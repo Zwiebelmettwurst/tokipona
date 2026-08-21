@@ -27,7 +27,7 @@
       levelNext: (xp) => `Noch ${xp} XP bis zur nächsten Stufe`,
       levelLine: (lvl, xp) => `Stufe ${lvl} · noch ${xp} XP bis zur nächsten`,
       greeting: 'o kama pona!',
-      introFirst: 'Zwölf Lektionen. Du baust Sätze, statt Vokabeln abzuhaken.',
+      introFirst: 'Erst der Satzbau, dann der Wortschatz. Du baust Sätze, statt Vokabeln abzuhaken.',
       introBack: (title) => `Weiter bei „${title}“.`,
       dueCards: (n) => `${n} ${n === 1 ? 'Karte' : 'Karten'} fällig`,
       dueSub: 'wörter, sätze und umschreibungen von vorher',
@@ -36,6 +36,7 @@
       askBuild: 'bau den satz', askFix: 'hier stimmt ein wort nicht — tipp es an',
       askCompound: 'dafür gibt es kein wort — wie sagst du es?',
       askGlyph: 'welches wort ist das?', askFree: 'schreib es selbst — freie eingabe',
+      askRule: 'so ist ein satz gebaut',
       hintFix: 'Ein Wort steht zu viel oder fehlt an dieser Stelle.',
       hintBuild: 'Antippen nimmt ein Wort zurück, Ziehen sortiert um.',
       hintFree: 'Der Parser prüft den Satzbau, während du tippst. Andere Wortwahl als '
@@ -255,7 +256,7 @@
       levelNext: (xp) => `${xp} XP to go until the next level`,
       levelLine: (lvl, xp) => `Level ${lvl} · ${xp} XP to the next one`,
       greeting: 'o kama pona!',
-      introFirst: 'Twelve lessons. You build sentences instead of ticking off words.',
+      introFirst: 'Structure first, vocabulary after. You build sentences instead of ticking off words.',
       introBack: (title) => `Continue with “${title}”.`,
       dueCards: (n) => `${n} ${n === 1 ? 'card' : 'cards'} due`,
       dueSub: 'words, sentences and paraphrases from before',
@@ -264,6 +265,7 @@
       askBuild: 'build the sentence', askFix: 'one word is wrong — tap it',
       askCompound: 'there is no word for this — how do you say it?',
       askGlyph: 'which word is this?', askFree: 'write it yourself — free input',
+      askRule: 'this is how a sentence is built',
       hintFix: 'One word is too many or wrong in this spot.',
       hintBuild: 'Tap to take a word back, drag to reorder.',
       hintFree: 'The parser checks the structure as you type. A different word choice than '
@@ -623,7 +625,10 @@
     return typeof value === 'function' ? value(...args) : value;
   };
 
-  const lessons = () => (DATA.languages[state.lang] || DATA.languages.de).lessons;
+  // Der Kurs mit der Einführung davor. Sie kommt nicht aus dem Import,
+  // sondern aus prototype/toki.js — sie erklärt Satzbau, keine Vokabeln.
+  const lessons = () => [introLesson()]
+    .concat((DATA.languages[state.lang] || DATA.languages.de).lessons);
   const glossesOf = (word) => {
     const entry = TP.lexicon[word];
     if (!entry) return [];
@@ -868,8 +873,16 @@
   }
 
   const lessonOf = (number) => lessons().find((l) => l.number === number);
-  const unlocked = (number) => number === lessons()[0].number
-    || Boolean(state.done[lessons()[lessons().findIndex((l) => l.number === number) - 1].number]);
+  // Die Einführung steht neben der Kette, nicht darin: sie ist immer offen,
+  // und Lektion 1 hängt weiterhin an nichts. Wer den Kurs schon begonnen hat,
+  // findet ihn deshalb unverändert vor.
+  const courseChain = () => lessons().filter((lesson) => lesson.number !== 0);
+  const unlocked = (number) => {
+    if (number === 0) return true;
+    const chain = courseChain();
+    const index = chain.findIndex((lesson) => lesson.number === number);
+    return index <= 0 || Boolean(state.done[chain[index - 1].number]);
+  };
 
   // ------------------------------------------------------- eigene Aufnahmen
 
@@ -1484,6 +1497,61 @@
     };
   }
 
+  // ------------------------------------------------------- Lektion 0
+  //
+  // Vor den Wörtern der Satzbau. Vier Regeln, jede mit Beispiel und
+  // Gegenbeispiel, dahinter Aufgaben, die genau diese Regel brauchen.
+  let introCache = null;
+  function introLesson() {
+    if (introCache && introCache.lang === state.lang) return introCache.lesson;
+    const nasin = OPEN.nasin;
+    const lesson = {
+      number: 0,
+      intro: true,
+      title: nasin.title[state.lang] || nasin.title.de,
+      note: nasin.note[state.lang] || nasin.note.de,
+      words: nasin.words.slice(),
+      items: nasin.items.map((item) => ({
+        id: item.id,
+        direction: item.direction,
+        tp: item.tp,
+        also: [],
+        target: item[state.lang] || item.de,
+        rule: item.rule,
+      })),
+    };
+    introCache = { lang: state.lang, lesson };
+    return lesson;
+  }
+
+  function buildIntroSession() {
+    const lesson = introLesson();
+    // Kurze Runde: eine Aufgabe je Regel. Sonst zwei. Die Regeln selbst
+    // bleiben immer alle stehen — sie sind der Inhalt, nicht das Beiwerk.
+    const perRule = sizeOf().id === 'kurz' ? 1 : 2;
+    const tasks = [];
+    OPEN.nasin.rules.forEach((rule) => {
+      tasks.push({ type: 'rule', rule, lesson, concepts: [] });
+      shuffle(lesson.items.filter((item) => item.rule === rule.id))
+        .slice(0, perRule)
+        .forEach((item) => tasks.push({
+          type: item.direction === 'de_tp' ? 'build' : 'choose',
+          item,
+          lesson,
+          concepts: rule.concepts || [],
+        }));
+    });
+    // Zum Schluss ein kaputter Satz: gelernt ist es erst, wenn man den Fehler
+    // sieht, ohne dass jemand daneben schreibt, dass da einer ist.
+    const flawed = brokenSentence(lesson);
+    if (flawed) {
+      tasks.push({ type: 'fix', flawed, lesson,
+                   concepts: [flawed.violation.concept].filter(Boolean) });
+    }
+    return { lesson, intro: true, home: 'pfad', restart: buildIntroSession,
+             queue: tasks, index: 0, correct: 0, total: 0, xp: 0, retried: new Set() };
+  }
+
   // Der Spaßmodus sieht für die Übungsmaschine aus wie eine Lektion — Nummer
   // 99, damit die Ablenkungswörter aus dem ganzen Kurs kommen dürfen.
   let musiCache = null;
@@ -1660,6 +1728,7 @@
 
   function lessonConcepts(lesson) {
     const map = {
+      0: ['c_li', 'c_e_objekt', 'c_mi_sina'],
       1: ['c_mi_sina', 'c_li'], 2: ['c_modifikator'], 3: ['c_e_objekt'], 4: ['c_e_objekt'],
       5: ['c_ni', 'c_en'], 6: ['c_praeposition'], 7: ['c_frage', 'c_o', 'c_namen'],
       8: ['c_modifikator'], 9: ['c_pi', 'c_la'], 10: ['c_praeverb'], 11: ['c_zahlen'], 12: [],
@@ -1746,12 +1815,20 @@
   }
 
   function pathScreen() {
-    const next = lessons().find((l) => !state.done[l.number]) || lessons()[lessons().length - 1];
+    // Weitergezählt wird im Kurs; die Einführung steht daneben. Wer schon
+    // mittendrin ist, soll nicht an den Anfang zurückgeschickt werden.
+    const chain = courseChain();
+    const next = chain.find((l) => !state.done[l.number]) || chain[chain.length - 1];
+    const started = chain.some((l) => state.done[l.number]);
+    // Genau eine Karte ist die, wo man gerade steht: am Anfang die Einführung,
+    // danach die nächste Kurslektion.
+    const current = !started && !state.done[0] ? 0 : next.number;
+    const here = lessons().find((lesson) => lesson.number === current) || next;
     const screen = el(`
       <div class="screen">
         <div class="hello">
           <h1>${escape(t('greeting'))}</h1>
-          <p>${state.xp ? escape(t('introBack', next.title)) : escape(t('introFirst'))}</p>
+          <p>${state.xp ? escape(t('introBack', here.title)) : escape(t('introFirst'))}</p>
         </div>
         <div class="path"></div>
       </div>`);
@@ -1790,9 +1867,10 @@
     lessons().forEach((lesson) => {
       const open = unlocked(lesson.number);
       const done = Boolean(state.done[lesson.number]);
-      const stateName = done ? 'done' : (open ? (lesson.number === next.number ? 'current' : 'open') : 'locked');
+      const stateName = done ? 'done'
+        : (open ? (lesson.number === current ? 'current' : 'open') : 'locked');
       const card = el(`
-        <button class="lesson" data-state="${stateName}">
+        <button class="lesson${lesson.intro ? ' intro' : ''}" data-state="${stateName}">
           <span class="badge">${done ? '✓' : lesson.number}</span>
           <span class="body">
             <b>${escape(lesson.title)}</b>
@@ -1801,7 +1879,12 @@
           <span class="dots">${lesson.words.map((word) =>
             `<i class="${state.seenWords[word] ? 'on' : ''}"></i>`).join('')}</span>
         </button>`);
-      if (open) card.onclick = () => { session = buildSession(lesson); render(); };
+      if (open) {
+        card.onclick = () => {
+          session = lesson.intro ? buildIntroSession() : buildSession(lesson);
+          render();
+        };
+      }
       else card.disabled = true;
       path.append(card);
     });
@@ -2488,7 +2571,8 @@
     head.append(skip);
     app.append(head);
 
-    if (task.type === 'word') app.append(wordTask(task));
+    if (task.type === 'rule') app.append(ruleTask(task));
+    else if (task.type === 'word') app.append(wordTask(task));
     else if (task.type === 'build') app.append(buildTask(task));
     else if (task.type === 'choose') app.append(chooseTask(task));
     else if (task.type === 'fix') app.append(fixTask(task));
@@ -2507,6 +2591,45 @@
 
   function screenWith(inner) {
     return el(`<div class="screen">${inner}</div>`);
+  }
+
+  // Eine Regel, kein Rätsel: Beispiel, Bau, Erklärung, Gegenbeispiel. Es gibt
+  // nichts zu antworten und deshalb auch keine Punkte — die kommen aus den
+  // Aufgaben, die darauf folgen.
+  function ruleTask(task) {
+    const rule = task.rule;
+    const screen = screenWith(`
+      <p class="prompt">${escape(t('askRule'))}</p>
+      <h2 class="question tp"></h2>
+      <p class="hint">${escape(rule[state.lang] || rule.de)}</p>
+      <div class="rulebody"></div>
+      <div class="actions"><button class="primary">${escape(t('understood'))}</button></div>`);
+
+    const asked = screen.querySelector('.question');
+    asked.append(glossed(rule.tp, 'glossline'));
+    withSay(asked, rule.tp);
+
+    const body = screen.querySelector('.rulebody');
+    const xray = xrayBlock(rule.tp, null, null);
+    if (xray) body.append(xray);
+    // Die Erklärung ist eigener Text aus prototype/toki.js und darf Auszeichnung
+    // tragen — sie kommt nicht von außen.
+    body.append(el(`<p class="reason">${rule.point[state.lang] || rule.point.de}</p>`));
+    if (rule.bad) {
+      const wrong = rule.bad.kind === 'falsch';
+      body.append(el(`
+        <div class="rulebad" data-kind="${escape(rule.bad.kind)}">
+          <p class="badline"><span class="mark">${wrong ? '✕' : '≠'}</span>
+            <code>${escape(rule.bad.tp)}</code></p>
+          <p class="hint">${rule.bad[state.lang] || rule.bad.de}</p>
+        </div>`));
+    }
+
+    screen.querySelector('.primary').onclick = () => {
+      session.index += 1;
+      render();
+    };
+    return screen;
   }
 
   function wordTask(task) {

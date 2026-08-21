@@ -25,7 +25,7 @@ const state = (page) => page.evaluate(() => {
   await page.evaluate(() => localStorage.clear());
   await page.reload();
   await page.waitForSelector('.lesson');
-  await page.locator('.lesson').first().click();
+  await page.locator('.lesson:not(.intro):not(.review)').first().click();
   await page.waitForSelector('.exbar');
 
   // bis zu einer Bau-Aufgabe
@@ -75,7 +75,7 @@ const state = (page) => page.evaluate(() => {
   for (let attempt = 0; attempt < 14 && !checked; attempt += 1) {
     await page.reload();
     await page.waitForSelector('.lesson');
-    await page.locator('.lesson[data-state="current"]').first().click();
+    await page.locator('.lesson:not(.intro):not(.review)[data-state="current"]').first().click();
     await page.waitForSelector('.exbar');
     for (let step = 0; step < 8 && !checked; step += 1) {
       if (await page.locator('.slot').count()) {

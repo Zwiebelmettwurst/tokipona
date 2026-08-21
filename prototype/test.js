@@ -310,6 +310,77 @@ for (const group of open.phrases) {
   }
 }
 
+// 10c. Lektion 0: der Satzbau, bevor es Wortschatz gibt. Die Gegenbeispiele
+//      sind der Kern — „falsch“ muss der Parser abweisen, „anders“ muss er
+//      durchlassen. Wäre es umgekehrt, stünde in der Lektion eine Lüge.
+const nasin = open.nasin;
+const nasinWords = new Set(nasin.words);
+const ruleIds = new Set();
+for (const lang of Object.keys(data.languages)) {
+  check(nasin.title[lang] && nasin.title[lang].trim(), `LEKTION0: kein Titel für ${lang}`);
+  check(nasin.note[lang] && nasin.note[lang].trim(), `LEKTION0: keine Notiz für ${lang}`);
+}
+for (const word of nasin.words) {
+  check(Boolean(TokiPona.lexicon[word]), `LEKTION0 ${word}: steht nicht im Lexikon`);
+}
+for (const rule of nasin.rules) {
+  check(!ruleIds.has(rule.id), `REGEL ${rule.id}: doppelte Kennung`);
+  ruleIds.add(rule.id);
+  const parsed = TokiPona.parse(rule.tp);
+  check(parsed.isValid,
+    `REGEL ${rule.id}  ${rule.tp} → ${parsed.violations.map((v) => v.rule).join(', ')}`);
+  for (const lang of Object.keys(data.languages)) {
+    check(rule[lang] && rule[lang].trim(), `REGEL ${rule.id}: keine Lesart für ${lang}`);
+    check(rule.point[lang] && rule.point[lang].trim(), `REGEL ${rule.id}: keine Erklärung für ${lang}`);
+    check(rule.bad[lang] && rule.bad[lang].trim(), `REGEL ${rule.id}: kein Gegenbeispiel für ${lang}`);
+  }
+  check(['falsch', 'anders'].includes(rule.bad.kind),
+    `REGEL ${rule.id}: unbekannte Art „${rule.bad.kind}“`);
+  const bad = TokiPona.parse(rule.bad.tp);
+  if (rule.bad.kind === 'falsch') {
+    check(!bad.isValid, `REGEL ${rule.id}: „${rule.bad.tp}“ gilt als falsch, parst aber sauber`);
+  } else {
+    check(bad.isValid,
+      `REGEL ${rule.id}: „${rule.bad.tp}“ soll nur anders heißen, `
+      + `wird aber abgewiesen (${bad.violations.map((v) => v.rule).join(', ')})`);
+    check(rule.bad.tp !== rule.tp, `REGEL ${rule.id}: Gegenbeispiel ist das Beispiel`);
+  }
+  for (const token of TokiPona.tokenize(rule.tp)) {
+    check(!TokiPona.lexicon[token.text] || nasinWords.has(token.text),
+      `REGEL ${rule.id}: „${token.text}“ steht nicht in den Wörtern der Lektion`);
+  }
+  const mine = nasin.items.filter((item) => item.rule === rule.id);
+  check(mine.length >= 2, `REGEL ${rule.id}: nur ${mine.length} Aufgabe(n), gebraucht werden zwei`);
+}
+const nasinIds = new Set();
+for (const item of nasin.items) {
+  check(!nasinIds.has(item.id), `LEKTION0 ${item.id}: doppelte Kennung`);
+  nasinIds.add(item.id);
+  check(ruleIds.has(item.rule), `LEKTION0 ${item.id}: Regel „${item.rule}“ gibt es nicht`);
+  check(['de_tp', 'tp_de'].includes(item.direction),
+    `LEKTION0 ${item.id}: unbekannte Richtung „${item.direction}“`);
+  const parsed = TokiPona.parse(item.tp);
+  check(parsed.isValid,
+    `LEKTION0 ${item.id}  ${item.tp} → ${parsed.violations.map((v) => v.rule).join(', ')}`);
+  for (const lang of Object.keys(data.languages)) {
+    check(Array.isArray(item[lang]) && item[lang].length && item[lang][0].trim(),
+      `LEKTION0 ${item.id}: keine Lesart für ${lang}`);
+  }
+  for (const token of TokiPona.tokenize(item.tp)) {
+    check(!TokiPona.lexicon[token.text] || nasinWords.has(token.text),
+      `LEKTION0 ${item.id}: „${token.text}“ steht nicht in den Wörtern der Lektion`);
+  }
+}
+// Kein Wort steht in der Liste, das nirgends vorkommt.
+const nasinUsed = new Set(nasin.rules.map((r) => r.tp).concat(nasin.items.map((i) => i.tp))
+  .flatMap((tp) => TokiPona.tokenize(tp).map((token) => token.text)));
+for (const word of nasin.words) {
+  check(nasinUsed.has(word), `LEKTION0 ${word}: steht in der Liste, kommt aber in keinem Satz vor`);
+}
+// Die Auswahlaufgabe braucht drei verschiedene Lesarten in der Lektion.
+check(new Set(nasin.items.map((item) => item.de[0])).size >= 3,
+  'LEKTION0: zu wenige verschiedene Lesarten für die Auswahlaufgabe');
+
 // 10b. Beispielsätze für die Wörter, die im Kurs nicht vorkommen
 for (const [word, extra] of Object.entries(open.extras)) {
   check(Boolean(TokiPona.lexicon[word]), `BEISPIEL ${word}: steht nicht im Lexikon`);
@@ -440,6 +511,7 @@ console.log(`fügen:   ${open.joins.length} Fügungen geprüft`);
 console.log(`alltag:  ${phrases} Sätze in ${open.phrases.length} Gruppen geprüft`);
 console.log(`namen:   ${NAMES.length} Namen nachgesprochen und lautlich geprüft`);
 console.log(`stil:    ${open.styles.length} Stilpaare geprüft`);
+console.log(`lektion0: ${nasin.rules.length} Regeln, ${nasin.items.length} Aufgaben geprüft`);
 console.log(`lesen:   ${lipu.texts.length} Texte, ${lines} Zeilen, `
   + `${lipu.texts.reduce((n, text) => n + text.questions.length, 0)} Fragen geprüft`);
 console.log(failures ? `\n✗ ${failures} Abweichung(en)` : '\n✓ alle Prüfungen bestanden');

@@ -91,7 +91,7 @@ const spoken = (page) => page.evaluate(() => window.__gesprochen.slice());
   // Höraufgabe: kommt vor und lässt sich lösen
   await page.locator('.tabs button[data-tab="pfad"]').click();
   await page.waitForSelector('.lesson');
-  await page.locator('.lesson').first().click();
+  await page.locator('.lesson:not(.intro):not(.review)').first().click();
   await page.waitForSelector('.exbar');
   let sawListen = false;
   let heardSolution = false;
@@ -203,7 +203,7 @@ const spoken = (page) => page.evaluate(() => window.__gesprochen.slice());
   check((await bare.locator('.say').count()) === 0, 'Hörknöpfe ohne Sprachausgabe');
   const note = await bare.locator('.card', { hasText: 'aussprache' }).textContent();
   check(/keine Sprachausgabe/i.test(note), `kein Hinweis auf fehlende Sprachausgabe: ${note.slice(0, 80)}`);
-  await bare.locator('.lesson').first().click();
+  await bare.locator('.lesson:not(.intro):not(.review)').first().click();
   await bare.waitForSelector('.exbar');
   check((await bare.locator('.playbox').count()) === 0, 'Höraufgabe ohne Sprachausgabe');
   console.log('Ohne Sprachausgabe: keine Knöpfe, keine Höraufgabe, kein Fehler');

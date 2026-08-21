@@ -19,7 +19,7 @@ const check = (c, m) => { if (!c) { errors.push(m); console.log('  ✗ ' + m); }
     await page.waitForSelector('.lesson');
     // Streifen erzwingen: so, wie ihn der Service Worker auslöst
     await page.evaluate(() => {
-      document.querySelector('.lesson:not(.review)').click();
+      document.querySelector('.lesson:not(.intro):not(.review)').click();
       window.otokiUpdateReady(false);
     });
     await page.waitForSelector('.updatebar');

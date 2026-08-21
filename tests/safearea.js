@@ -59,7 +59,7 @@ const FILE = lib.FILE;
     console.log(`${label}: Kopfzeile ab ${tabs.ringTop}px (Systemleiste ${tabs.safeTop}px), `
       + `Reiter halten ${tabs.tabPad}px frei (${tabs.safeBottom}px nötig)`);
 
-    await page.locator('.lesson').first().click();
+    await page.locator('.lesson:not(.intro):not(.review)').first().click();
     await page.waitForSelector('.exbar');
 
     const bar = await page.evaluate(() => {

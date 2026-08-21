@@ -25,7 +25,7 @@ const SHOTS = lib.SHOTS;
       + `, gesperrt: ${await page.locator('.lesson[data-state="locked"]').count()}`);
     await page.screenshot({ path: `${SHOTS}/1-pfad-${scheme}.png`, fullPage: true });
 
-    await page.locator('.lesson').first().click();
+    await page.locator('.lesson:not(.intro):not(.review)').first().click();
     await page.waitForSelector('.exbar');
 
     const known = new Map();          // Frage → Musterlösung

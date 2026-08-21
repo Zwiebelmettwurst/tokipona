@@ -51,7 +51,7 @@ const FILE = lib.FILE;
 
   const playLesson = async () => {
     const kinds = new Set();
-    await page.locator('.lesson:not(.review)').first().click();
+    await page.locator('.lesson:not(.intro):not(.review)').first().click();
     await page.waitForSelector('.exbar');
     for (let i = 0; i < 30 && !(await page.locator('.done').count()); i += 1) {
       kinds.add(await page.evaluate(() => (

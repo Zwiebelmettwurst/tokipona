@@ -452,6 +452,26 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   margin: 0.9rem 0 0.2rem;
 }
 
+/* Lektion 0 erklärt, statt abzufragen — ein ruhiger Kasten, kein Urteil. */
+.rulebody { margin-top: 0.9rem; }
+.rulebody .xraywrap { margin-bottom: 0.8rem; }
+.rulebody .reason { margin: 0 0 0.8rem; }
+.rulebad {
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--ink-faint);
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.7rem;
+}
+.rulebad[data-kind="falsch"] { border-left-color: var(--wrong); background: var(--wrong-soft); }
+.rulebad .badline {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  margin: 0 0 0.35rem;
+}
+.rulebad .mark { color: var(--ink-faint); font-size: 0.9375rem; }
+.rulebad[data-kind="falsch"] .mark { color: var(--wrong); }
+.rulebad code { font-family: var(--mono); font-size: 0.9375rem; color: var(--ink-dim); }
 .lesson.review .badge { background: var(--gold-soft); color: var(--gold); font-size: 1rem; }
 .lesson.review { border-color: var(--gold); }
 .lesson.weak .badge { background: var(--wrong-soft); color: var(--wrong); font-size: 1rem; }

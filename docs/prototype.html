@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="o toki!">
-<script>window.OTOKI_VERSION = '31ce4d3ca3';</script>
+<script>window.OTOKI_VERSION = 'df7f64113e';</script>
 
 <style>
 /* linja pimeja 1.9 — jan Inkepa, CC0. Siehe prototype/SCHRIFT.md.
@@ -474,6 +474,26 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   margin: 0.9rem 0 0.2rem;
 }
 
+/* Lektion 0 erklärt, statt abzufragen — ein ruhiger Kasten, kein Urteil. */
+.rulebody { margin-top: 0.9rem; }
+.rulebody .xraywrap { margin-bottom: 0.8rem; }
+.rulebody .reason { margin: 0 0 0.8rem; }
+.rulebad {
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--ink-faint);
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.7rem;
+}
+.rulebad[data-kind="falsch"] { border-left-color: var(--wrong); background: var(--wrong-soft); }
+.rulebad .badline {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  margin: 0 0 0.35rem;
+}
+.rulebad .mark { color: var(--ink-faint); font-size: 0.9375rem; }
+.rulebad[data-kind="falsch"] .mark { color: var(--wrong); }
+.rulebad code { font-family: var(--mono); font-size: 0.9375rem; color: var(--ink-dim); }
 .lesson.review .badge { background: var(--gold-soft); color: var(--gold); font-size: 1rem; }
 .lesson.review { border-color: var(--gold); }
 .lesson.weak .badge { background: var(--wrong-soft); color: var(--wrong); font-size: 1rem; }
@@ -1532,6 +1552,128 @@ const TOKIPONA_TOKI = {
     context: { de: 'ein Vorfeld mit <b>la</b>', en: 'a context with <b>la</b>' },
     subject: { de: 'ein Subjekt', en: 'a subject' },
     preverb: { de: 'ein Präverb wie <b>wile</b> oder <b>ken</b>', en: 'a preverb such as <b>wile</b> or <b>ken</b>' },
+  },
+
+  // ---------------------------------------------------------- Lektion 0
+  //
+  // Der Kurs fängt bei den Wörtern an — hier fängt er beim Satz an. Vier
+  // Regeln, jede mit einem Beispiel, einem Gegenbeispiel und danach zwei
+  // Aufgaben, die genau sie brauchen.
+  //
+  // Die Gegenbeispiele sind von zweierlei Art, und der Unterschied ist der
+  // halbe Lerninhalt: `falsch` verletzt eine Regel — der Parser weist es ab.
+  // `anders` ist tadellose Sprache und heißt nur etwas anderes; genau daran
+  // sieht man, was li und e eigentlich tun. prototype/test.js prüft beides.
+  nasin: {
+    title: { de: 'Wie ein Satz gebaut ist', en: 'How a sentence is built' },
+    note: {
+      de: 'Zwei kleine Wörter tragen den ganzen Satzbau: <b>li</b> trennt '
+        + 'Subjekt und Prädikat, <b>e</b> kündigt das Objekt an. Ab jetzt siehst '
+        + 'du beide in jedem Satz.',
+      en: 'Two little words carry the whole structure: <b>li</b> separates '
+        + 'subject and predicate, <b>e</b> announces the object. From here on you '
+        + 'will see both in every sentence.',
+    },
+    words: ['mi', 'sina', 'ona', 'jan', 'soweli', 'li', 'e',
+            'pona', 'moku', 'lukin', 'kili', 'telo', 'lape'],
+
+    rules: [
+      { id: 'r1', tp: 'soweli li pona.',
+        de: 'Das Tier ist gut.', en: 'The animal is good.',
+        concepts: ['c_li'],
+        point: {
+          de: 'Ein Satz hat zwei Teile: wovon die Rede ist, und was darüber '
+            + 'gesagt wird. Dazwischen steht <b>li</b>. Es ist kein Wort mit '
+            + 'Bedeutung, sondern die Naht.',
+          en: 'A sentence has two parts: what is being talked about, and what is '
+            + 'said about it. Between them stands <b>li</b>. It carries no meaning '
+            + 'of its own — it is the seam.',
+        },
+        bad: { kind: 'anders', tp: 'soweli pona.',
+               de: 'Auch richtige Sprache — nur kein Satz. Ohne <b>li</b> wird '
+                 + '<i>pona</i> zur Beifügung: „ein gutes Tier“.',
+               en: 'Perfectly good language — just not a sentence. Without '
+                 + '<b>li</b>, <i>pona</i> becomes a modifier: “a good animal”.' } },
+
+      { id: 'r2', tp: 'mi pona.',
+        de: 'Mir geht es gut.', en: 'I am well.',
+        concepts: ['c_li', 'c_mi_sina'],
+        point: {
+          de: 'Eine Ausnahme, und nur diese eine: steht <b>mi</b> oder <b>sina</b> '
+            + 'allein als Subjekt, fällt <b>li</b> weg. Kommt noch ein Wort dazu — '
+            + '<i>mi mute li pona</i> —, steht es wieder da.',
+          en: 'One exception, and only this one: when <b>mi</b> or <b>sina</b> '
+            + 'stands alone as the subject, <b>li</b> drops out. Add another word — '
+            + '<i>mi mute li pona</i> — and it is back.',
+        },
+        bad: { kind: 'falsch', tp: 'mi li pona.',
+               de: 'Nach <b>mi</b> allein steht nie <b>li</b>.',
+               en: 'After <b>mi</b> alone there is never a <b>li</b>.' } },
+
+      { id: 'r3', tp: 'soweli li moku e kili.',
+        de: 'Das Tier isst eine Frucht.', en: 'The animal eats a fruit.',
+        concepts: ['c_e_objekt'],
+        point: {
+          de: 'Was wird gegessen? Das sagt <b>e</b>. Es steht vor dem Objekt und '
+            + 'gehört ihm — ohne <b>e</b> gibt es kein Objekt, egal wie die Wörter '
+            + 'stehen.',
+          en: 'What is being eaten? <b>e</b> says so. It stands before the object '
+            + 'and belongs to it — without <b>e</b> there is no object, no matter '
+            + 'how the words are arranged.',
+        },
+        bad: { kind: 'anders', tp: 'soweli li moku kili.',
+               de: 'Ein sauberer Satz — er sagt nur nicht, <i>was</i> gegessen '
+                 + 'wird. Ohne <b>e</b> beschreibt <i>kili</i> nur das <i>moku</i>: '
+                 + 'etwa „isst auf Frucht-Art“.',
+               en: 'A sound sentence — it just never says <i>what</i> is eaten. '
+                 + 'Without <b>e</b>, <i>kili</i> only describes the <i>moku</i>: '
+                 + 'something like “eats fruit-wise”.' } },
+
+      { id: 'r4', tp: 'mi lukin e sina.',
+        de: 'Ich sehe dich.', en: 'I see you.',
+        concepts: ['c_li', 'c_e_objekt'],
+        point: {
+          de: 'Beide Regeln zusammen: nach <b>mi</b> allein kein <b>li</b>, vor dem '
+            + 'Objekt aber sehr wohl <b>e</b>. Die Reihenfolge liegt fest — '
+            + 'Subjekt, <b>li</b>, Prädikat, <b>e</b>, Objekt.',
+          en: 'Both rules at once: no <b>li</b> after <b>mi</b> alone, but <b>e</b> '
+            + 'before the object all the same. The order is fixed — subject, '
+            + '<b>li</b>, predicate, <b>e</b>, object.',
+        },
+        bad: { kind: 'falsch', tp: 'mi li lukin e sina.',
+               de: 'Das <b>li</b> ist zu viel, das <b>e</b> nicht.',
+               en: 'The <b>li</b> is one too many; the <b>e</b> is not.' } },
+    ],
+
+    items: [
+      { id: 'n01', rule: 'r1', direction: 'tp_de', tp: 'jan li pona.',
+        de: ['Der Mensch ist gut.'], en: ['The person is good.'] },
+      { id: 'n02', rule: 'r1', direction: 'de_tp', tp: 'soweli li lape.',
+        de: ['Das Tier schläft.'], en: ['The animal sleeps.'] },
+      { id: 'n03', rule: 'r1', direction: 'de_tp', tp: 'ona li moku.',
+        de: ['Sie isst.'], en: ['She eats.'] },
+
+      { id: 'n04', rule: 'r2', direction: 'tp_de', tp: 'sina lukin.',
+        de: ['Du siehst.'], en: ['You see.'] },
+      { id: 'n05', rule: 'r2', direction: 'de_tp', tp: 'mi lape.',
+        de: ['Ich schlafe.'], en: ['I sleep.'] },
+      { id: 'n06', rule: 'r2', direction: 'de_tp', tp: 'sina pona.',
+        de: ['Dir geht es gut.'], en: ['You are well.'] },
+
+      { id: 'n07', rule: 'r3', direction: 'tp_de', tp: 'jan li moku e telo.',
+        de: ['Der Mensch trinkt Wasser.'], en: ['The person drinks water.'] },
+      { id: 'n08', rule: 'r3', direction: 'de_tp', tp: 'soweli li lukin e kili.',
+        de: ['Das Tier sieht eine Frucht.'], en: ['The animal sees a fruit.'] },
+      { id: 'n09', rule: 'r3', direction: 'de_tp', tp: 'ona li moku e kili.',
+        de: ['Sie isst eine Frucht.'], en: ['She eats a fruit.'] },
+
+      { id: 'n10', rule: 'r4', direction: 'tp_de', tp: 'mi moku e telo.',
+        de: ['Ich trinke Wasser.'], en: ['I drink water.'] },
+      { id: 'n11', rule: 'r4', direction: 'de_tp', tp: 'sina lukin e soweli.',
+        de: ['Du siehst das Tier.'], en: ['You see the animal.'] },
+      { id: 'n12', rule: 'r4', direction: 'de_tp', tp: 'mi lukin e jan.',
+        de: ['Ich sehe den Menschen.'], en: ['I see the person.'] },
+    ],
   },
 
   prompts: [
@@ -3236,7 +3378,7 @@ const TokiPona = (function (data) {
       levelNext: (xp) => `Noch ${xp} XP bis zur nächsten Stufe`,
       levelLine: (lvl, xp) => `Stufe ${lvl} · noch ${xp} XP bis zur nächsten`,
       greeting: 'o kama pona!',
-      introFirst: 'Zwölf Lektionen. Du baust Sätze, statt Vokabeln abzuhaken.',
+      introFirst: 'Erst der Satzbau, dann der Wortschatz. Du baust Sätze, statt Vokabeln abzuhaken.',
       introBack: (title) => `Weiter bei „${title}“.`,
       dueCards: (n) => `${n} ${n === 1 ? 'Karte' : 'Karten'} fällig`,
       dueSub: 'wörter, sätze und umschreibungen von vorher',
@@ -3245,6 +3387,7 @@ const TokiPona = (function (data) {
       askBuild: 'bau den satz', askFix: 'hier stimmt ein wort nicht — tipp es an',
       askCompound: 'dafür gibt es kein wort — wie sagst du es?',
       askGlyph: 'welches wort ist das?', askFree: 'schreib es selbst — freie eingabe',
+      askRule: 'so ist ein satz gebaut',
       hintFix: 'Ein Wort steht zu viel oder fehlt an dieser Stelle.',
       hintBuild: 'Antippen nimmt ein Wort zurück, Ziehen sortiert um.',
       hintFree: 'Der Parser prüft den Satzbau, während du tippst. Andere Wortwahl als '
@@ -3464,7 +3607,7 @@ const TokiPona = (function (data) {
       levelNext: (xp) => `${xp} XP to go until the next level`,
       levelLine: (lvl, xp) => `Level ${lvl} · ${xp} XP to the next one`,
       greeting: 'o kama pona!',
-      introFirst: 'Twelve lessons. You build sentences instead of ticking off words.',
+      introFirst: 'Structure first, vocabulary after. You build sentences instead of ticking off words.',
       introBack: (title) => `Continue with “${title}”.`,
       dueCards: (n) => `${n} ${n === 1 ? 'card' : 'cards'} due`,
       dueSub: 'words, sentences and paraphrases from before',
@@ -3473,6 +3616,7 @@ const TokiPona = (function (data) {
       askBuild: 'build the sentence', askFix: 'one word is wrong — tap it',
       askCompound: 'there is no word for this — how do you say it?',
       askGlyph: 'which word is this?', askFree: 'write it yourself — free input',
+      askRule: 'this is how a sentence is built',
       hintFix: 'One word is too many or wrong in this spot.',
       hintBuild: 'Tap to take a word back, drag to reorder.',
       hintFree: 'The parser checks the structure as you type. A different word choice than '
@@ -3832,7 +3976,10 @@ const TokiPona = (function (data) {
     return typeof value === 'function' ? value(...args) : value;
   };
 
-  const lessons = () => (DATA.languages[state.lang] || DATA.languages.de).lessons;
+  // Der Kurs mit der Einführung davor. Sie kommt nicht aus dem Import,
+  // sondern aus prototype/toki.js — sie erklärt Satzbau, keine Vokabeln.
+  const lessons = () => [introLesson()]
+    .concat((DATA.languages[state.lang] || DATA.languages.de).lessons);
   const glossesOf = (word) => {
     const entry = TP.lexicon[word];
     if (!entry) return [];
@@ -4077,8 +4224,16 @@ const TokiPona = (function (data) {
   }
 
   const lessonOf = (number) => lessons().find((l) => l.number === number);
-  const unlocked = (number) => number === lessons()[0].number
-    || Boolean(state.done[lessons()[lessons().findIndex((l) => l.number === number) - 1].number]);
+  // Die Einführung steht neben der Kette, nicht darin: sie ist immer offen,
+  // und Lektion 1 hängt weiterhin an nichts. Wer den Kurs schon begonnen hat,
+  // findet ihn deshalb unverändert vor.
+  const courseChain = () => lessons().filter((lesson) => lesson.number !== 0);
+  const unlocked = (number) => {
+    if (number === 0) return true;
+    const chain = courseChain();
+    const index = chain.findIndex((lesson) => lesson.number === number);
+    return index <= 0 || Boolean(state.done[chain[index - 1].number]);
+  };
 
   // ------------------------------------------------------- eigene Aufnahmen
 
@@ -4693,6 +4848,61 @@ const TokiPona = (function (data) {
     };
   }
 
+  // ------------------------------------------------------- Lektion 0
+  //
+  // Vor den Wörtern der Satzbau. Vier Regeln, jede mit Beispiel und
+  // Gegenbeispiel, dahinter Aufgaben, die genau diese Regel brauchen.
+  let introCache = null;
+  function introLesson() {
+    if (introCache && introCache.lang === state.lang) return introCache.lesson;
+    const nasin = OPEN.nasin;
+    const lesson = {
+      number: 0,
+      intro: true,
+      title: nasin.title[state.lang] || nasin.title.de,
+      note: nasin.note[state.lang] || nasin.note.de,
+      words: nasin.words.slice(),
+      items: nasin.items.map((item) => ({
+        id: item.id,
+        direction: item.direction,
+        tp: item.tp,
+        also: [],
+        target: item[state.lang] || item.de,
+        rule: item.rule,
+      })),
+    };
+    introCache = { lang: state.lang, lesson };
+    return lesson;
+  }
+
+  function buildIntroSession() {
+    const lesson = introLesson();
+    // Kurze Runde: eine Aufgabe je Regel. Sonst zwei. Die Regeln selbst
+    // bleiben immer alle stehen — sie sind der Inhalt, nicht das Beiwerk.
+    const perRule = sizeOf().id === 'kurz' ? 1 : 2;
+    const tasks = [];
+    OPEN.nasin.rules.forEach((rule) => {
+      tasks.push({ type: 'rule', rule, lesson, concepts: [] });
+      shuffle(lesson.items.filter((item) => item.rule === rule.id))
+        .slice(0, perRule)
+        .forEach((item) => tasks.push({
+          type: item.direction === 'de_tp' ? 'build' : 'choose',
+          item,
+          lesson,
+          concepts: rule.concepts || [],
+        }));
+    });
+    // Zum Schluss ein kaputter Satz: gelernt ist es erst, wenn man den Fehler
+    // sieht, ohne dass jemand daneben schreibt, dass da einer ist.
+    const flawed = brokenSentence(lesson);
+    if (flawed) {
+      tasks.push({ type: 'fix', flawed, lesson,
+                   concepts: [flawed.violation.concept].filter(Boolean) });
+    }
+    return { lesson, intro: true, home: 'pfad', restart: buildIntroSession,
+             queue: tasks, index: 0, correct: 0, total: 0, xp: 0, retried: new Set() };
+  }
+
   // Der Spaßmodus sieht für die Übungsmaschine aus wie eine Lektion — Nummer
   // 99, damit die Ablenkungswörter aus dem ganzen Kurs kommen dürfen.
   let musiCache = null;
@@ -4869,6 +5079,7 @@ const TokiPona = (function (data) {
 
   function lessonConcepts(lesson) {
     const map = {
+      0: ['c_li', 'c_e_objekt', 'c_mi_sina'],
       1: ['c_mi_sina', 'c_li'], 2: ['c_modifikator'], 3: ['c_e_objekt'], 4: ['c_e_objekt'],
       5: ['c_ni', 'c_en'], 6: ['c_praeposition'], 7: ['c_frage', 'c_o', 'c_namen'],
       8: ['c_modifikator'], 9: ['c_pi', 'c_la'], 10: ['c_praeverb'], 11: ['c_zahlen'], 12: [],
@@ -4955,12 +5166,20 @@ const TokiPona = (function (data) {
   }
 
   function pathScreen() {
-    const next = lessons().find((l) => !state.done[l.number]) || lessons()[lessons().length - 1];
+    // Weitergezählt wird im Kurs; die Einführung steht daneben. Wer schon
+    // mittendrin ist, soll nicht an den Anfang zurückgeschickt werden.
+    const chain = courseChain();
+    const next = chain.find((l) => !state.done[l.number]) || chain[chain.length - 1];
+    const started = chain.some((l) => state.done[l.number]);
+    // Genau eine Karte ist die, wo man gerade steht: am Anfang die Einführung,
+    // danach die nächste Kurslektion.
+    const current = !started && !state.done[0] ? 0 : next.number;
+    const here = lessons().find((lesson) => lesson.number === current) || next;
     const screen = el(`
       <div class="screen">
         <div class="hello">
           <h1>${escape(t('greeting'))}</h1>
-          <p>${state.xp ? escape(t('introBack', next.title)) : escape(t('introFirst'))}</p>
+          <p>${state.xp ? escape(t('introBack', here.title)) : escape(t('introFirst'))}</p>
         </div>
         <div class="path"></div>
       </div>`);
@@ -4999,9 +5218,10 @@ const TokiPona = (function (data) {
     lessons().forEach((lesson) => {
       const open = unlocked(lesson.number);
       const done = Boolean(state.done[lesson.number]);
-      const stateName = done ? 'done' : (open ? (lesson.number === next.number ? 'current' : 'open') : 'locked');
+      const stateName = done ? 'done'
+        : (open ? (lesson.number === current ? 'current' : 'open') : 'locked');
       const card = el(`
-        <button class="lesson" data-state="${stateName}">
+        <button class="lesson${lesson.intro ? ' intro' : ''}" data-state="${stateName}">
           <span class="badge">${done ? '✓' : lesson.number}</span>
           <span class="body">
             <b>${escape(lesson.title)}</b>
@@ -5010,7 +5230,12 @@ const TokiPona = (function (data) {
           <span class="dots">${lesson.words.map((word) =>
             `<i class="${state.seenWords[word] ? 'on' : ''}"></i>`).join('')}</span>
         </button>`);
-      if (open) card.onclick = () => { session = buildSession(lesson); render(); };
+      if (open) {
+        card.onclick = () => {
+          session = lesson.intro ? buildIntroSession() : buildSession(lesson);
+          render();
+        };
+      }
       else card.disabled = true;
       path.append(card);
     });
@@ -5697,7 +5922,8 @@ const TokiPona = (function (data) {
     head.append(skip);
     app.append(head);
 
-    if (task.type === 'word') app.append(wordTask(task));
+    if (task.type === 'rule') app.append(ruleTask(task));
+    else if (task.type === 'word') app.append(wordTask(task));
     else if (task.type === 'build') app.append(buildTask(task));
     else if (task.type === 'choose') app.append(chooseTask(task));
     else if (task.type === 'fix') app.append(fixTask(task));
@@ -5716,6 +5942,45 @@ const TokiPona = (function (data) {
 
   function screenWith(inner) {
     return el(`<div class="screen">${inner}</div>`);
+  }
+
+  // Eine Regel, kein Rätsel: Beispiel, Bau, Erklärung, Gegenbeispiel. Es gibt
+  // nichts zu antworten und deshalb auch keine Punkte — die kommen aus den
+  // Aufgaben, die darauf folgen.
+  function ruleTask(task) {
+    const rule = task.rule;
+    const screen = screenWith(`
+      <p class="prompt">${escape(t('askRule'))}</p>
+      <h2 class="question tp"></h2>
+      <p class="hint">${escape(rule[state.lang] || rule.de)}</p>
+      <div class="rulebody"></div>
+      <div class="actions"><button class="primary">${escape(t('understood'))}</button></div>`);
+
+    const asked = screen.querySelector('.question');
+    asked.append(glossed(rule.tp, 'glossline'));
+    withSay(asked, rule.tp);
+
+    const body = screen.querySelector('.rulebody');
+    const xray = xrayBlock(rule.tp, null, null);
+    if (xray) body.append(xray);
+    // Die Erklärung ist eigener Text aus prototype/toki.js und darf Auszeichnung
+    // tragen — sie kommt nicht von außen.
+    body.append(el(`<p class="reason">${rule.point[state.lang] || rule.point.de}</p>`));
+    if (rule.bad) {
+      const wrong = rule.bad.kind === 'falsch';
+      body.append(el(`
+        <div class="rulebad" data-kind="${escape(rule.bad.kind)}">
+          <p class="badline"><span class="mark">${wrong ? '✕' : '≠'}</span>
+            <code>${escape(rule.bad.tp)}</code></p>
+          <p class="hint">${rule.bad[state.lang] || rule.bad.de}</p>
+        </div>`));
+    }
+
+    screen.querySelector('.primary').onclick = () => {
+      session.index += 1;
+      render();
+    };
+    return screen;
   }
 
   function wordTask(task) {

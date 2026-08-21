@@ -16,7 +16,8 @@ const seed = async (page, stand) => {
 
 // Zählt die Aufgaben einer Runde: bis zum Abschluss durchklicken.
 const runde = async (page) => {
-  await page.locator('.lesson[data-state="current"]').first().click();
+  // Erste Kurslektion, nicht die Einführung: die zählt ihre Aufgaben anders.
+  await page.locator(lib.KURS).first().click();
   await page.waitForSelector('.exbar');
   const gesamt = await page.evaluate(() => document.querySelectorAll('.exbar').length);
   if (!gesamt) return 0;

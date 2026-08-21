@@ -26,7 +26,7 @@ const FILE = lib.FILE;
     }));
     console.log(`${label}: hover=${media.hover} pointer-fine=${media.fine}`);
 
-    await page.locator('.lesson').first().click();
+    await page.locator('.lesson:not(.intro):not(.review)').first().click();
     await page.waitForSelector('.exbar');
 
     // Bis zu einer Auswahlaufgabe vorspulen
