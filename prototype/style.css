@@ -253,8 +253,10 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 .concept .bar i { display: block; height: 100%; background: var(--accent); transition: width 0.5s ease; }
 .concept code { font-family: var(--mono); font-size: 0.75rem; color: var(--ink-faint); }
 
-.row { display: flex; gap: 0.5rem; margin-top: 0.7rem; }
-.row .ghost { flex: 1; }
+.row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem; }
+.row .ghost { flex: 1; min-width: 0; }
+/* Vier Stimmen passen nicht nebeneinander auf ein Telefon — zwei mal zwei. */
+.voicepick .ghost { flex: 1 1 44%; }
 
 .drawer { display: flex; flex-direction: column; gap: 0.5rem; }
 .drawer:not(:empty) { margin-top: 0.6rem; }
@@ -694,8 +696,10 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 .word span:not(.glyph-inline) {
   color: var(--ink-dim);
   font-size: 0.875rem;
+  /* Nicht unter 6rem quetschen: auf schmalen Telefonen blieb sonst eine
+     Spalte von einem Zeichen Breite übrig. Dann lieber eine Zeile tiefer. */
   flex: 1;
-  min-width: 0;
+  min-width: 6rem;
   overflow-wrap: anywhere;   /* „geschlechtsnonkonform“ passt sonst nirgends */
 }
 .word em {
@@ -837,6 +841,13 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   inset: -0.6rem;
 }
 .say:active { background: var(--accent-soft); }
+/* Solange etwas läuft, ist zu sehen, dass der Tipp angekommen ist — sonst
+   sieht ein stummes Gerät genauso aus wie ein toter Knopf. */
+.say[data-busy="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+}
 .word .say { margin-left: auto; }
 
 .playbox {

@@ -102,6 +102,28 @@ const FILE = lib.FILE;
         by: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       }));
       if (wide.over) errors.push(`[${label}] Reiter ${tab} scrollt ${wide.by}px waagerecht`);
+      // Nicht scrollen reicht nicht: eine Spalte kann so schmal gequetscht
+      // werden, dass ein Zeichen je Zeile übrigbleibt. Im Wörterbuch war
+      // genau das der Fall — sichtbar an der Zeilenhöhe.
+      if (tab === 'nimi') {
+        const zeile = await page.evaluate(() => {
+          const row = document.querySelector('.word');
+          const gloss = row && row.querySelector('span:not(.glyph-inline)');
+          return row && gloss
+            ? { hoch: Math.round(row.getBoundingClientRect().height),
+                breit: Math.round(gloss.getBoundingClientRect().width) }
+            : null;
+        });
+        if (!zeile) errors.push(`[${label}] keine Wortzeile gefunden`);
+        else {
+          if (zeile.breit < 80) {
+            errors.push(`[${label}] Bedeutungsspalte nur ${zeile.breit}px breit`);
+          }
+          if (zeile.hoch > 160) {
+            errors.push(`[${label}] Wortzeile ${zeile.hoch}px hoch — die Spalte ist gequetscht`);
+          }
+        }
+      }
     }
 
     await page.close();

@@ -14,7 +14,9 @@
   ];
   // Die beiden Sprecherinnen — hier oben, weil der geladene Zustand dagegen
   // geprüft wird.
-  const VOICES = [{ id: 'kalaasi' }, { id: 'jlakuse' }, { id: 'ante' }];
+  // „ilo“ überspringt die Aufnahmen und nimmt die Stimme des Geräts — der
+  // Ausweg, wenn die mitgelieferten Dateien auf einem Gerät stumm bleiben.
+  const VOICES = [{ id: 'kalaasi' }, { id: 'jlakuse' }, { id: 'ante' }, { id: 'ilo' }];
 
   // Alles, was die Oberfläche sagt, steht hier — die Lektionen selbst kommen
   // aus den Kursdaten, die in derselben Sprache vorliegen.
@@ -118,7 +120,8 @@
         + 'jan Lakuse (Projekt Linku). Die App nimmt eine echte Aufnahme, wo es '
         + 'eine gibt, und die Gerätestimme nur für ganze Sätze.',
       voicePick: 'Stimme',
-      voiceNames: { kalaasi: 'kala Asi', jlakuse: 'jan Lakuse', ante: 'abwechselnd' },
+      voiceNames: { kalaasi: 'kala Asi', jlakuse: 'jan Lakuse', ante: 'abwechselnd',
+                    ilo: 'Gerätestimme' },
       voiceFetch: 'für unterwegs holen', voiceFetching: (n, all) => `holt … ${n}/${all}`,
       voiceReady: 'liegen auf dem Gerät', voiceFailed: 'Holen ging nicht.',
       voiceCredit: 'Aufnahmen: kala Asi (CC BY-SA 4.0) und jan Lakuse · Projekt Linku',
@@ -202,6 +205,10 @@
         + 'Angeschaltet kommt in jeder Lektion eine Höraufgabe dazu.',
       soundOn: 'Aussprache anschalten', soundOff: 'Aussprache abschalten',
       soundNone: 'Dieses Gerät bringt keine Sprachausgabe mit.',
+      soundFailed: 'Hier kommt kein Ton heraus.',
+      soundSwitch: 'Bleibt es beim Antippen still, liegt es meist am Gerät: '
+        + 'iPhones schalten mit dem Stummschalter auch die Aufnahmen ab. '
+        + 'Unter kalama steht „Gerätestimme“ — die spricht dann statt der Dateien.',
       musiTab: 'musi', musiTitle: 'utala musi',
       musiLead: 'Sticheln, kontern, Frieden schließen — mit 137 Wörtern und ohne ein '
         + 'einziges Schimpfwort.',
@@ -341,7 +348,8 @@
         + '(Linku project). The app uses a real recording wherever there is one and '
         + 'falls back to the device voice for whole sentences.',
       voicePick: 'voice',
-      voiceNames: { kalaasi: 'kala Asi', jlakuse: 'jan Lakuse', ante: 'alternating' },
+      voiceNames: { kalaasi: 'kala Asi', jlakuse: 'jan Lakuse', ante: 'alternating',
+                    ilo: 'device voice' },
       voiceFetch: 'keep them offline', voiceFetching: (n, all) => `fetching … ${n}/${all}`,
       voiceReady: 'stored on the device', voiceFailed: 'Fetching failed.',
       voiceCredit: 'Recordings: kala Asi (CC BY-SA 4.0) and jan Lakuse · Linku project',
@@ -425,6 +433,10 @@
         + 'lesson gains a listening task.',
       soundOn: 'Turn pronunciation on', soundOff: 'Turn pronunciation off',
       soundNone: 'This device has no speech output.',
+      soundFailed: 'No sound comes out here.',
+      soundSwitch: 'If tapping stays silent, the device is usually the reason: '
+        + 'iPhones mute the recordings along with everything else via the ring switch. '
+        + 'Under kalama there is „device voice“ — it speaks instead of the files.',
       musiTab: 'musi', musiTitle: 'utala musi',
       musiLead: 'Taunt, counter, make peace — with 137 words and not a single '
         + 'swear word.',
@@ -917,24 +929,63 @@
     return TP.lexicon[word] ? word : null;
   };
 
-  function playRecording(text) {
+  // Ein einziges Abspielgerät für alle Aufnahmen, aus zwei Gründen, beide von
+  // iOS: die Erlaubnis abzuspielen hängt dort am Element, das die erste
+  // Berührung gesehen hat, und ein Element, auf das niemand mehr zeigt, wird
+  // mitten im Abspielen weggeräumt. Vorher entstand bei jedem Tipp ein neues.
+  let player = null;
+  let playerUrl = null;
+
+  function audioPlayer() {
+    if (!player) {
+      player = new Audio();
+      player.preload = 'auto';
+    }
+    player.onended = null;
+    player.onerror = null;
+    if (playerUrl) { URL.revokeObjectURL(playerUrl); playerUrl = null; }
+    return player;
+  }
+
+  // Spielt eine Aufnahme, falls es eine gibt. Ob sie wirklich klingt, stellt
+  // sich erst danach heraus — eine fehlende Datei meldet sich als Ereignis,
+  // ein verweigertes Abspielen über das Versprechen. In beiden Fällen
+  // übernimmt `onFail`, statt dass gar nichts passiert.
+  function playRecording(text, onState, onFail) {
+    if (state.voice === 'ilo') return false;
     const key = String(text).trim();
     const blob = RECORDED.get(key);
-    if (blob) {
-      try {
-        const audio = new Audio(URL.createObjectURL(blob));
-        audio.onended = () => URL.revokeObjectURL(audio.src);
-        audio.play().catch(() => {});
-        return true;
-      } catch (error) { /* dann eben die nächste Stufe */ }
-    }
     const word = spokenWord(key);
-    if (!word) return false;
+    if (!blob && !word) return false;
+
+    let audio;
+    let source;
     try {
-      const audio = new Audio(`./kalama/${voiceFolder(word)}/${word}.mp3`);
-      audio.play().catch(() => {});
-      return true;
+      audio = audioPlayer();
+      source = blob ? URL.createObjectURL(blob)
+        : `./kalama/${voiceFolder(word)}/${word}.mp3`;
     } catch (error) { return false; }
+    if (blob) playerUrl = source;
+
+    let settled = false;
+    const stop = (failed) => {
+      if (settled) return;
+      settled = true;
+      if (onState) onState(false);
+      if (failed && onFail) onFail();
+    };
+    // Notbremse: meldet das Gerät weder Ende noch Fehler, gibt der Knopf
+    // trotzdem irgendwann wieder Ruhe.
+    setTimeout(() => stop(false), 8000);
+    audio.onended = () => stop(false);
+    audio.onerror = () => stop(true);
+    audio.src = source;
+    if (onState) onState(true);
+    try {
+      const started = audio.play();
+      if (started && started.catch) started.catch(() => stop(true));
+    } catch (error) { stop(true); }
+    return true;
   }
 
   async function recordFor(text, onState) {
@@ -1230,18 +1281,49 @@
     return utterance;
   }
 
-  function speak(text) {
-    // Die eigene Stimme schlägt die des Geräts.
-    if (playRecording(text)) return true;
+  function speakDevice(text, onState) {
     if (!speechAvailable()) return false;
     voice = voice || pickVoice();
     const utterance = utteranceFor(text);
     if (!utterance) return false;
+    let settled = false;
+    const stop = () => { if (settled) return; settled = true; if (onState) onState(false); };
+    setTimeout(stop, 20000);
+    utterance.onend = stop;
+    utterance.onerror = stop;
     try {
-      window.speechSynthesis.cancel();
+      // Nur abbrechen, wenn wirklich etwas läuft: ein Abbruch unmittelbar vor
+      // dem Sprechen verschluckt auf manchen Geräten die neue Äußerung.
+      if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+        window.speechSynthesis.cancel();
+      }
       window.speechSynthesis.speak(utterance);
     } catch (error) { return false; }
+    if (onState) onState(true);
     return true;
+  }
+
+  // Nur ein Knopf leuchtet: fängt woanders etwas Neues an, geht der vorige aus.
+  // Sonst bliebe er hängen, weil sein Ende nie gemeldet wird — das Abspielgerät
+  // ist für alle dasselbe.
+  let releaseSay = null;
+  function claimSay(onState) {
+    if (releaseSay) releaseSay(false);
+    const wrapped = (on) => {
+      if (onState) onState(on);
+      if (on) releaseSay = wrapped;
+      else if (releaseSay === wrapped) releaseSay = null;
+    };
+    return wrapped;
+  }
+
+  // Reihenfolge: eigene Aufnahme, mitgelieferte, Gerätestimme. Die Aufnahmen
+  // melden erst hinterher, ob sie wirklich klingen — misslingt es, springt die
+  // Gerätestimme ein, statt dass der Knopf stumm bleibt.
+  function speak(text, onState) {
+    const report = claimSay(onState);
+    if (playRecording(text, report, () => speakDevice(text, report))) return true;
+    return speakDevice(text, report);
   }
 
   // Ganze Texte am Stück: die Sätze werden hintereinander in die Warteschlange
@@ -1249,7 +1331,11 @@
   function speakLines(list, onLine, onEnd) {
     if (!speechAvailable()) return false;
     voice = voice || pickVoice();
-    try { window.speechSynthesis.cancel(); } catch (error) { return false; }
+    try {
+      if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+        window.speechSynthesis.cancel();
+      }
+    } catch (error) { return false; }
     let spoken = 0;
     list.forEach((text, index) => {
       const utterance = utteranceFor(text);
@@ -1280,7 +1366,13 @@
     if (!state.sound || !speechAvailable()) return null;
     const button = el(`<button class="say" type="button"
       aria-label="${escape(label || t('listen'))}" title="${escape(label || t('listen'))}">♪</button>`);
-    button.onclick = (event) => { event.stopPropagation(); speak(text); };
+    // Sichtbare Rückmeldung: solange etwas läuft, ist der Knopf angefasst.
+    // Kommt gar kein Ton zustande, sagt es die App, statt stumm zu bleiben.
+    button.onclick = (event) => {
+      event.stopPropagation();
+      const busy = (on) => { button.dataset.busy = String(on); };
+      if (!speak(text, busy)) { busy(false); toast(t('soundFailed')); }
+    };
     return button;
   }
 
@@ -2106,6 +2198,7 @@
       row.append(el(`<p class="hint">${escape(t('soundNone'))}</p>`));
       return card;
     }
+    row.before(el(`<p class="hint">${escape(t('soundSwitch'))}</p>`));
     const button = el(`<button class="ghost">${escape(t(state.sound ? 'soundOff' : 'soundOn'))}</button>`);
     button.onclick = () => {
       state.sound = !state.sound;
