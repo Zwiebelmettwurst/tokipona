@@ -104,24 +104,26 @@ const FILE = lib.FILE;
       if (wide.over) errors.push(`[${label}] Reiter ${tab} scrollt ${wide.by}px waagerecht`);
       // Nicht scrollen reicht nicht: eine Spalte kann so schmal gequetscht
       // werden, dass ein Zeichen je Zeile übrigbleibt. Im Wörterbuch war
-      // genau das der Fall — sichtbar an der Zeilenhöhe.
+      // genau das der Fall — die Bedeutung stand in einer 19px-Spalte.
+      // Geprüft wird das schmalste Wort der ganzen Liste.
       if (tab === 'nimi') {
-        const zeile = await page.evaluate(() => {
-          const row = document.querySelector('.word');
-          const gloss = row && row.querySelector('span:not(.glyph-inline)');
-          return row && gloss
-            ? { hoch: Math.round(row.getBoundingClientRect().height),
-                breit: Math.round(gloss.getBoundingClientRect().width) }
-            : null;
+        const eng = await page.evaluate(() => {
+          const rows = Array.from(document.querySelectorAll('.word'));
+          if (!rows.length) return null;
+          return rows.map((row) => {
+            const gloss = row.querySelector('span:not(.glyph-inline)');
+            return {
+              wort: row.querySelector('b').textContent.trim(),
+              anteil: gloss
+                ? gloss.getBoundingClientRect().width / row.getBoundingClientRect().width : 0,
+              breit: gloss ? Math.round(gloss.getBoundingClientRect().width) : 0,
+            };
+          }).sort((a, b) => a.anteil - b.anteil)[0];
         });
-        if (!zeile) errors.push(`[${label}] keine Wortzeile gefunden`);
-        else {
-          if (zeile.breit < 80) {
-            errors.push(`[${label}] Bedeutungsspalte nur ${zeile.breit}px breit`);
-          }
-          if (zeile.hoch > 160) {
-            errors.push(`[${label}] Wortzeile ${zeile.hoch}px hoch — die Spalte ist gequetscht`);
-          }
+        if (!eng) errors.push(`[${label}] keine Wortzeile gefunden`);
+        else if (eng.anteil < 0.6) {
+          errors.push(`[${label}] Bedeutungsspalte bei „${eng.wort}“ nur ${eng.breit}px `
+            + `(${Math.round(eng.anteil * 100)}% der Zeile)`);
         }
       }
     }

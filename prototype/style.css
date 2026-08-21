@@ -677,29 +677,47 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 }
 
 .words { display: flex; flex-direction: column; gap: 0; }
+
+/* Eine Wortzeile hat zwei Zeilen: oben Zeichen, Wort, Buchmarke und Knöpfe,
+   darunter die Bedeutung über die volle Breite. Nebeneinander ging es nicht:
+   auf Telefonbreite blieb für die Bedeutung eine Spalte von einem Zeichen
+   übrig. `order` sortiert um, ohne die Reihenfolge im Text anzurühren —
+   Vorlesehilfen und Tastatur behalten Wort, Bedeutung, Knöpfe in der
+   Reihenfolge, in der sie zusammengehören. */
 .word {
   display: flex;
-  gap: 0.7rem;
-  padding: 0.55rem 0.2rem;
+  flex-wrap: wrap;
+  column-gap: 0.6rem;
+  row-gap: 0.25rem;
+  padding: 0.6rem 0.2rem;
   border-bottom: 1px solid var(--rule);
   align-items: center;
 }
+.word .glyph-inline { order: 1; }
+.word b { order: 2; }
+.word em { order: 3; }
+.word .say { order: 4; }
+.word .rec { order: 5; }
+.word .netopen { order: 6; }
+.word span:not(.glyph-inline) { order: 7; }
+.word .example { order: 8; }
+.word .net { order: 9; }
+
 .word b {
   font-family: var(--mono);
   font-weight: 500;
-  min-width: 5.5rem;
+  /* Wächst in die freie Breite und schiebt Marke und Knöpfe an den Rand. */
+  flex: 1 1 auto;
+  min-width: 0;
   overflow-wrap: anywhere;   /* kijetesantakalu passt in keine Spalte */
 }
 
-/* min-width: 0 erlaubt dem Flex-Kind, unter seine Inhaltsbreite zu schrumpfen —
-   ohne das schiebt eine lange Bedeutung die ganze Zeile aus dem Bild. */
 .word span:not(.glyph-inline) {
   color: var(--ink-dim);
   font-size: 0.875rem;
-  /* Nicht unter 6rem quetschen: auf schmalen Telefonen blieb sonst eine
-     Spalte von einem Zeichen Breite übrig. Dann lieber eine Zeile tiefer. */
-  flex: 1;
-  min-width: 6rem;
+  /* Eigene Zeile, eingerückt unter das Wort. */
+  flex: 0 0 100%;
+  padding-left: 3.5rem;
   overflow-wrap: anywhere;   /* „geschlechtsnonkonform“ passt sonst nirgends */
 }
 .word em {
@@ -848,7 +866,7 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   color: var(--accent-ink);
   border-color: var(--accent);
 }
-.word .say { margin-left: auto; }
+.word .say { margin-left: 0; }
 
 .playbox {
   display: flex;
@@ -911,7 +929,8 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 /* Beispielsatz unter dem Wort */
 .word { flex-wrap: wrap; }
 .word .example {
-  width: 100%;
+  flex: 0 0 100%;
+  padding-left: 3.5rem;
   margin: 0.2rem 0 0;
   font-size: 0.75rem;
   color: var(--ink-faint);
