@@ -92,6 +92,19 @@ async function fixWrong(page) {
       `Platzhalter im Blatt: ${fix.alles.slice(0, 120)}`);
   }
 
+  // Das Blatt erscheint ohne Seitenwechsel — Vorlesehilfen erfahren nur
+  // davon, wenn es sich als lebender Bereich meldet.
+  const angesagt = await page.evaluate(() => {
+    const sheet = document.querySelector('.sheet');
+    return sheet ? { rolle: sheet.getAttribute('role'), live: sheet.getAttribute('aria-live') } : null;
+  });
+  if (!angesagt) check(Boolean(fix), 'kein Rückmeldeblatt zum Prüfen');
+  else {
+    console.log('Ansage:', JSON.stringify(angesagt));
+    check(angesagt.live === 'polite' || angesagt.rolle === 'status',
+      `Rückmeldeblatt wird nicht angesagt (role=${angesagt.rolle}, aria-live=${angesagt.live})`);
+  }
+
   // Falsch gebaut: eigener Satz und Musterlösung müssen beide beschriftet sein
   const wrong = await build(page, 'lsp06_06', ['jan', 'mije', 'li', 'moku']);
   console.log(`falsch → „${wrong.verdict}“`);
