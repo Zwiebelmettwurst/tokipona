@@ -11,6 +11,11 @@ const FILE = 'file://' + path.join(DOCS, 'prototype.html');
 const START = 'file://' + path.join(DOCS, 'index.html');
 const SHOTS = path.join(__dirname, 'shots');
 
+// Eine Kurslektion — nicht die Einführung (Lektion 0) und nicht die
+// Sonderkarten oben (fällige Karten, Schwachstellen). Wer den Kurs meint,
+// nimmt diesen Wähler.
+const KURS = '.lesson:not(.intro):not(.review)';
+
 // Playwright bringt in der Werkbank seinen eigenen Browser mit; hier liegt
 // einer neben der Sitzung.
 function browserPath() {
@@ -47,4 +52,4 @@ function collector() {
   return { errors, check, done };
 }
 
-module.exports = { ROOT, DOCS, FILE, START, SHOTS, launch, collector, browserPath };
+module.exports = { ROOT, DOCS, FILE, START, SHOTS, KURS, launch, collector, browserPath };

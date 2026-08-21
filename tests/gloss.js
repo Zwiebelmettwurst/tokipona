@@ -35,7 +35,7 @@ const toChoose = async (page) => {
     JSON.stringify({ done: { 1: true }, lang: 'de' })));
   await page.reload();
   await page.waitForSelector('.lesson');
-  await page.locator('.lesson[data-state="current"]').first().click();
+  await page.locator('.lesson:not(.intro):not(.review)[data-state="current"]').first().click();
   await page.waitForSelector('.exbar');
 
   if (!(await toChoose(page))) { console.log('keine Leseaufgabe gefunden'); process.exit(1); }
@@ -87,7 +87,7 @@ const toChoose = async (page) => {
     JSON.stringify({ done: { 1: true }, lang: 'de' })));
   await wide.reload();
   await wide.waitForSelector('.lesson');
-  await wide.locator('.lesson[data-state="current"]').first().click();
+  await wide.locator('.lesson:not(.intro):not(.review)[data-state="current"]').first().click();
   await wide.waitForSelector('.exbar');
   if (await toChoose(wide)) {
     await wide.locator('.question.tp .gloss-word').first().hover();

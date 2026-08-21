@@ -17,8 +17,8 @@ async function build(page, id, words) {
     }));
   }, 's:' + id);
   await page.reload();
-  await page.waitForSelector('.lesson.review');
-  await page.locator('.lesson.review').click();
+  await page.waitForSelector('.lesson.due');
+  await page.locator('.lesson.due').click();
   await page.waitForSelector('.slot');
   for (const word of words) {
     const tile = page.locator(`.bank .tile:not(.used)[data-word="${word}"]`).first();
@@ -39,10 +39,71 @@ async function build(page, id, words) {
   }));
 }
 
+// Fehlersatz-Aufgabe: die falsche Kachel antippen und lesen, was dasteht.
+async function fixWrong(page) {
+  await page.goto(FILE);
+  await page.evaluate(() => localStorage.setItem('o-toki-fortschritt-v1',
+    JSON.stringify({ lang: 'de', sound: false, size: 'lang' })));
+  await page.reload();
+  await page.waitForSelector('.lesson');
+  await page.locator('.lesson:not(.intro):not(.review)').first().click();
+  await page.waitForSelector('.exbar');
+  for (let i = 0; i < 25 && !(await page.locator('.pickline').count()); i += 1) {
+    if (await page.locator('.done').count()) return null;
+    await page.locator('.exbar .skip').click();
+    await page.waitForTimeout(30);
+  }
+  if (!(await page.locator('.pickline').count())) return null;
+  const words = await page.locator('.pickline .tile').allTextContents();
+  // Irgendeine Kachel antippen; getroffen oder nicht — es muss etwas Lesbares
+  // dastehen. Bei einem Treffer probieren wir die nächste.
+  for (const index of [0, 1, 2]) {
+    if (index >= words.length) break;
+    await page.locator('.pickline .tile').nth(index).click();
+    await page.locator('.actions .primary').click();
+    await page.waitForSelector('.sheet');
+    const out = await page.evaluate(() => ({
+      good: Boolean(document.querySelector('.sheet .verdict.good')),
+      reason: document.querySelector('.sheet .reason')
+        ? document.querySelector('.sheet .reason').textContent.replace(/\s+/g, ' ').trim() : '',
+      alles: document.querySelector('.sheet').textContent.replace(/\s+/g, ' ').trim(),
+    }));
+    if (!out.good) return Object.assign(out, { words });
+    await page.locator('.sheet .primary').click();
+    await page.waitForTimeout(40);
+    if (!(await page.locator('.pickline').count())) return null;
+  }
+  return null;
+}
+
 (async () => {
   const browser = await lib.launch(chromium);
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, locale: 'de-DE' });
   page.on('pageerror', (e) => { errors.push('Seitenfehler: ' + e.message); console.log('  ✗ ' + e.message); });
+
+  // Fehlersatz falsch getippt: die Erklärung muss ein Satz sein, kein Loch.
+  const fix = await fixWrong(page);
+  if (!fix) {
+    check(false, 'keine Fehlersatz-Aufgabe gefunden');
+  } else {
+    console.log(`Fehlersatz „${fix.words.join(' ')}“ → „${fix.reason}“`);
+    check(fix.reason.length > 10, `Erklärung fehlt oder ist zu kurz: „${fix.reason}“`);
+    check(!/undefined|null|NaN|\[object/.test(fix.alles),
+      `Platzhalter im Blatt: ${fix.alles.slice(0, 120)}`);
+  }
+
+  // Das Blatt erscheint ohne Seitenwechsel — Vorlesehilfen erfahren nur
+  // davon, wenn es sich als lebender Bereich meldet.
+  const angesagt = await page.evaluate(() => {
+    const sheet = document.querySelector('.sheet');
+    return sheet ? { rolle: sheet.getAttribute('role'), live: sheet.getAttribute('aria-live') } : null;
+  });
+  if (!angesagt) check(Boolean(fix), 'kein Rückmeldeblatt zum Prüfen');
+  else {
+    console.log('Ansage:', JSON.stringify(angesagt));
+    check(angesagt.live === 'polite' || angesagt.rolle === 'status',
+      `Rückmeldeblatt wird nicht angesagt (role=${angesagt.rolle}, aria-live=${angesagt.live})`);
+  }
 
   // Falsch gebaut: eigener Satz und Musterlösung müssen beide beschriftet sein
   const wrong = await build(page, 'lsp06_06', ['jan', 'mije', 'li', 'moku']);

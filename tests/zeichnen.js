@@ -20,8 +20,8 @@ async function openTrace(page, word) {
   await page.goto(FILE);
   await seed(page, word);
   await page.reload();
-  await page.waitForSelector('.lesson.review');
-  await page.locator('.lesson.review').click();
+  await page.waitForSelector('.lesson.due');
+  await page.locator('.lesson.due').click();
   await page.waitForSelector('.trace');
   await page.waitForTimeout(200);            // Schrift laden lassen
 }

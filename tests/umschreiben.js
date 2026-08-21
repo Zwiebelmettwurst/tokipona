@@ -15,8 +15,8 @@ async function coin(page, index, text) {
     srs: { [key]: { reps: 1, interval: 600000, ease: 2.5, due: Date.now() - 1000 } },
   })), 'n:' + index);
   await page.reload();
-  await page.waitForSelector('.lesson.review');
-  await page.locator('.lesson.review').click();
+  await page.waitForSelector('.lesson.due');
+  await page.locator('.lesson.due').click();
   await page.waitForSelector('.typed');
   const asked = (await page.locator('.question').textContent()).trim();
   await page.locator('.typed').fill(text);

@@ -87,7 +87,7 @@ const check = (condition, message) => { if (!condition) errors.push(message); };
   check(caches.length === 1 && caches[0] === 'o-toki-neu-eins', 'alte Caches bleiben liegen');
 
   // 2. Neue Veröffentlichung mitten in einer Übung → nur ein Streifen
-  await page.locator('.lesson:not(.review)').first().click();
+  await page.locator('.lesson:not(.intro):not(.review)').first().click();
   await page.waitForSelector('.exbar');
   const before = await page.locator('.question').textContent();
   publish('neu-zwei');

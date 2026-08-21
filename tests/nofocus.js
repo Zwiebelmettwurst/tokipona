@@ -36,7 +36,7 @@ const FILE = lib.FILE;
   };
 
   // Lektion antippen — der Tipp, der auf iOS den Hover hinterlässt
-  await page.locator('.lesson').first().tap();
+  await page.locator('.lesson:not(.intro):not(.review)').first().tap();
   await page.waitForSelector('.exbar');
   await probe('erste Aufgabe nach Lektionstipp');
   await page.screenshot({ path: `${SHOTS}/16-frisch.png` });

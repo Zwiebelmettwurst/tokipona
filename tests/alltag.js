@@ -99,8 +99,8 @@ const check = (condition, message) => { if (!condition) { errors.push(message); 
     srs: { 's:p01': { reps: 4, interval: 604800000, ease: 2.7, due: Date.now() - 1000 } },
   })));
   await page.reload();
-  await page.waitForSelector('.lesson.review');
-  await page.locator('.lesson.review').click();
+  await page.waitForSelector('.lesson.due');
+  await page.locator('.lesson.due').click();
   await page.waitForSelector('.exbar');
   await page.locator('.exbar .skip').click();
   await page.waitForTimeout(80);
@@ -117,8 +117,8 @@ const check = (condition, message) => { if (!condition) { errors.push(message); 
     srs: { 't:mi': { reps: 1, interval: 600000, ease: 2.5, due: Date.now() - 1000 } },
   })));
   await page.reload();
-  await page.waitForSelector('.lesson.review');
-  await page.locator('.lesson.review').click();
+  await page.waitForSelector('.lesson.due');
+  await page.locator('.lesson.due').click();
   await page.waitForSelector('.trace');
   await page.locator('.exbar .skip').click();
   await page.waitForTimeout(80);

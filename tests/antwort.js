@@ -25,8 +25,8 @@ async function answer(page, id, text) {
   await page.goto(FILE);
   await seedQuestion(page, id);
   await page.reload();
-  await page.waitForSelector('.lesson.review');
-  await page.locator('.lesson.review').click();
+  await page.waitForSelector('.lesson.due');
+  await page.locator('.lesson.due').click();
   await page.waitForSelector('.typed');
   const question = (await page.locator('.question').textContent()).trim();
   const ask = (await page.locator('.ask').textContent()).trim();
@@ -100,8 +100,8 @@ async function answer(page, id, text) {
     }));
   });
   await page.reload();
-  await page.waitForSelector('.lesson.review');
-  await page.locator('.lesson.review').click();
+  await page.waitForSelector('.lesson.due');
+  await page.locator('.lesson.due').click();
   await page.waitForSelector('.typed');
   const englishHint = (await page.locator('.screen > .hint').first().textContent()).trim();
   const englishAsk = (await page.locator('.ask').textContent()).trim();

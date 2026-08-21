@@ -37,7 +37,7 @@ async function dragTo(page, fromIndex, toIndex) {
   await page.evaluate(() => localStorage.clear());
   await page.reload();
   await page.waitForSelector('.lesson');
-  await page.locator('.lesson').first().click();
+  await page.locator('.lesson:not(.intro):not(.review)').first().click();
   await page.waitForSelector('.exbar');
 
   // Bis zu einer Bau-Aufgabe vorspulen

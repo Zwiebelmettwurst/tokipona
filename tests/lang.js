@@ -23,7 +23,7 @@ const FILE = lib.FILE;
 
     const chosen = await page.evaluate(() =>
       JSON.parse(localStorage.getItem('o-toki-fortschritt-v1') || '{}').lang);
-    const firstLesson = (await page.locator('.lesson .body b').first().textContent()).trim();
+    const firstLesson = (await page.locator(lib.KURS + ' .body b').first().textContent()).trim();
     console.log(`${locale}: Sprache ${chosen || '(noch nicht gespeichert)'}, erste Lektion „${firstLesson}“`);
     if (expectLang === 'de' && firstLesson !== 'Einfache Sätze') errors.push(`${locale}: falsche Lektionssprache`);
     if (expectLang === 'en' && firstLesson !== 'Simple sentences') errors.push(`${locale}: falsche Lektionssprache`);
@@ -41,7 +41,7 @@ const FILE = lib.FILE;
 
   const play = async (label) => {
     const seen = [];
-    await page.locator('.lesson:not(.review)').first().click();
+    await page.locator('.lesson:not(.intro):not(.review)').first().click();
     await page.waitForSelector('.exbar');
     for (let i = 0; i < 30 && !(await page.locator('.done').count()); i += 1) {
       seen.push((await page.locator('.prompt').first().textContent()).trim());
@@ -78,7 +78,7 @@ const FILE = lib.FILE;
   await page.locator('.card:has(h2) .ghost', { hasText: 'English' }).click();
   await page.waitForTimeout(100);
   const heading = (await page.locator('.hello p').textContent()).trim();
-  const lesson = (await page.locator('.lesson:not(.review) .body b').first().textContent()).trim();
+  const lesson = (await page.locator('.lesson:not(.intro):not(.review) .body b').first().textContent()).trim();
   console.log(`nach dem Umschalten: „${heading.slice(0, 40)}…“, Lektion „${lesson}“`);
   if (!/Continue|Twelve/.test(heading)) errors.push('Oberfläche nicht umgeschaltet');
   await page.screenshot({ path: `${SHOTS}/24-englisch.png`, fullPage: true });
@@ -127,7 +127,7 @@ const FILE = lib.FILE;
   if (!goal) errors.push('Tageszielkarte nicht übersetzt');
 
   // Auch der Überspringen-Knopf und die Wortkacheln
-  await page.locator('.lesson:not(.review)').first().click();
+  await page.locator('.lesson:not(.intro):not(.review)').first().click();
   await page.waitForSelector('.exbar');
   const skipLabel = (await page.locator('.exbar .skip').textContent()).trim();
   if (skipLabel !== 'skip') errors.push(`Überspringen nicht übersetzt: ${skipLabel}`);

@@ -253,8 +253,10 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 .concept .bar i { display: block; height: 100%; background: var(--accent); transition: width 0.5s ease; }
 .concept code { font-family: var(--mono); font-size: 0.75rem; color: var(--ink-faint); }
 
-.row { display: flex; gap: 0.5rem; margin-top: 0.7rem; }
-.row .ghost { flex: 1; }
+.row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem; }
+.row .ghost { flex: 1; min-width: 0; }
+/* Vier Stimmen passen nicht nebeneinander auf ein Telefon — zwei mal zwei. */
+.voicepick .ghost { flex: 1 1 44%; }
 
 .drawer { display: flex; flex-direction: column; gap: 0.5rem; }
 .drawer:not(:empty) { margin-top: 0.6rem; }
@@ -450,8 +452,47 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   margin: 0.9rem 0 0.2rem;
 }
 
+/* Lektion 0 erklärt, statt abzufragen — ein ruhiger Kasten, kein Urteil. */
+.rulebody { margin-top: 0.9rem; }
+.rulebody .xraywrap { margin-bottom: 0.8rem; }
+.rulebody .reason { margin: 0 0 0.8rem; }
+.rulebad {
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--ink-faint);
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.7rem;
+}
+.rulebad[data-kind="falsch"] { border-left-color: var(--wrong); background: var(--wrong-soft); }
+.rulebad .badline {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  margin: 0 0 0.35rem;
+}
+.rulebad .mark { color: var(--ink-faint); font-size: 0.9375rem; }
+.rulebad[data-kind="falsch"] .mark { color: var(--wrong); }
+.rulebad code { font-family: var(--mono); font-size: 0.9375rem; color: var(--ink-dim); }
 .lesson.review .badge { background: var(--gold-soft); color: var(--gold); font-size: 1rem; }
 .lesson.review { border-color: var(--gold); }
+.lesson.weak .badge { background: var(--wrong-soft); color: var(--wrong); font-size: 1rem; }
+.lesson.weak { border-color: var(--wrong); }
+
+/* Tagebuch: schreiben oben, Gelesenes darunter. */
+.diarytext {
+  min-height: 5.5rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+.diarywrite .actions { margin-top: 0.6rem; padding: 0.6rem 0 0; }
+.diarywrite .lookup { margin-top: 0.6rem; }
+.diarynudge .question.tp { margin: 0.4rem 0 0.5rem; font-size: 1.0625rem; }
+.diaryentry .question.tp {
+  margin: 0.4rem 0 0.6rem;
+  font-size: 0.9375rem;
+  white-space: pre-wrap;
+}
+.diaryentry .xraywrap { margin-bottom: 0.6rem; }
+.diarypast .card { margin-top: 0.7rem; }
 
 /* Zeigergeräte bekommen eine Hover-Rückmeldung. Auf Tippgeräten bliebe sie
    nach der Berührung kleben und sähe aus wie eine getroffene Auswahl. */
@@ -656,27 +697,47 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 }
 
 .words { display: flex; flex-direction: column; gap: 0; }
+
+/* Eine Wortzeile hat zwei Zeilen: oben Zeichen, Wort, Buchmarke und Knöpfe,
+   darunter die Bedeutung über die volle Breite. Nebeneinander ging es nicht:
+   auf Telefonbreite blieb für die Bedeutung eine Spalte von einem Zeichen
+   übrig. `order` sortiert um, ohne die Reihenfolge im Text anzurühren —
+   Vorlesehilfen und Tastatur behalten Wort, Bedeutung, Knöpfe in der
+   Reihenfolge, in der sie zusammengehören. */
 .word {
   display: flex;
-  gap: 0.7rem;
-  padding: 0.55rem 0.2rem;
+  flex-wrap: wrap;
+  column-gap: 0.6rem;
+  row-gap: 0.25rem;
+  padding: 0.6rem 0.2rem;
   border-bottom: 1px solid var(--rule);
   align-items: center;
 }
+.word .glyph-inline { order: 1; }
+.word b { order: 2; }
+.word em { order: 3; }
+.word .say { order: 4; }
+.word .rec { order: 5; }
+.word .netopen { order: 6; }
+.word span:not(.glyph-inline) { order: 7; }
+.word .example { order: 8; }
+.word .net { order: 9; }
+
 .word b {
   font-family: var(--mono);
   font-weight: 500;
-  min-width: 5.5rem;
+  /* Wächst in die freie Breite und schiebt Marke und Knöpfe an den Rand. */
+  flex: 1 1 auto;
+  min-width: 0;
   overflow-wrap: anywhere;   /* kijetesantakalu passt in keine Spalte */
 }
 
-/* min-width: 0 erlaubt dem Flex-Kind, unter seine Inhaltsbreite zu schrumpfen —
-   ohne das schiebt eine lange Bedeutung die ganze Zeile aus dem Bild. */
 .word span:not(.glyph-inline) {
   color: var(--ink-dim);
   font-size: 0.875rem;
-  flex: 1;
-  min-width: 0;
+  /* Eigene Zeile, eingerückt unter das Wort. */
+  flex: 0 0 100%;
+  padding-left: 3.5rem;
   overflow-wrap: anywhere;   /* „geschlechtsnonkonform“ passt sonst nirgends */
 }
 .word em {
@@ -818,7 +879,14 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   inset: -0.6rem;
 }
 .say:active { background: var(--accent-soft); }
-.word .say { margin-left: auto; }
+/* Solange etwas läuft, ist zu sehen, dass der Tipp angekommen ist — sonst
+   sieht ein stummes Gerät genauso aus wie ein toter Knopf. */
+.say[data-busy="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+}
+.word .say { margin-left: 0; }
 
 .playbox {
   display: flex;
@@ -881,7 +949,8 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 /* Beispielsatz unter dem Wort */
 .word { flex-wrap: wrap; }
 .word .example {
-  width: 100%;
+  flex: 0 0 100%;
+  padding-left: 3.5rem;
   margin: 0.2rem 0 0;
   font-size: 0.75rem;
   color: var(--ink-faint);

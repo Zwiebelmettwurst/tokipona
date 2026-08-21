@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="o toki!">
-<script>window.OTOKI_VERSION = 'c03c88d374';</script>
+<script>window.OTOKI_VERSION = 'fbd6a2a510';</script>
 
 <style>
 /* linja pimeja 1.9 — jan Inkepa, CC0. Siehe prototype/SCHRIFT.md.
@@ -275,8 +275,10 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 .concept .bar i { display: block; height: 100%; background: var(--accent); transition: width 0.5s ease; }
 .concept code { font-family: var(--mono); font-size: 0.75rem; color: var(--ink-faint); }
 
-.row { display: flex; gap: 0.5rem; margin-top: 0.7rem; }
-.row .ghost { flex: 1; }
+.row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem; }
+.row .ghost { flex: 1; min-width: 0; }
+/* Vier Stimmen passen nicht nebeneinander auf ein Telefon — zwei mal zwei. */
+.voicepick .ghost { flex: 1 1 44%; }
 
 .drawer { display: flex; flex-direction: column; gap: 0.5rem; }
 .drawer:not(:empty) { margin-top: 0.6rem; }
@@ -472,8 +474,47 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   margin: 0.9rem 0 0.2rem;
 }
 
+/* Lektion 0 erklärt, statt abzufragen — ein ruhiger Kasten, kein Urteil. */
+.rulebody { margin-top: 0.9rem; }
+.rulebody .xraywrap { margin-bottom: 0.8rem; }
+.rulebody .reason { margin: 0 0 0.8rem; }
+.rulebad {
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--ink-faint);
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.7rem;
+}
+.rulebad[data-kind="falsch"] { border-left-color: var(--wrong); background: var(--wrong-soft); }
+.rulebad .badline {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  margin: 0 0 0.35rem;
+}
+.rulebad .mark { color: var(--ink-faint); font-size: 0.9375rem; }
+.rulebad[data-kind="falsch"] .mark { color: var(--wrong); }
+.rulebad code { font-family: var(--mono); font-size: 0.9375rem; color: var(--ink-dim); }
 .lesson.review .badge { background: var(--gold-soft); color: var(--gold); font-size: 1rem; }
 .lesson.review { border-color: var(--gold); }
+.lesson.weak .badge { background: var(--wrong-soft); color: var(--wrong); font-size: 1rem; }
+.lesson.weak { border-color: var(--wrong); }
+
+/* Tagebuch: schreiben oben, Gelesenes darunter. */
+.diarytext {
+  min-height: 5.5rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+.diarywrite .actions { margin-top: 0.6rem; padding: 0.6rem 0 0; }
+.diarywrite .lookup { margin-top: 0.6rem; }
+.diarynudge .question.tp { margin: 0.4rem 0 0.5rem; font-size: 1.0625rem; }
+.diaryentry .question.tp {
+  margin: 0.4rem 0 0.6rem;
+  font-size: 0.9375rem;
+  white-space: pre-wrap;
+}
+.diaryentry .xraywrap { margin-bottom: 0.6rem; }
+.diarypast .card { margin-top: 0.7rem; }
 
 /* Zeigergeräte bekommen eine Hover-Rückmeldung. Auf Tippgeräten bliebe sie
    nach der Berührung kleben und sähe aus wie eine getroffene Auswahl. */
@@ -678,27 +719,47 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 }
 
 .words { display: flex; flex-direction: column; gap: 0; }
+
+/* Eine Wortzeile hat zwei Zeilen: oben Zeichen, Wort, Buchmarke und Knöpfe,
+   darunter die Bedeutung über die volle Breite. Nebeneinander ging es nicht:
+   auf Telefonbreite blieb für die Bedeutung eine Spalte von einem Zeichen
+   übrig. `order` sortiert um, ohne die Reihenfolge im Text anzurühren —
+   Vorlesehilfen und Tastatur behalten Wort, Bedeutung, Knöpfe in der
+   Reihenfolge, in der sie zusammengehören. */
 .word {
   display: flex;
-  gap: 0.7rem;
-  padding: 0.55rem 0.2rem;
+  flex-wrap: wrap;
+  column-gap: 0.6rem;
+  row-gap: 0.25rem;
+  padding: 0.6rem 0.2rem;
   border-bottom: 1px solid var(--rule);
   align-items: center;
 }
+.word .glyph-inline { order: 1; }
+.word b { order: 2; }
+.word em { order: 3; }
+.word .say { order: 4; }
+.word .rec { order: 5; }
+.word .netopen { order: 6; }
+.word span:not(.glyph-inline) { order: 7; }
+.word .example { order: 8; }
+.word .net { order: 9; }
+
 .word b {
   font-family: var(--mono);
   font-weight: 500;
-  min-width: 5.5rem;
+  /* Wächst in die freie Breite und schiebt Marke und Knöpfe an den Rand. */
+  flex: 1 1 auto;
+  min-width: 0;
   overflow-wrap: anywhere;   /* kijetesantakalu passt in keine Spalte */
 }
 
-/* min-width: 0 erlaubt dem Flex-Kind, unter seine Inhaltsbreite zu schrumpfen —
-   ohne das schiebt eine lange Bedeutung die ganze Zeile aus dem Bild. */
 .word span:not(.glyph-inline) {
   color: var(--ink-dim);
   font-size: 0.875rem;
-  flex: 1;
-  min-width: 0;
+  /* Eigene Zeile, eingerückt unter das Wort. */
+  flex: 0 0 100%;
+  padding-left: 3.5rem;
   overflow-wrap: anywhere;   /* „geschlechtsnonkonform“ passt sonst nirgends */
 }
 .word em {
@@ -840,7 +901,14 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   inset: -0.6rem;
 }
 .say:active { background: var(--accent-soft); }
-.word .say { margin-left: auto; }
+/* Solange etwas läuft, ist zu sehen, dass der Tipp angekommen ist — sonst
+   sieht ein stummes Gerät genauso aus wie ein toter Knopf. */
+.say[data-busy="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+}
+.word .say { margin-left: 0; }
 
 .playbox {
   display: flex;
@@ -903,7 +971,8 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 /* Beispielsatz unter dem Wort */
 .word { flex-wrap: wrap; }
 .word .example {
-  width: 100%;
+  flex: 0 0 100%;
+  padding-left: 3.5rem;
   margin: 0.2rem 0 0;
   font-size: 0.75rem;
   color: var(--ink-faint);
@@ -1483,6 +1552,128 @@ const TOKIPONA_TOKI = {
     context: { de: 'ein Vorfeld mit <b>la</b>', en: 'a context with <b>la</b>' },
     subject: { de: 'ein Subjekt', en: 'a subject' },
     preverb: { de: 'ein Präverb wie <b>wile</b> oder <b>ken</b>', en: 'a preverb such as <b>wile</b> or <b>ken</b>' },
+  },
+
+  // ---------------------------------------------------------- Lektion 0
+  //
+  // Der Kurs fängt bei den Wörtern an — hier fängt er beim Satz an. Vier
+  // Regeln, jede mit einem Beispiel, einem Gegenbeispiel und danach zwei
+  // Aufgaben, die genau sie brauchen.
+  //
+  // Die Gegenbeispiele sind von zweierlei Art, und der Unterschied ist der
+  // halbe Lerninhalt: `falsch` verletzt eine Regel — der Parser weist es ab.
+  // `anders` ist tadellose Sprache und heißt nur etwas anderes; genau daran
+  // sieht man, was li und e eigentlich tun. prototype/test.js prüft beides.
+  nasin: {
+    title: { de: 'Wie ein Satz gebaut ist', en: 'How a sentence is built' },
+    note: {
+      de: 'Zwei kleine Wörter tragen den ganzen Satzbau: <b>li</b> trennt '
+        + 'Subjekt und Prädikat, <b>e</b> kündigt das Objekt an. Ab jetzt siehst '
+        + 'du beide in jedem Satz.',
+      en: 'Two little words carry the whole structure: <b>li</b> separates '
+        + 'subject and predicate, <b>e</b> announces the object. From here on you '
+        + 'will see both in every sentence.',
+    },
+    words: ['mi', 'sina', 'ona', 'jan', 'soweli', 'li', 'e',
+            'pona', 'moku', 'lukin', 'kili', 'telo', 'lape'],
+
+    rules: [
+      { id: 'r1', tp: 'soweli li pona.',
+        de: 'Das Tier ist gut.', en: 'The animal is good.',
+        concepts: ['c_li'],
+        point: {
+          de: 'Ein Satz hat zwei Teile: wovon die Rede ist, und was darüber '
+            + 'gesagt wird. Dazwischen steht <b>li</b>. Es ist kein Wort mit '
+            + 'Bedeutung, sondern die Naht.',
+          en: 'A sentence has two parts: what is being talked about, and what is '
+            + 'said about it. Between them stands <b>li</b>. It carries no meaning '
+            + 'of its own — it is the seam.',
+        },
+        bad: { kind: 'anders', tp: 'soweli pona.',
+               de: 'Auch richtige Sprache — nur kein Satz. Ohne <b>li</b> wird '
+                 + '<i>pona</i> zur Beifügung: „ein gutes Tier“.',
+               en: 'Perfectly good language — just not a sentence. Without '
+                 + '<b>li</b>, <i>pona</i> becomes a modifier: “a good animal”.' } },
+
+      { id: 'r2', tp: 'mi pona.',
+        de: 'Mir geht es gut.', en: 'I am well.',
+        concepts: ['c_li', 'c_mi_sina'],
+        point: {
+          de: 'Eine Ausnahme, und nur diese eine: steht <b>mi</b> oder <b>sina</b> '
+            + 'allein als Subjekt, fällt <b>li</b> weg. Kommt noch ein Wort dazu — '
+            + '<i>mi mute li pona</i> —, steht es wieder da.',
+          en: 'One exception, and only this one: when <b>mi</b> or <b>sina</b> '
+            + 'stands alone as the subject, <b>li</b> drops out. Add another word — '
+            + '<i>mi mute li pona</i> — and it is back.',
+        },
+        bad: { kind: 'falsch', tp: 'mi li pona.',
+               de: 'Nach <b>mi</b> allein steht nie <b>li</b>.',
+               en: 'After <b>mi</b> alone there is never a <b>li</b>.' } },
+
+      { id: 'r3', tp: 'soweli li moku e kili.',
+        de: 'Das Tier isst eine Frucht.', en: 'The animal eats a fruit.',
+        concepts: ['c_e_objekt'],
+        point: {
+          de: 'Was wird gegessen? Das sagt <b>e</b>. Es steht vor dem Objekt und '
+            + 'gehört ihm — ohne <b>e</b> gibt es kein Objekt, egal wie die Wörter '
+            + 'stehen.',
+          en: 'What is being eaten? <b>e</b> says so. It stands before the object '
+            + 'and belongs to it — without <b>e</b> there is no object, no matter '
+            + 'how the words are arranged.',
+        },
+        bad: { kind: 'anders', tp: 'soweli li moku kili.',
+               de: 'Ein sauberer Satz — er sagt nur nicht, <i>was</i> gegessen '
+                 + 'wird. Ohne <b>e</b> beschreibt <i>kili</i> nur das <i>moku</i>: '
+                 + 'etwa „isst auf Frucht-Art“.',
+               en: 'A sound sentence — it just never says <i>what</i> is eaten. '
+                 + 'Without <b>e</b>, <i>kili</i> only describes the <i>moku</i>: '
+                 + 'something like “eats fruit-wise”.' } },
+
+      { id: 'r4', tp: 'mi lukin e sina.',
+        de: 'Ich sehe dich.', en: 'I see you.',
+        concepts: ['c_li', 'c_e_objekt'],
+        point: {
+          de: 'Beide Regeln zusammen: nach <b>mi</b> allein kein <b>li</b>, vor dem '
+            + 'Objekt aber sehr wohl <b>e</b>. Die Reihenfolge liegt fest — '
+            + 'Subjekt, <b>li</b>, Prädikat, <b>e</b>, Objekt.',
+          en: 'Both rules at once: no <b>li</b> after <b>mi</b> alone, but <b>e</b> '
+            + 'before the object all the same. The order is fixed — subject, '
+            + '<b>li</b>, predicate, <b>e</b>, object.',
+        },
+        bad: { kind: 'falsch', tp: 'mi li lukin e sina.',
+               de: 'Das <b>li</b> ist zu viel, das <b>e</b> nicht.',
+               en: 'The <b>li</b> is one too many; the <b>e</b> is not.' } },
+    ],
+
+    items: [
+      { id: 'n01', rule: 'r1', direction: 'tp_de', tp: 'jan li pona.',
+        de: ['Der Mensch ist gut.'], en: ['The person is good.'] },
+      { id: 'n02', rule: 'r1', direction: 'de_tp', tp: 'soweli li lape.',
+        de: ['Das Tier schläft.'], en: ['The animal sleeps.'] },
+      { id: 'n03', rule: 'r1', direction: 'de_tp', tp: 'ona li moku.',
+        de: ['Sie isst.'], en: ['She eats.'] },
+
+      { id: 'n04', rule: 'r2', direction: 'tp_de', tp: 'sina lukin.',
+        de: ['Du siehst.'], en: ['You see.'] },
+      { id: 'n05', rule: 'r2', direction: 'de_tp', tp: 'mi lape.',
+        de: ['Ich schlafe.'], en: ['I sleep.'] },
+      { id: 'n06', rule: 'r2', direction: 'de_tp', tp: 'sina pona.',
+        de: ['Dir geht es gut.'], en: ['You are well.'] },
+
+      { id: 'n07', rule: 'r3', direction: 'tp_de', tp: 'jan li moku e telo.',
+        de: ['Der Mensch trinkt Wasser.'], en: ['The person drinks water.'] },
+      { id: 'n08', rule: 'r3', direction: 'de_tp', tp: 'soweli li lukin e kili.',
+        de: ['Das Tier sieht eine Frucht.'], en: ['The animal sees a fruit.'] },
+      { id: 'n09', rule: 'r3', direction: 'de_tp', tp: 'ona li moku e kili.',
+        de: ['Sie isst eine Frucht.'], en: ['She eats a fruit.'] },
+
+      { id: 'n10', rule: 'r4', direction: 'tp_de', tp: 'mi moku e telo.',
+        de: ['Ich trinke Wasser.'], en: ['I drink water.'] },
+      { id: 'n11', rule: 'r4', direction: 'de_tp', tp: 'sina lukin e soweli.',
+        de: ['Du siehst das Tier.'], en: ['You see the animal.'] },
+      { id: 'n12', rule: 'r4', direction: 'de_tp', tp: 'mi lukin e jan.',
+        de: ['Ich sehe den Menschen.'], en: ['I see the person.'] },
+    ],
   },
 
   prompts: [
@@ -3161,13 +3352,25 @@ const TokiPona = (function (data) {
 // Prototyp des Übungsflows. Zeigt den Kernkreislauf des Plans:
 // bauen statt erkennen, sofortige Rückmeldung mit Satzröntgen, sichtbarer
 // Fortschritt — ohne Herzen und ohne Bestenliste.
+//
+// Zusammengesetzt aus prototype/app/ — siehe prototype/app/README.md.
 
 (function (DATA, MUSI, OPEN, LIPU, TP) {
   const KEY = 'o-toki-fortschritt-v1';
   const GOALS = [20, 40, 60, 100];
+  // Wie lang eine Runde ist. Nicht nur abschneiden: eine lange Runde holt
+  // wirklich mehr Sätze aus der Lektion, eine kurze lässt Beiwerk weg.
+  const SIZE_LABELS = { kurz: 'sizeShort', mittel: 'sizeMedium', lang: 'sizeLong' };
+  const SIZES = [
+    { id: 'kurz', words: 1, builds: 2, reads: 1, cap: 6 },
+    { id: 'mittel', words: 2, builds: 3, reads: 2, cap: 12 },
+    { id: 'lang', words: 3, builds: 5, reads: 4, cap: 20 },
+  ];
   // Die beiden Sprecherinnen — hier oben, weil der geladene Zustand dagegen
   // geprüft wird.
-  const VOICES = [{ id: 'kalaasi' }, { id: 'jlakuse' }, { id: 'ante' }];
+  // „ilo“ überspringt die Aufnahmen und nimmt die Stimme des Geräts — der
+  // Ausweg, wenn die mitgelieferten Dateien auf einem Gerät stumm bleiben.
+  const VOICES = [{ id: 'kalaasi' }, { id: 'jlakuse' }, { id: 'ante' }, { id: 'ilo' }];
 
   // Alles, was die Oberfläche sagt, steht hier — die Lektionen selbst kommen
   // aus den Kursdaten, die in derselben Sprache vorliegen.
@@ -3178,7 +3381,7 @@ const TokiPona = (function (data) {
       levelNext: (xp) => `Noch ${xp} XP bis zur nächsten Stufe`,
       levelLine: (lvl, xp) => `Stufe ${lvl} · noch ${xp} XP bis zur nächsten`,
       greeting: 'o kama pona!',
-      introFirst: 'Zwölf Lektionen. Du baust Sätze, statt Vokabeln abzuhaken.',
+      introFirst: 'Erst der Satzbau, dann der Wortschatz. Du baust Sätze, statt Vokabeln abzuhaken.',
       introBack: (title) => `Weiter bei „${title}“.`,
       dueCards: (n) => `${n} ${n === 1 ? 'Karte' : 'Karten'} fällig`,
       dueSub: 'wörter, sätze und umschreibungen von vorher',
@@ -3187,6 +3390,7 @@ const TokiPona = (function (data) {
       askBuild: 'bau den satz', askFix: 'hier stimmt ein wort nicht — tipp es an',
       askCompound: 'dafür gibt es kein wort — wie sagst du es?',
       askGlyph: 'welches wort ist das?', askFree: 'schreib es selbst — freie eingabe',
+      askRule: 'so ist ein satz gebaut',
       hintFix: 'Ein Wort steht zu viel oder fehlt an dieser Stelle.',
       hintBuild: 'Antippen nimmt ein Wort zurück, Ziehen sortiert um.',
       hintFree: 'Der Parser prüft den Satzbau, während du tippst. Andere Wortwahl als '
@@ -3242,7 +3446,6 @@ const TokiPona = (function (data) {
       askTrace: 'zeichne das zeichen',
       traceClear: 'nochmal',
       traceHint: 'Fahr mit dem Finger über die Vorlage. Mehrere Striche sind erlaubt.',
-      traceGood: 'Getroffen',
       traceThin: 'Da fehlt noch ein Stück der Vorlage.',
       traceWide: 'Zu viel daneben — bleib auf der Linie.',
       traceScore: (hit, clean) => `Vorlage ${hit}% getroffen, ${clean}% deiner Linie sitzt drauf.`,
@@ -3270,8 +3473,8 @@ const TokiPona = (function (data) {
       voiceHint: 'Alle 137 Wörter sind zweimal aufgenommen, von kala Asi und von '
         + 'jan Lakuse (Projekt Linku). Die App nimmt eine echte Aufnahme, wo es '
         + 'eine gibt, und die Gerätestimme nur für ganze Sätze.',
-      voicePick: 'Stimme',
-      voiceNames: { kalaasi: 'kala Asi', jlakuse: 'jan Lakuse', ante: 'abwechselnd' },
+      voiceNames: { kalaasi: 'kala Asi', jlakuse: 'jan Lakuse', ante: 'abwechselnd',
+                    ilo: 'Gerätestimme' },
       voiceFetch: 'für unterwegs holen', voiceFetching: (n, all) => `holt … ${n}/${all}`,
       voiceReady: 'liegen auf dem Gerät', voiceFailed: 'Holen ging nicht.',
       voiceCredit: 'Aufnahmen: kala Asi (CC BY-SA 4.0) und jan Lakuse · Projekt Linku',
@@ -3285,9 +3488,6 @@ const TokiPona = (function (data) {
       recNone: 'Dieses Gerät nimmt nichts auf.',
       recSaved: (word) => `„${word}“ aufgenommen`,
       cardMake: 'Satzkarte', cardShare: 'teilen', cardSave: 'sichern',
-      cardTitle: 'satzkarte',
-      cardHint: 'Aus deinem Satz wird ein Bild — mit Zeichen, Schrift und '
-        + 'Satzbau. Zum Teilen oder Aufheben.',
       cardFailed: 'Das Bild ließ sich nicht bauen.',
       mapTitle: 'nimi ale — die ganze sprache',
       mapHint: 'Jedes Kästchen ein Wort. Es färbt sich, sobald du es siehst, '
@@ -3334,7 +3534,6 @@ const TokiPona = (function (data) {
       goalTitle: 'tagesziel',
       goalHint: 'Wie viel willst du dir an einem Tag vornehmen? Eine Aufgabe bringt zehn Punkte.',
       goalPick: (xp) => `${xp} XP`,
-      example: 'Beispiel',
       askAnswer: 'antworte frei',
       answerHint: 'Deine Antwort, dein Satz. Geprüft wird der Bau.',
       answerNeeds: (what) => `Die Antwort braucht ${what}.`,
@@ -3355,7 +3554,11 @@ const TokiPona = (function (data) {
         + 'Angeschaltet kommt in jeder Lektion eine Höraufgabe dazu.',
       soundOn: 'Aussprache anschalten', soundOff: 'Aussprache abschalten',
       soundNone: 'Dieses Gerät bringt keine Sprachausgabe mit.',
-      musiTab: 'musi', musiTitle: 'utala musi',
+      soundFailed: 'Hier kommt kein Ton heraus.',
+      soundSwitch: 'Bleibt es beim Antippen still, liegt es meist am Gerät: '
+        + 'iPhones schalten mit dem Stummschalter auch die Aufnahmen ab. '
+        + 'Unter kalama steht „Gerätestimme“ — die spricht dann statt der Dateien.',
+      musiTitle: 'utala musi',
       musiLead: 'Sticheln, kontern, Frieden schließen — mit 137 Wörtern und ohne ein '
         + 'einziges Schimpfwort.',
       musiStart: 'utala anfangen',
@@ -3366,6 +3569,28 @@ const TokiPona = (function (data) {
       musiSting: 'Frechheit', musiLiteral: 'wörtlich',
       musiSection: (name, count) => `${name} · ${count}`,
       musiPeace: 'Und danach: <i>mi musi taso</i> — war nur Spaß.',
+      sizeTitle: 'länge einer runde',
+      sizeHint: 'Wie viele Aufgaben eine Lektion hat. Kurz reicht für die Bahn, '
+        + 'lang für den Abend. Wiederholungen richten sich mit.',
+      sizeShort: 'Kurz · 6', sizeMedium: 'Mittel · 12', sizeLong: 'Lang · 20',
+      weakTitle: 'schwachstellen üben',
+      weakSub: (n) => `${n} ${n === 1 ? 'Sache sitzt' : 'Sachen sitzen'} noch nicht`,
+      weakDone: 'Schwachstellen durch',
+      weakNote: 'Was hier wieder wackelt, steht beim nächsten Mal erneut da.',
+      diaryTitle: 'o sitelen — tagebuch',
+      diaryHint: 'Ein Satz am Tag, selbst geschrieben. Der Parser liest mit, '
+        + 'bewertet aber nicht — es ist dein Tagebuch.',
+      diaryOpen: 'Heute schreiben', diaryBack: 'Zurück',
+      diaryLead: 'Schreib auf, wie dein Tag war. Kurz reicht.',
+      diaryPrompt: 'Anstoß für heute',
+      diaryPlaceholder: 'tenpo suno ni la mi …',
+      diarySave: 'Eintrag sichern', diarySaved: 'Gesichert.',
+      diaryEmpty: 'Noch kein Eintrag. Der erste ist der schwerste.',
+      diaryCount: (n, days) => `${n} ${n === 1 ? 'Eintrag' : 'Einträge'}`
+        + `${days > 1 ? ` · ${days} Tage am Stück` : ''}`,
+      diaryToday: 'heute', diaryXray: 'Satzbau ansehen',
+      diaryReward: 'Erster Eintrag heute · +15 XP',
+      diaryLines: (ok, all) => `${ok}/${all} Sätze gehen glatt durch`,
       updateReady: 'Neue Fassung ist da.', updateLoad: 'Jetzt laden',
       versionLabel: (v) => `Fassung ${v}`,
       credit: (link) => `Prototyp. Übungssätze aus ${link} (MIT, © 2020 /dev/urandom `
@@ -3377,7 +3602,7 @@ const TokiPona = (function (data) {
       levelNext: (xp) => `${xp} XP to go until the next level`,
       levelLine: (lvl, xp) => `Level ${lvl} · ${xp} XP to the next one`,
       greeting: 'o kama pona!',
-      introFirst: 'Twelve lessons. You build sentences instead of ticking off words.',
+      introFirst: 'Structure first, vocabulary after. You build sentences instead of ticking off words.',
       introBack: (title) => `Continue with “${title}”.`,
       dueCards: (n) => `${n} ${n === 1 ? 'card' : 'cards'} due`,
       dueSub: 'words, sentences and paraphrases from before',
@@ -3386,6 +3611,7 @@ const TokiPona = (function (data) {
       askBuild: 'build the sentence', askFix: 'one word is wrong — tap it',
       askCompound: 'there is no word for this — how do you say it?',
       askGlyph: 'which word is this?', askFree: 'write it yourself — free input',
+      askRule: 'this is how a sentence is built',
       hintFix: 'One word is too many or wrong in this spot.',
       hintBuild: 'Tap to take a word back, drag to reorder.',
       hintFree: 'The parser checks the structure as you type. A different word choice than '
@@ -3441,7 +3667,6 @@ const TokiPona = (function (data) {
       askTrace: 'draw the glyph',
       traceClear: 'again',
       traceHint: 'Trace the template with your finger. Several strokes are fine.',
-      traceGood: 'On the line',
       traceThin: 'Part of the template is still missing.',
       traceWide: 'Too much beside it — stay on the line.',
       traceScore: (hit, clean) => `${hit}% of the template covered, ${clean}% of your line sits on it.`,
@@ -3469,8 +3694,8 @@ const TokiPona = (function (data) {
       voiceHint: 'All 137 words are recorded twice, by kala Asi and by jan Lakuse '
         + '(Linku project). The app uses a real recording wherever there is one and '
         + 'falls back to the device voice for whole sentences.',
-      voicePick: 'voice',
-      voiceNames: { kalaasi: 'kala Asi', jlakuse: 'jan Lakuse', ante: 'alternating' },
+      voiceNames: { kalaasi: 'kala Asi', jlakuse: 'jan Lakuse', ante: 'alternating',
+                    ilo: 'device voice' },
       voiceFetch: 'keep them offline', voiceFetching: (n, all) => `fetching … ${n}/${all}`,
       voiceReady: 'stored on the device', voiceFailed: 'Fetching failed.',
       voiceCredit: 'Recordings: kala Asi (CC BY-SA 4.0) and jan Lakuse · Linku project',
@@ -3484,9 +3709,6 @@ const TokiPona = (function (data) {
       recNone: 'This device cannot record.',
       recSaved: (word) => `“${word}” recorded`,
       cardMake: 'sentence card', cardShare: 'share', cardSave: 'save',
-      cardTitle: 'sentence card',
-      cardHint: 'Your sentence as a picture — glyphs, letters and structure. '
-        + 'To share or to keep.',
       cardFailed: 'The picture could not be built.',
       mapTitle: 'nimi ale — the whole language',
       mapHint: 'One box per word. It takes colour once you have met it and turns '
@@ -3533,7 +3755,6 @@ const TokiPona = (function (data) {
       goalTitle: 'daily goal',
       goalHint: 'How much do you want to take on in a day? One exercise is worth ten points.',
       goalPick: (xp) => `${xp} XP`,
-      example: 'Example',
       askAnswer: 'answer freely',
       answerHint: 'Your answer, your sentence. What gets checked is the build.',
       answerNeeds: (what) => `The answer needs ${what}.`,
@@ -3554,7 +3775,11 @@ const TokiPona = (function (data) {
         + 'lesson gains a listening task.',
       soundOn: 'Turn pronunciation on', soundOff: 'Turn pronunciation off',
       soundNone: 'This device has no speech output.',
-      musiTab: 'musi', musiTitle: 'utala musi',
+      soundFailed: 'No sound comes out here.',
+      soundSwitch: 'If tapping stays silent, the device is usually the reason: '
+        + 'iPhones mute the recordings along with everything else via the ring switch. '
+        + 'Under kalama there is „device voice“ — it speaks instead of the files.',
+      musiTitle: 'utala musi',
       musiLead: 'Taunt, counter, make peace — with 137 words and not a single '
         + 'swear word.',
       musiStart: 'start the sparring',
@@ -3565,6 +3790,28 @@ const TokiPona = (function (data) {
       musiSting: 'cheek', musiLiteral: 'literally',
       musiSection: (name, count) => `${name} · ${count}`,
       musiPeace: 'And afterwards: <i>mi musi taso</i> — it was only play.',
+      sizeTitle: 'length of a round',
+      sizeHint: 'How many exercises a lesson holds. Short fits a train ride, '
+        + 'long fits an evening. Reviews follow suit.',
+      sizeShort: 'Short · 6', sizeMedium: 'Medium · 12', sizeLong: 'Long · 20',
+      weakTitle: 'practise weak spots',
+      weakSub: (n) => `${n} ${n === 1 ? 'thing has' : 'things have'} not settled yet`,
+      weakDone: 'Weak spots done',
+      weakNote: 'Whatever wobbles again will be waiting next time.',
+      diaryTitle: 'o sitelen — diary',
+      diaryHint: 'One sentence a day, written by you. The parser reads along '
+        + 'but does not grade — it is your diary.',
+      diaryOpen: 'Write today', diaryBack: 'Back',
+      diaryLead: 'Write down how your day went. Short is fine.',
+      diaryPrompt: 'A nudge for today',
+      diaryPlaceholder: 'tenpo suno ni la mi …',
+      diarySave: 'Save entry', diarySaved: 'Saved.',
+      diaryEmpty: 'No entry yet. The first one is the hardest.',
+      diaryCount: (n, days) => `${n} ${n === 1 ? 'entry' : 'entries'}`
+        + `${days > 1 ? ` · ${days} days in a row` : ''}`,
+      diaryToday: 'today', diaryXray: 'Show the structure',
+      diaryReward: 'First entry today · +15 XP',
+      diaryLines: (ok, all) => `${ok}/${all} sentences hold up`,
       updateReady: 'A new version is here.', updateLoad: 'Load it now',
       versionLabel: (v) => `Version ${v}`,
       credit: (link) => `Prototype. Exercise sentences from ${link} (MIT, © 2020 /dev/urandom `
@@ -3693,6 +3940,8 @@ const TokiPona = (function (data) {
   const blank = {
     xp: 0, streak: 0, lastDay: null, dayXp: 0, goal: 40, days: {}, read: {},
     done: {}, mastery: {}, seenWords: {}, srs: {},
+    size: 'mittel',
+    diary: {},
     sitelen: false,
     sound: true,
     nameHead: 'jan',
@@ -3714,7 +3963,10 @@ const TokiPona = (function (data) {
     return typeof value === 'function' ? value(...args) : value;
   };
 
-  const lessons = () => (DATA.languages[state.lang] || DATA.languages.de).lessons;
+  // Der Kurs mit der Einführung davor. Sie kommt nicht aus dem Import,
+  // sondern aus prototype/toki.js — sie erklärt Satzbau, keine Vokabeln.
+  const lessons = () => [introLesson()]
+    .concat((DATA.languages[state.lang] || DATA.languages.de).lessons);
   const glossesOf = (word) => {
     const entry = TP.lexicon[word];
     if (!entry) return [];
@@ -3752,6 +4004,7 @@ const TokiPona = (function (data) {
   save();
   let session = null;
   let reading = null;
+  let diary = false;
   let tab = 'pfad';
 
   // Was aus dem Speicher oder aus einer Sicherungsdatei kommt, ist erst einmal
@@ -3783,12 +4036,16 @@ const TokiPona = (function (data) {
     state.lang = DATA.languages[raw.lang] ? raw.lang : blank.lang;
     state.nameHead = typeof raw.nameHead === 'string' ? raw.nameHead.slice(0, 16) : blank.nameHead;
     state.voice = VOICES.some((entry) => entry.id === raw.voice) ? raw.voice : blank.voice;
+    state.size = SIZES.some((entry) => entry.id === raw.size) ? raw.size : blank.size;
     state.sitelen = raw.sitelen === true;
     state.sound = raw.sound !== false;
     state.done = plain(raw.done, (value) => (value ? true : undefined));
     state.read = plain(raw.read, (value) => (value ? true : undefined));
     state.seenWords = plain(raw.seenWords, (value) => (value ? true : undefined));
     state.days = plain(raw.days, (value) => number(value, undefined, 1e9));
+    // Tagebucheinträge sind eigener Text — begrenzt, aber sonst unangetastet.
+    state.diary = plain(raw.diary, (value) => (typeof value === 'string' && value.trim()
+      ? value.slice(0, 600) : undefined));
     state.mastery = plain(raw.mastery, (value) => number(value, undefined, 1));
     state.srs = plain(raw.srs, (card) => {
       if (!card || typeof card !== 'object') return undefined;
@@ -3868,10 +4125,43 @@ const TokiPona = (function (data) {
     state.srs[key] = card;
   }
 
-  const dueKeys = () => {
+  // Aufgaben-Kennung → Lektion und Aufgabe. Vorher lief für jede Karte eine
+  // Schleife über alle Lektionen; bei fälligen Karten war das eine Schleife
+  // in einer Schleife, bei jedem Zeichnen der Startseite.
+  let itemCache = null;
+  function itemIndex() {
+    if (itemCache && itemCache.lang === state.lang) return itemCache.map;
+    const map = new Map();
+    for (const lesson of lessons().concat([musiLesson(), phraseLesson()])) {
+      for (const item of lesson.items) {
+        if (!map.has(item.id)) map.set(item.id, { lesson, item });
+      }
+    }
+    itemCache = { lang: state.lang, map };
+    return map;
+  }
+
+  // Fällige Karten, die sich auch bauen lassen. Verschwindet eine Aufgabe aus
+  // dem Kurs, bleibt ihre Karte sonst für immer fällig: die Startseite meldet
+  // „3 Karten fällig“, und ein Tipp darauf führt geradewegs auf eine leere
+  // Runde. Also wird hier gebaut, bevor gezählt wird.
+  function dueTasks() {
     const now = Date.now();
-    return Object.keys(state.srs).filter((key) => state.srs[key].due <= now);
-  };
+    const tasks = [];
+    let dropped = false;
+    for (const key of Object.keys(state.srs)) {
+      if (state.srs[key].due > now) continue;
+      const task = taskFromKey(key);
+      if (task) { tasks.push(task); continue; }
+      // Zeichenkarten hängen an der Schriftmessung, die erst nach dem Laden
+      // durchläuft — vor ihr sind sie nur vorübergehend nicht zu bauen.
+      if (key.startsWith('g:') || key.startsWith('t:')) continue;
+      delete state.srs[key];
+      dropped = true;
+    }
+    if (dropped) save();
+    return tasks;
+  }
 
   function taskFromKey(key) {
     const [kind, rest] = [key.slice(0, 1), key.slice(2)];
@@ -3922,12 +4212,11 @@ const TokiPona = (function (data) {
       const compound = COMPOUNDS[Number(rest)];
       return compound ? { type: 'compound', compound, lesson: lessons()[0], concepts: [] } : null;
     }
-    for (const lesson of lessons().concat([musiLesson(), phraseLesson()])) {
-      const item = lesson.items.find((i) => i.id === rest);
-      if (item) {
-        return { type: item.direction === 'de_tp' ? 'build' : 'choose', item, lesson,
-                 concepts: lessonConcepts(lesson) };
-      }
+    const found = itemIndex().get(rest);
+    if (found) {
+      return { type: found.item.direction === 'de_tp' ? 'build' : 'choose',
+               item: found.item, lesson: found.lesson,
+               concepts: lessonConcepts(found.lesson) };
     }
     return null;
   }
@@ -3954,8 +4243,16 @@ const TokiPona = (function (data) {
   }
 
   const lessonOf = (number) => lessons().find((l) => l.number === number);
-  const unlocked = (number) => number === lessons()[0].number
-    || Boolean(state.done[lessons()[lessons().findIndex((l) => l.number === number) - 1].number]);
+  // Die Einführung steht neben der Kette, nicht darin: sie ist immer offen,
+  // und Lektion 1 hängt weiterhin an nichts. Wer den Kurs schon begonnen hat,
+  // findet ihn deshalb unverändert vor.
+  const courseChain = () => lessons().filter((lesson) => lesson.number !== 0);
+  const unlocked = (number) => {
+    if (number === 0) return true;
+    const chain = courseChain();
+    const index = chain.findIndex((lesson) => lesson.number === number);
+    return index <= 0 || Boolean(state.done[chain[index - 1].number]);
+  };
 
   // ------------------------------------------------------- eigene Aufnahmen
 
@@ -4015,24 +4312,63 @@ const TokiPona = (function (data) {
     return TP.lexicon[word] ? word : null;
   };
 
-  function playRecording(text) {
+  // Ein einziges Abspielgerät für alle Aufnahmen, aus zwei Gründen, beide von
+  // iOS: die Erlaubnis abzuspielen hängt dort am Element, das die erste
+  // Berührung gesehen hat, und ein Element, auf das niemand mehr zeigt, wird
+  // mitten im Abspielen weggeräumt. Vorher entstand bei jedem Tipp ein neues.
+  let player = null;
+  let playerUrl = null;
+
+  function audioPlayer() {
+    if (!player) {
+      player = new Audio();
+      player.preload = 'auto';
+    }
+    player.onended = null;
+    player.onerror = null;
+    if (playerUrl) { URL.revokeObjectURL(playerUrl); playerUrl = null; }
+    return player;
+  }
+
+  // Spielt eine Aufnahme, falls es eine gibt. Ob sie wirklich klingt, stellt
+  // sich erst danach heraus — eine fehlende Datei meldet sich als Ereignis,
+  // ein verweigertes Abspielen über das Versprechen. In beiden Fällen
+  // übernimmt `onFail`, statt dass gar nichts passiert.
+  function playRecording(text, onState, onFail) {
+    if (state.voice === 'ilo') return false;
     const key = String(text).trim();
     const blob = RECORDED.get(key);
-    if (blob) {
-      try {
-        const audio = new Audio(URL.createObjectURL(blob));
-        audio.onended = () => URL.revokeObjectURL(audio.src);
-        audio.play().catch(() => {});
-        return true;
-      } catch (error) { /* dann eben die nächste Stufe */ }
-    }
     const word = spokenWord(key);
-    if (!word) return false;
+    if (!blob && !word) return false;
+
+    let audio;
+    let source;
     try {
-      const audio = new Audio(`./kalama/${voiceFolder(word)}/${word}.mp3`);
-      audio.play().catch(() => {});
-      return true;
+      audio = audioPlayer();
+      source = blob ? URL.createObjectURL(blob)
+        : `./kalama/${voiceFolder(word)}/${word}.mp3`;
     } catch (error) { return false; }
+    if (blob) playerUrl = source;
+
+    let settled = false;
+    const stop = (failed) => {
+      if (settled) return;
+      settled = true;
+      if (onState) onState(false);
+      if (failed && onFail) onFail();
+    };
+    // Notbremse: meldet das Gerät weder Ende noch Fehler, gibt der Knopf
+    // trotzdem irgendwann wieder Ruhe.
+    setTimeout(() => stop(false), 8000);
+    audio.onended = () => stop(false);
+    audio.onerror = () => stop(true);
+    audio.src = source;
+    if (onState) onState(true);
+    try {
+      const started = audio.play();
+      if (started && started.catch) started.catch(() => stop(true));
+    } catch (error) { stop(true); }
+    return true;
   }
 
   async function recordFor(text, onState) {
@@ -4098,19 +4434,13 @@ const TokiPona = (function (data) {
         <p class="hint voicecredit"><a href="https://github.com/lipu-linku/ijo"
           rel="noopener">${escape(t('voiceCredit'))}</a></p>
       </div>`);
-    const picker = el(`<div class="row voicepick"></div>`);
     const names = t('voiceNames');
-    VOICES.forEach((entry) => {
-      const chip = el(`<button class="ghost" data-picked="${state.voice === entry.id}"
-        >${escape(names[entry.id])}</button>`);
-      chip.onclick = () => {
-        state.voice = entry.id;
-        save();
-        render();
-        speak('toki');
-      };
-      picker.append(chip);
-    });
+    const picker = pickRow(
+      VOICES.map((entry) => ({ value: entry.id, label: names[entry.id] })),
+      state.voice,
+      (value) => { state.voice = value; save(); render(); speak('toki'); },
+      'voicepick',
+    );
     card.querySelector('.row').before(picker);
 
     const row = card.querySelector('.row:not(.voicepick)');
@@ -4328,18 +4658,49 @@ const TokiPona = (function (data) {
     return utterance;
   }
 
-  function speak(text) {
-    // Die eigene Stimme schlägt die des Geräts.
-    if (playRecording(text)) return true;
+  function speakDevice(text, onState) {
     if (!speechAvailable()) return false;
     voice = voice || pickVoice();
     const utterance = utteranceFor(text);
     if (!utterance) return false;
+    let settled = false;
+    const stop = () => { if (settled) return; settled = true; if (onState) onState(false); };
+    setTimeout(stop, 20000);
+    utterance.onend = stop;
+    utterance.onerror = stop;
     try {
-      window.speechSynthesis.cancel();
+      // Nur abbrechen, wenn wirklich etwas läuft: ein Abbruch unmittelbar vor
+      // dem Sprechen verschluckt auf manchen Geräten die neue Äußerung.
+      if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+        window.speechSynthesis.cancel();
+      }
       window.speechSynthesis.speak(utterance);
     } catch (error) { return false; }
+    if (onState) onState(true);
     return true;
+  }
+
+  // Nur ein Knopf leuchtet: fängt woanders etwas Neues an, geht der vorige aus.
+  // Sonst bliebe er hängen, weil sein Ende nie gemeldet wird — das Abspielgerät
+  // ist für alle dasselbe.
+  let releaseSay = null;
+  function claimSay(onState) {
+    if (releaseSay) releaseSay(false);
+    const wrapped = (on) => {
+      if (onState) onState(on);
+      if (on) releaseSay = wrapped;
+      else if (releaseSay === wrapped) releaseSay = null;
+    };
+    return wrapped;
+  }
+
+  // Reihenfolge: eigene Aufnahme, mitgelieferte, Gerätestimme. Die Aufnahmen
+  // melden erst hinterher, ob sie wirklich klingen — misslingt es, springt die
+  // Gerätestimme ein, statt dass der Knopf stumm bleibt.
+  function speak(text, onState) {
+    const report = claimSay(onState);
+    if (playRecording(text, report, () => speakDevice(text, report))) return true;
+    return speakDevice(text, report);
   }
 
   // Ganze Texte am Stück: die Sätze werden hintereinander in die Warteschlange
@@ -4347,7 +4708,11 @@ const TokiPona = (function (data) {
   function speakLines(list, onLine, onEnd) {
     if (!speechAvailable()) return false;
     voice = voice || pickVoice();
-    try { window.speechSynthesis.cancel(); } catch (error) { return false; }
+    try {
+      if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+        window.speechSynthesis.cancel();
+      }
+    } catch (error) { return false; }
     let spoken = 0;
     list.forEach((text, index) => {
       const utterance = utteranceFor(text);
@@ -4378,7 +4743,13 @@ const TokiPona = (function (data) {
     if (!state.sound || !speechAvailable()) return null;
     const button = el(`<button class="say" type="button"
       aria-label="${escape(label || t('listen'))}" title="${escape(label || t('listen'))}">♪</button>`);
-    button.onclick = (event) => { event.stopPropagation(); speak(text); };
+    // Sichtbare Rückmeldung: solange etwas läuft, ist der Knopf angefasst.
+    // Kommt gar kein Ton zustande, sagt es die App, statt stumm zu bleiben.
+    button.onclick = (event) => {
+      event.stopPropagation();
+      const busy = (on) => { button.dataset.busy = String(on); };
+      if (!speak(text, busy)) { busy(false); toast(t('soundFailed')); }
+    };
     return button;
   }
 
@@ -4399,13 +4770,35 @@ const TokiPona = (function (data) {
     return out;
   };
 
+  const sizeOf = () => SIZES.find((entry) => entry.id === state.size) || SIZES[1];
+
+  // Zuschneiden, ohne die Runde eintönig zu machen: erst von jeder Sorte eine
+  // Aufgabe sichern, dann in der ursprünglichen Reihenfolge auffüllen.
+  function trimQueue(tasks, limit) {
+    if (tasks.length <= limit) return tasks;
+    const kept = new Set();
+    const seen = new Set();
+    for (const task of tasks) {
+      if (kept.size >= limit) break;
+      if (seen.has(task.type)) continue;
+      seen.add(task.type);
+      kept.add(task);
+    }
+    for (const task of tasks) {
+      if (kept.size >= limit) break;
+      kept.add(task);
+    }
+    return tasks.filter((task) => kept.has(task));
+  }
+
   function buildSession(lesson) {
+    const size = sizeOf();
     const builds = shuffle(lesson.items.filter((i) => i.direction === 'de_tp'));
     const reads = shuffle(lesson.items.filter((i) => i.direction === 'tp_de'));
     const words = shuffle(lesson.words.filter((w) => TP.lexicon[w]));
     const tasks = [];
 
-    words.slice(0, 2).forEach((word) => tasks.push({ type: 'word', word, lesson, concepts: [] }));
+    words.slice(0, size.words).forEach((word) => tasks.push({ type: 'word', word, lesson, concepts: [] }));
     // In jeder zweiten Lektion wird ein Wort nicht abgefragt, sondern gebaut.
     const longWord = words.find((word) => (TP.syllables(word) || []).length >= 2);
     if (longWord && lesson.number % 2 === 1) {
@@ -4416,9 +4809,9 @@ const TokiPona = (function (data) {
     if (style && lesson.number >= 5) {
       tasks.push({ type: 'style', style, lesson, concepts: [] });
     }
-    builds.slice(0, 3).forEach((item) =>
+    builds.slice(0, size.builds).forEach((item) =>
       tasks.push({ type: 'build', item, lesson, concepts: lessonConcepts(lesson) }));
-    reads.slice(0, 2).forEach((item) =>
+    reads.slice(0, size.reads).forEach((item) =>
       tasks.push({ type: 'choose', item, lesson, concepts: lessonConcepts(lesson) }));
 
     const flawed = brokenSentence(lesson);
@@ -4438,7 +4831,7 @@ const TokiPona = (function (data) {
       tasks.push({ type: 'trace', word: traceWord, lesson, concepts: [] });
     }
 
-    const heard = reads[2] || builds[4];
+    const heard = reads[size.reads] || builds[size.builds + 1];
     if (state.sound && speechAvailable() && heard) {
       // Gerade Lektionen diktieren, ungerade lassen wählen.
       const kind = lesson.number % 2 === 0 ? 'dictation' : 'listen';
@@ -4452,19 +4845,75 @@ const TokiPona = (function (data) {
 
     const prompt = shuffle(OPEN.prompts.filter((entry) => entry.stage <= lesson.number))[0];
     if (prompt) tasks.push({ type: 'answer', prompt, lesson, concepts: lessonConcepts(lesson) });
-    else if (builds[3]) {
-      tasks.push({ type: 'free', item: builds[3], lesson, concepts: lessonConcepts(lesson) });
+    else if (builds[size.builds]) {
+      tasks.push({ type: 'free', item: builds[size.builds], lesson, concepts: lessonConcepts(lesson) });
     }
 
     return {
       lesson,
-      queue: tasks.length ? tasks : builds.slice(0, 4).map((item) => ({ type: 'build', item, lesson, concepts: [] })),
+      queue: trimQueue(tasks.length ? tasks
+        : builds.slice(0, 4).map((item) => ({ type: 'build', item, lesson, concepts: [] })), size.cap),
       index: 0,
       correct: 0,
       total: 0,
       xp: 0,
       retried: new Set(),
     };
+  }
+
+  // ------------------------------------------------------- Lektion 0
+  //
+  // Vor den Wörtern der Satzbau. Vier Regeln, jede mit Beispiel und
+  // Gegenbeispiel, dahinter Aufgaben, die genau diese Regel brauchen.
+  let introCache = null;
+  function introLesson() {
+    if (introCache && introCache.lang === state.lang) return introCache.lesson;
+    const nasin = OPEN.nasin;
+    const lesson = {
+      number: 0,
+      intro: true,
+      title: nasin.title[state.lang] || nasin.title.de,
+      note: nasin.note[state.lang] || nasin.note.de,
+      words: nasin.words.slice(),
+      items: nasin.items.map((item) => ({
+        id: item.id,
+        direction: item.direction,
+        tp: item.tp,
+        also: [],
+        target: item[state.lang] || item.de,
+        rule: item.rule,
+      })),
+    };
+    introCache = { lang: state.lang, lesson };
+    return lesson;
+  }
+
+  function buildIntroSession() {
+    const lesson = introLesson();
+    // Kurze Runde: eine Aufgabe je Regel. Sonst zwei. Die Regeln selbst
+    // bleiben immer alle stehen — sie sind der Inhalt, nicht das Beiwerk.
+    const perRule = sizeOf().id === 'kurz' ? 1 : 2;
+    const tasks = [];
+    OPEN.nasin.rules.forEach((rule) => {
+      tasks.push({ type: 'rule', rule, lesson, concepts: [] });
+      shuffle(lesson.items.filter((item) => item.rule === rule.id))
+        .slice(0, perRule)
+        .forEach((item) => tasks.push({
+          type: item.direction === 'de_tp' ? 'build' : 'choose',
+          item,
+          lesson,
+          concepts: rule.concepts || [],
+        }));
+    });
+    // Zum Schluss ein kaputter Satz: gelernt ist es erst, wenn man den Fehler
+    // sieht, ohne dass jemand daneben schreibt, dass da einer ist.
+    const flawed = brokenSentence(lesson);
+    if (flawed) {
+      tasks.push({ type: 'fix', flawed, lesson,
+                   concepts: [flawed.violation.concept].filter(Boolean) });
+    }
+    return { lesson, intro: true, home: 'pfad', restart: buildIntroSession,
+             queue: tasks, index: 0, correct: 0, total: 0, xp: 0, retried: new Set() };
   }
 
   // Der Spaßmodus sieht für die Übungsmaschine aus wie eine Lektion — Nummer
@@ -4500,7 +4949,8 @@ const TokiPona = (function (data) {
     // Aus jeder Sorte etwas, damit die Runde nicht nur aus Sticheleien besteht.
     const bySort = ['utala', 'utala', 'konter', 'wawa', 'pona'].map((kind) =>
       shuffle(lesson.items.filter((item) => item.kind === kind))[0]).filter(Boolean);
-    const picks = [...new Set(bySort.concat(shuffle(lesson.items)))].slice(0, 6);
+    const picks = [...new Set(bySort.concat(shuffle(lesson.items)))]
+      .slice(0, Math.max(3, sizeOf().cap - 2));
     const tasks = shuffle(picks).map((item, index) => ({
       type: index % 2 ? 'build' : 'choose', item, lesson, concepts: [],
     }));
@@ -4527,10 +4977,81 @@ const TokiPona = (function (data) {
   }
 
   function buildReviewSession() {
-    const tasks = shuffle(dueKeys()).map(taskFromKey).filter(Boolean).slice(0, 12);
+    const tasks = shuffle(dueTasks()).slice(0, sizeOf().cap);
     return {
       lesson: null, review: true, queue: tasks, index: 0, correct: 0, total: 0, xp: 0,
       retried: new Set(),
+    };
+  }
+
+  // ------------------------------------------------------- Schwachstellen
+
+  // Wackelig ist, was danebenging — nicht, was noch nie dran war. Eine falsche
+  // Antwort senkt die Leichtigkeit unter den Anfangswert; das ist die einzige
+  // Spur, die ein Fehler hinterlässt. Übersprungene Karten bleiben bei 2,5 und
+  // zählen deshalb nicht mit: Überspringen ist kein Fehler.
+  // Der Fälligkeitstermin spielt hier keine Rolle — darum geht es ja gerade.
+  function weakKeys() {
+    const scored = Object.keys(state.srs).map((key) => {
+      const card = state.srs[key];
+      // Kleiner Wert heißt: sitzt schlecht.
+      const score = (card.reps ? 1 : 0) + (card.ease - 1.4) / 1.4;
+      return { key, score, slipped: card.ease < 2.5 };
+    }).filter((entry) => entry.slipped && entry.score < 1.4);
+    scored.sort((a, b) => a.score - b.score);
+    return scored.map((entry) => entry.key);
+  }
+
+  // Bei Konzepten fehlt diese Spur: ein frisches Konzept steht genauso niedrig
+  // wie ein misslungenes. Also zählt nur, was in einer abgeschlossenen Lektion
+  // vorkam — wer eine Lektion sauber durchspielt, landet über der Hälfte.
+  function weakConcepts() {
+    const covered = new Set(lessons()
+      .filter((lesson) => state.done[lesson.number])
+      .flatMap(lessonConcepts));
+    return Object.keys(state.mastery)
+      .filter((concept) => covered.has(concept) && state.mastery[concept] < 0.5)
+      .sort((a, b) => state.mastery[a] - state.mastery[b]);
+  }
+
+  // Zu einem schwachen Konzept passt jede Lektion, die es überhaupt behandelt —
+  // und aus den freigeschalteten davon kommen die Sätze.
+  function itemsForConcept(concept) {
+    const open = lessons().filter((lesson) => unlocked(lesson.number)
+      && lessonConcepts(lesson).includes(concept));
+    return shuffle(open).flatMap((lesson) => shuffle(lesson.items)
+      .slice(0, 2)
+      .map((item) => ({
+        type: item.direction === 'de_tp' ? 'build' : 'choose',
+        item,
+        lesson,
+        concepts: [concept],
+      })));
+  }
+
+  function weakSession() {
+    const cap = sizeOf().cap;
+    const fromCards = weakKeys().map(taskFromKey).filter(Boolean);
+    const fromConcepts = weakConcepts().flatMap(itemsForConcept);
+    // Abwechselnd auffädeln: sonst stehen erst zehn Wörter und dann zehn Sätze.
+    const queue = [];
+    const seen = new Set();
+    for (let i = 0; i < Math.max(fromCards.length, fromConcepts.length); i += 1) {
+      for (const task of [fromCards[i], fromConcepts[i]]) {
+        if (!task) continue;
+        const id = keyOf(task) || String(queue.length);
+        if (seen.has(id)) continue;
+        seen.add(id);
+        queue.push(task);
+      }
+    }
+    return queue.slice(0, cap);
+  }
+
+  function buildWeakSession() {
+    return {
+      lesson: null, review: true, weak: true, queue: weakSession(),
+      index: 0, correct: 0, total: 0, xp: 0, retried: new Set(),
     };
   }
 
@@ -4571,6 +5092,7 @@ const TokiPona = (function (data) {
 
   function lessonConcepts(lesson) {
     const map = {
+      0: ['c_li', 'c_e_objekt', 'c_mi_sina'],
       1: ['c_mi_sina', 'c_li'], 2: ['c_modifikator'], 3: ['c_e_objekt'], 4: ['c_e_objekt'],
       5: ['c_ni', 'c_en'], 6: ['c_praeposition'], 7: ['c_frage', 'c_o', 'c_namen'],
       8: ['c_modifikator'], 9: ['c_pi', 'c_la'], 10: ['c_praeverb'], 11: ['c_zahlen'], 12: [],
@@ -4614,6 +5136,7 @@ const TokiPona = (function (data) {
     app.innerHTML = '';
     if (session) { renderSession(); clearStrayFocus(); return; }
     if (reading) { app.append(readerScreen(reading)); clearStrayFocus(); return; }
+    if (diary) { app.append(diaryScreen()); clearStrayFocus(); return; }
     app.append(topbar());
     if (tab === 'pfad') app.append(pathScreen());
     else if (tab === 'nimi') app.append(wordScreen());
@@ -4656,20 +5179,28 @@ const TokiPona = (function (data) {
   }
 
   function pathScreen() {
-    const next = lessons().find((l) => !state.done[l.number]) || lessons()[lessons().length - 1];
+    // Weitergezählt wird im Kurs; die Einführung steht daneben. Wer schon
+    // mittendrin ist, soll nicht an den Anfang zurückgeschickt werden.
+    const chain = courseChain();
+    const next = chain.find((l) => !state.done[l.number]) || chain[chain.length - 1];
+    const started = chain.some((l) => state.done[l.number]);
+    // Genau eine Karte ist die, wo man gerade steht: am Anfang die Einführung,
+    // danach die nächste Kurslektion.
+    const current = !started && !state.done[0] ? 0 : next.number;
+    const here = lessons().find((lesson) => lesson.number === current) || next;
     const screen = el(`
       <div class="screen">
         <div class="hello">
           <h1>${escape(t('greeting'))}</h1>
-          <p>${state.xp ? escape(t('introBack', next.title)) : escape(t('introFirst'))}</p>
+          <p>${state.xp ? escape(t('introBack', here.title)) : escape(t('introFirst'))}</p>
         </div>
         <div class="path"></div>
       </div>`);
 
-    const due = dueKeys().length;
+    const due = dueTasks().length;
     if (due) {
       const card = el(`
-        <button class="lesson review" data-state="current">
+        <button class="lesson review due" data-state="current">
           <span class="badge">↻</span>
           <span class="body">
             <b>${escape(t('dueCards', due))}</b>
@@ -4680,13 +5211,30 @@ const TokiPona = (function (data) {
       screen.querySelector('.hello').after(card);
     }
 
+    // Was wackelt, kommt sonst erst dann wieder, wenn die Wiederholung es
+    // vorsieht. Hier steht es sofort zur Verfügung.
+    const weak = weakSession();
+    if (weak.length >= 4) {
+      const card = el(`
+        <button class="lesson review weak" data-state="current">
+          <span class="badge">△</span>
+          <span class="body">
+            <b>${escape(t('weakTitle'))}</b>
+            <span>${escape(t('weakSub', weak.length))}</span>
+          </span>
+        </button>`);
+      card.onclick = () => { session = buildWeakSession(); render(); };
+      (screen.querySelector('.lesson.review') || screen.querySelector('.hello')).after(card);
+    }
+
     const path = screen.querySelector('.path');
     lessons().forEach((lesson) => {
       const open = unlocked(lesson.number);
       const done = Boolean(state.done[lesson.number]);
-      const stateName = done ? 'done' : (open ? (lesson.number === next.number ? 'current' : 'open') : 'locked');
+      const stateName = done ? 'done'
+        : (open ? (lesson.number === current ? 'current' : 'open') : 'locked');
       const card = el(`
-        <button class="lesson" data-state="${stateName}">
+        <button class="lesson${lesson.intro ? ' intro' : ''}" data-state="${stateName}">
           <span class="badge">${done ? '✓' : lesson.number}</span>
           <span class="body">
             <b>${escape(lesson.title)}</b>
@@ -4695,7 +5243,12 @@ const TokiPona = (function (data) {
           <span class="dots">${lesson.words.map((word) =>
             `<i class="${state.seenWords[word] ? 'on' : ''}"></i>`).join('')}</span>
         </button>`);
-      if (open) card.onclick = () => { session = buildSession(lesson); render(); };
+      if (open) {
+        card.onclick = () => {
+          session = lesson.intro ? buildIntroSession() : buildSession(lesson);
+          render();
+        };
+      }
       else card.disabled = true;
       path.append(card);
     });
@@ -4716,8 +5269,10 @@ const TokiPona = (function (data) {
     }
 
     screen.append(readingCard());
+    screen.append(diaryCard());
     screen.append(weekCard());
     screen.append(goalCard());
+    screen.append(sizeCard());
     screen.append(languageCard());
     screen.append(soundCard());
     screen.append(sitelenCard());
@@ -4759,6 +5314,148 @@ const TokiPona = (function (data) {
       list.append(row);
     });
     return card;
+  }
+
+  // ------------------------------------------------------------ Tagebuch
+
+  // Wie viele Tage am Stück geschrieben wurde, von heute (oder gestern) zurück.
+  function diaryStreak() {
+    const entries = state.diary || {};
+    let days = 0;
+    let cursor = new Date();
+    if (!entries[today()]) cursor = new Date(Date.now() - 86400000);
+    for (;;) {
+      const key = cursor.toISOString().slice(0, 10);
+      if (!entries[key]) return days;
+      days += 1;
+      cursor = new Date(cursor.getTime() - 86400000);
+    }
+  }
+
+  // Ein Anstoß, der sich am Tag festmacht statt zu würfeln: wer zweimal
+  // hinschaut, findet dieselbe Frage vor.
+  function diaryNudge() {
+    const open = OPEN.prompts.filter((entry) => unlocked(entry.stage));
+    if (!open.length) return null;
+    const day = today();
+    let sum = 0;
+    for (let i = 0; i < day.length; i += 1) sum = (sum * 31 + day.charCodeAt(i)) % 100003;
+    return open[sum % open.length];
+  }
+
+  function diaryCard() {
+    const entries = Object.keys(state.diary || {});
+    const streak = diaryStreak();
+    const card = el(`
+      <div class="card">
+        <h2>${escape(t('diaryTitle'))}</h2>
+        <p class="hint">${escape(t('diaryHint'))}</p>
+        <div class="row"><button class="ghost">${escape(t('diaryOpen'))}</button></div>
+        <p class="hint">${escape(entries.length
+          ? t('diaryCount', entries.length, streak) : t('diaryEmpty'))}</p>
+      </div>`);
+    card.querySelector('.ghost').onclick = () => { diary = true; render(); };
+    return card;
+  }
+
+  function diaryScreen() {
+    const day = today();
+    const nudge = diaryNudge();
+    const screen = screenWith(`
+      <div class="exbar">
+        <button aria-label="${escape(t('diaryBack'))}">✕</button>
+        <span class="track"></span>
+        <span class="metric">sitelen</span>
+      </div>
+      <div class="hello">
+        <h1>${escape(t('diaryTitle'))}</h1>
+        <p>${escape(t('diaryLead'))}</p>
+      </div>
+      <div class="card diarywrite">
+        <h2>${escape(t('diaryToday'))} · ${escape(day)}</h2>
+        <textarea class="typed diarytext" rows="4" autocomplete="off" autocapitalize="off"
+                  spellcheck="false" placeholder="${escape(t('diaryPlaceholder'))}"
+                  aria-label="toki pona"></textarea>
+        <p class="live"></p>
+        <div class="actions"><button class="primary">${escape(t('diarySave'))}</button></div>
+      </div>
+      <div class="diarypast"></div>`);
+
+    screen.querySelector('.exbar button').onclick = () => { diary = false; render(); };
+
+    if (nudge) {
+      const box = el(`
+        <div class="card diarynudge">
+          <h2>${escape(t('diaryPrompt'))}</h2>
+          <p class="question tp">${escape(nudge.tp)}</p>
+          <p class="hint">${escape((nudge[state.lang] || nudge.de)[0])}</p>
+        </div>`);
+      const listen = sayButton(nudge.tp, t('listen'));
+      if (listen) box.querySelector('.question').append(listen);
+      screen.querySelector('.hello').after(box);
+    }
+
+    const input = screen.querySelector('.diarytext');
+    const live = screen.querySelector('.live');
+    const button = screen.querySelector('.primary');
+    input.value = (state.diary && state.diary[day]) || '';
+    button.after(lookupHelper(input));
+
+    // Mitlesen, nicht benoten: gezählt wird, wie viele Sätze durchgehen, und
+    // beim ersten Stolperer steht daneben, woran es liegt.
+    const draw = () => {
+      const text = input.value.trim();
+      if (!text) { live.textContent = ''; live.className = 'live'; return; }
+      const parts = TP.splitUtterances(text);
+      const results = parts.map((part) => TP.parse(part));
+      const ok = results.filter((result) => result.isValid).length;
+      const first = results.find((result) => !result.isValid);
+      live.textContent = t('diaryLines', ok, results.length)
+        + (first ? ' · ' + say(first.violations[0]) : '');
+      live.className = 'live ' + (first ? 'bad' : 'good');
+    };
+    input.oninput = draw;
+    draw();
+
+    button.onclick = () => {
+      const text = input.value.trim();
+      const fresh = !(state.diary && state.diary[day]);
+      state.diary = state.diary || {};
+      if (text) state.diary[day] = text.slice(0, 600);
+      else delete state.diary[day];
+      save();
+      // Einmal am Tag gibt es Punkte — fürs Schreiben, nicht fürs Richtigsein.
+      if (text && fresh) { award(15); toast(t('diaryReward')); }
+      else toast(t('diarySaved'));
+      render();
+    };
+
+    const past = screen.querySelector('.diarypast');
+    Object.keys(state.diary || {}).sort().reverse()
+      .filter((key) => key !== day)
+      .forEach((key) => {
+        const text = state.diary[key];
+        const entry = el(`
+          <div class="card diaryentry">
+            <h2>${escape(key)}</h2>
+            <p class="question tp">${escape(text)}</p>
+            <div class="row"><button class="ghost">${escape(t('diaryXray'))}</button></div>
+          </div>`);
+        const toggle = entry.querySelector('.ghost');
+        toggle.onclick = () => {
+          if (entry.querySelector('.xraywrap')) {
+            entry.querySelectorAll('.xraywrap').forEach((box) => box.remove());
+            return;
+          }
+          TP.splitUtterances(text).forEach((part) => {
+            const box = xrayBlock(part, null, null);
+            if (box) toggle.parentElement.before(box);
+          });
+        };
+        past.append(entry);
+      });
+
+    return screen;
   }
 
   // Der Text selbst: Zeile für Zeile, Übersetzung erst auf Tippen.
@@ -4887,22 +5584,39 @@ const TokiPona = (function (data) {
     return card;
   }
 
-  function goalCard() {
+  // Eine Reihe Auswahlknöpfe, wie sie an mehreren Stellen gebraucht wird.
+  // `options` sind Paare aus Beschriftung und Wert.
+  function pickRow(options, picked, onPick, className) {
+    const row = el(`<div class="row${className ? ' ' + className : ''}"></div>`);
+    options.forEach((option) => {
+      const chip = el(`<button class="ghost" type="button"
+        data-picked="${option.value === picked}">${escape(option.label)}</button>`);
+      chip.onclick = () => onPick(option.value);
+      row.append(chip);
+    });
+    return row;
+  }
+
+  // Eine Einstellungskarte: Überschrift, Erklärung, eine Reihe zum Auswählen.
+  function settingCard(titleKey, hintKey, options, picked, onPick) {
     const card = el(`
       <div class="card">
-        <h2>${escape(t('goalTitle'))}</h2>
-        <p class="hint">${escape(t('goalHint'))}</p>
-        <div class="row"></div>
+        <h2>${escape(t(titleKey))}</h2>
+        <p class="hint">${escape(t(hintKey))}</p>
       </div>`);
-    const row = card.querySelector('.row');
-    GOALS.forEach((value) => {
-      const button = el(`<button class="ghost" data-picked="${value === goal()}"
-        >${escape(t('goalPick', value))}</button>`);
-      button.onclick = () => { state.goal = value; save(); render(); };
-      row.append(button);
-    });
+    card.append(pickRow(options, picked, onPick));
     return card;
   }
+
+  const goalCard = () => settingCard('goalTitle', 'goalHint',
+    GOALS.map((value) => ({ value, label: t('goalPick', value) })),
+    goal(),
+    (value) => { state.goal = value; save(); render(); });
+
+  const sizeCard = () => settingCard('sizeTitle', 'sizeHint',
+    SIZES.map((entry) => ({ value: entry.id, label: t(SIZE_LABELS[entry.id]) })),
+    sizeOf().id,
+    (value) => { state.size = value; save(); render(); });
 
   function languageCard() {
     const card = el(`
@@ -4930,6 +5644,7 @@ const TokiPona = (function (data) {
       row.append(el(`<p class="hint">${escape(t('soundNone'))}</p>`));
       return card;
     }
+    row.before(el(`<p class="hint">${escape(t('soundSwitch'))}</p>`));
     const button = el(`<button class="ghost">${escape(t(state.sound ? 'soundOff' : 'soundOn'))}</button>`);
     button.onclick = () => {
       state.sound = !state.sound;
@@ -5219,7 +5934,8 @@ const TokiPona = (function (data) {
     head.append(skip);
     app.append(head);
 
-    if (task.type === 'word') app.append(wordTask(task));
+    if (task.type === 'rule') app.append(ruleTask(task));
+    else if (task.type === 'word') app.append(wordTask(task));
     else if (task.type === 'build') app.append(buildTask(task));
     else if (task.type === 'choose') app.append(chooseTask(task));
     else if (task.type === 'fix') app.append(fixTask(task));
@@ -5238,6 +5954,45 @@ const TokiPona = (function (data) {
 
   function screenWith(inner) {
     return el(`<div class="screen">${inner}</div>`);
+  }
+
+  // Eine Regel, kein Rätsel: Beispiel, Bau, Erklärung, Gegenbeispiel. Es gibt
+  // nichts zu antworten und deshalb auch keine Punkte — die kommen aus den
+  // Aufgaben, die darauf folgen.
+  function ruleTask(task) {
+    const rule = task.rule;
+    const screen = screenWith(`
+      <p class="prompt">${escape(t('askRule'))}</p>
+      <h2 class="question tp"></h2>
+      <p class="hint">${escape(rule[state.lang] || rule.de)}</p>
+      <div class="rulebody"></div>
+      <div class="actions"><button class="primary">${escape(t('understood'))}</button></div>`);
+
+    const asked = screen.querySelector('.question');
+    asked.append(glossed(rule.tp, 'glossline'));
+    withSay(asked, rule.tp);
+
+    const body = screen.querySelector('.rulebody');
+    const xray = xrayBlock(rule.tp, null, null);
+    if (xray) body.append(xray);
+    // Die Erklärung ist eigener Text aus prototype/toki.js und darf Auszeichnung
+    // tragen — sie kommt nicht von außen.
+    body.append(el(`<p class="reason">${rule.point[state.lang] || rule.point.de}</p>`));
+    if (rule.bad) {
+      const wrong = rule.bad.kind === 'falsch';
+      body.append(el(`
+        <div class="rulebad" data-kind="${escape(rule.bad.kind)}">
+          <p class="badline"><span class="mark">${wrong ? '✕' : '≠'}</span>
+            <code>${escape(rule.bad.tp)}</code></p>
+          <p class="hint">${rule.bad[state.lang] || rule.bad.de}</p>
+        </div>`));
+    }
+
+    screen.querySelector('.primary').onclick = () => {
+      session.index += 1;
+      render();
+    };
+    return screen;
   }
 
   function wordTask(task) {
@@ -6039,7 +6794,9 @@ const TokiPona = (function (data) {
         solution: task.flawed.correct,
         speak: task.flawed.correct,
         xray: task.flawed.correct,
-        reason: escape(task.flawed.violation.message),
+        // Der Verstoß trägt keinen fertigen Satz in sich, nur einen Schlüssel —
+        // `say` macht daraus die Erklärung in der eingestellten Sprache.
+        reason: escape(say(task.flawed.violation)),
       });
     };
     return screen;
@@ -6560,8 +7317,10 @@ const TokiPona = (function (data) {
       screen.classList.add('answered');
     }
 
+    // Vorlesehilfen bekommen das Urteil mit: das Blatt erscheint ohne
+    // Seitenwechsel, sonst bliebe es unbemerkt.
     const sheet = el(`
-      <div class="sheet">
+      <div class="sheet" role="status" aria-live="polite">
         <div class="verdict ${correct ? 'good' : 'bad'}">
           <span class="mark">${correct ? '✓' : '✕'}</span>
           <span>${escape(correct
@@ -6673,9 +7432,9 @@ const TokiPona = (function (data) {
       <div class="screen done">
         <div class="burst">pona!</div>
         <h2>${escape(quiz ? (quiz.title[state.lang] || quiz.title.de)
-          : (review ? t('reviewDone') : lesson.title))}</h2>
+          : (review ? t(session.weak ? 'weakDone' : 'reviewDone') : lesson.title))}</h2>
         <p>${escape(quiz ? (quiz.about[state.lang] || quiz.about.de)
-          : (review ? t('reviewNote')
+          : (review ? t(session.weak ? 'weakNote' : 'reviewNote')
             : (musi ? t('musiLead') : lesson.note.replace(/<[^>]+>/g, ''))))}</p>
         <div class="tally">
           <div><b>+${session.xp}</b><span>${escape(t('xp'))}</span></div>

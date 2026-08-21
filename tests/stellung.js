@@ -24,8 +24,8 @@ async function attempt(page, words) {
   await page.goto(FILE);
   await seed(page, 's:lsp02_08');
   await page.reload();
-  await page.waitForSelector('.lesson.review');
-  await page.locator('.lesson.review').click();
+  await page.waitForSelector('.lesson.due');
+  await page.locator('.lesson.due').click();
   await page.waitForSelector('.slot');
   const prompt = (await page.locator('.question').textContent()).trim();
   for (const word of words) {

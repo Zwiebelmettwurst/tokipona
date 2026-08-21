@@ -60,7 +60,7 @@ const FAKE = `
     done: { 1: true }, lang: 'de', sound: true,
     srs: { 's:lsp02_08': { reps: 1, interval: 600000, ease: 2.5, due: Date.now() - 1000 } } })));
   await page.reload();
-  await page.locator('.lesson.review').click();
+  await page.locator('.lesson.due').click();
   await page.waitForSelector('.exbar');
   // Die Wiederholung liefert eine Bauaufgabe; das Diktat kommt aus der Lektion.
   await page.goto(FILE);
@@ -68,7 +68,7 @@ const FAKE = `
     done: { 1: true }, lang: 'de', sound: true })));
   await page.reload();
   await page.waitForSelector('.lesson');
-  await page.locator('.lesson[data-state="current"]').first().click();
+  await page.locator('.lesson:not(.intro):not(.review)[data-state="current"]').first().click();
   await page.waitForSelector('.exbar');
   let sawDictation = false;
   for (let step = 0; step < 30 && !(await page.locator('.done').count()); step += 1) {
@@ -108,7 +108,7 @@ const FAKE = `
   await bare.goto(FILE);
   await bare.evaluate(() => localStorage.setItem('o-toki-fortschritt-v1', JSON.stringify({ done: { 1: true }, lang: 'de' })));
   await bare.reload();
-  await bare.locator('.lesson[data-state="current"]').first().click();
+  await bare.locator('.lesson:not(.intro):not(.review)[data-state="current"]').first().click();
   await bare.waitForSelector('.exbar');
   let seen = 0;
   for (let step = 0; step < 20 && !(await bare.locator('.done').count()); step += 1) {

@@ -19,7 +19,7 @@ const FILE = lib.FILE;
   await page.waitForSelector('.lesson');
 
   // Eine Lektion spielen, damit es etwas zu sichern gibt
-  await page.locator('.lesson').first().tap();
+  await page.locator('.lesson:not(.intro):not(.review)').first().tap();
   await page.waitForSelector('.exbar');
   for (let i = 0; i < 30 && !(await page.locator(".done").count()); i += 1) {
     if (await page.locator('.choice').count()) await page.locator('.choice').first().tap();

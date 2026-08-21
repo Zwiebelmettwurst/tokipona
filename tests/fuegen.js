@@ -18,8 +18,8 @@ async function open(page, id) {
     }));
   }, 's:' + id);
   await page.reload();
-  await page.waitForSelector('.lesson.review');
-  await page.locator('.lesson.review').click();
+  await page.waitForSelector('.lesson.due');
+  await page.locator('.lesson.due').click();
   await page.waitForSelector('.slot');
 }
 

@@ -25,7 +25,7 @@ const SHOTS = lib.SHOTS;
       + `, gesperrt: ${await page.locator('.lesson[data-state="locked"]').count()}`);
     await page.screenshot({ path: `${SHOTS}/1-pfad-${scheme}.png`, fullPage: true });
 
-    await page.locator('.lesson').first().click();
+    await page.locator('.lesson:not(.intro):not(.review)').first().click();
     await page.waitForSelector('.exbar');
 
     const known = new Map();          // Frage → Musterlösung
@@ -114,6 +114,14 @@ const SHOTS = lib.SHOTS;
 
       const sheet = page.locator('.sheet');
       if (await sheet.count()) {
+        // Kein Platzhalter darf durchrutschen: „undefined“ im Blatt heißt,
+        // dass eine Erklärung ins Leere greift.
+        const text = (await sheet.textContent()).replace(/\s+/g, ' ').trim();
+        for (const loch of ['undefined', 'null', 'NaN', '[object Object]']) {
+          if (text.includes(loch)) {
+            errors.push(`[${scheme}] „${loch}“ im Rückmeldeblatt: ${text.slice(0, 120)}`);
+          }
+        }
         const good = await sheet.locator('.verdict.good').count();
         if (!good) {
           const shown = await sheet.locator('.solution').count()
@@ -156,7 +164,7 @@ const SHOTS = lib.SHOTS;
     });
     await page.reload();
     await page.waitForSelector('.lesson');
-    const reviewCard = page.locator('.lesson.review');
+    const reviewCard = page.locator('.lesson.due');
     if (!(await reviewCard.count())) {
       errors.push(`[${scheme}] keine Wiederholungskarte trotz fälliger Karten`);
     } else {

@@ -14,7 +14,7 @@ const FILE = lib.FILE;
   await page.evaluate(() => localStorage.clear());
   await page.reload();
   await page.waitForSelector('.lesson');
-  await page.locator('.lesson').first().click();
+  await page.locator('.lesson:not(.intro):not(.review)').first().click();
   await page.waitForSelector('.exbar');
 
   for (let round = 1; round <= 4; round += 1) {

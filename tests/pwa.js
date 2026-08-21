@@ -79,7 +79,7 @@ const server = http.createServer((request, response) => {
   if (!registered) errors.push('Service Worker nicht registriert');
 
   // Eine Lektion anspielen, damit Fortschritt entsteht
-  await page.locator('.lesson:not(.review)').first().click();
+  await page.locator('.lesson:not(.intro):not(.review)').first().click();
   await page.waitForSelector('.exbar');
   await page.locator('.choice, .tile').first().click();
   const check = page.locator('.actions .primary');
