@@ -121,7 +121,19 @@ for (const pattern of musi.patterns) {
 
 // 8b. Zweisprachigkeit der Oberfläche: beide Tabellen tragen dieselben
 //     Schlüssel, und keine Beschriftung steht fest in einer Sprache im Code.
-const appSource = fs.readFileSync(`${__dirname}/app.js`, 'utf8');
+// Die Anwendung liegt in Teilen unter prototype/app/ — geprüft wird, was
+// prototype/build.py daraus zusammensetzt, also alle Teile der Reihe nach.
+const appParts = fs.readdirSync(`${__dirname}/app`).filter((name) => name.endsWith('.js')).sort();
+const appSource = appParts.map((name) => fs.readFileSync(`${__dirname}/app/${name}`, 'utf8')).join('\n');
+check(appParts.length > 0, 'prototype/app/ ist leer');
+// Zusammengesetzt muss es auch aufgehen: eine kaputte Klammer in einem Teil
+// fällt sonst erst beim Bauen auf.
+try {
+  // eslint-disable-next-line no-new-func
+  new Function('DATA', 'MUSI', 'OPEN', 'LIPU', 'TP', appSource);
+} catch (error) {
+  check(false, `ANWENDUNG: die Teile ergeben keinen gültigen Rumpf — ${error.message}`);
+}
 const inner = (marker) => {
   const start = appSource.indexOf(marker);
   if (start < 0) return '';
@@ -510,6 +522,7 @@ console.log(`offen:   ${open.prompts.length} Fragen, ${answers} Beispielantworte
 console.log(`fügen:   ${open.joins.length} Fügungen geprüft`);
 console.log(`alltag:  ${phrases} Sätze in ${open.phrases.length} Gruppen geprüft`);
 console.log(`namen:   ${NAMES.length} Namen nachgesprochen und lautlich geprüft`);
+console.log(`anwendung: ${appParts.length} Teile, ${appSource.split('\n').length} Zeilen geprüft`);
 console.log(`stil:    ${open.styles.length} Stilpaare geprüft`);
 console.log(`lektion0: ${nasin.rules.length} Regeln, ${nasin.items.length} Aufgaben geprüft`);
 console.log(`lesen:   ${lipu.texts.length} Texte, ${lines} Zeilen, `

@@ -13,6 +13,28 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 HERE = ROOT / "prototype"
 
+# Die Anwendung liegt in Teilen unter prototype/app/ und wird hier wieder
+# zusammengesetzt — in genau dieser Reihenfolge. Sie zählt: die Teile leben in
+# einer gemeinsamen Kapsel, und was mit `const` oben steht, muss vor seiner
+# ersten Benutzung dastehen. Funktionen dürfen sich frei über die Teile hinweg
+# aufrufen; sie werden vorgezogen.
+APP_HEAD = """// Prototyp des Übungsflows. Zeigt den Kernkreislauf des Plans:
+// bauen statt erkennen, sofortige Rückmeldung mit Satzröntgen, sichtbarer
+// Fortschritt — ohne Herzen und ohne Bestenliste.
+//
+// Zusammengesetzt aus prototype/app/ — siehe prototype/app/README.md.
+
+(function (DATA, MUSI, OPEN, LIPU, TP) {"""
+APP_FOOT = "})(TOKIPONA_DATA, TOKIPONA_MUSI, TOKIPONA_TOKI, TOKIPONA_LIPU, TokiPona);"
+
+
+def app_source():
+    """Die Teile in Reihenfolge, eingefasst in ihre Kapsel."""
+    parts = sorted((HERE / "app").glob("*.js"))
+    if not parts:
+        raise SystemExit("prototype/app/ ist leer — es gibt nichts zu bauen.")
+    return "\n".join([APP_HEAD] + [part.read_text() for part in parts] + [APP_FOOT]) + "\n"
+
 TEMPLATE = """<!doctype html>
 <meta charset="utf-8">
 <title>o toki!</title>
@@ -132,7 +154,7 @@ FONT = """/* linja pimeja 1.9 — jan Inkepa, CC0. Siehe prototype/SCHRIFT.md.
 def main():
     data = (HERE / "data.js").read_text()
     parser = (HERE / "tokipona.js").read_text()
-    app = (HERE / "app.js").read_text()
+    app = app_source()
     style = (HERE / "style.css").read_text()
     worker = (HERE / "sw.js").read_text()
     musi = (HERE / "musi.js").read_text()
@@ -177,7 +199,9 @@ def main():
     sw = ROOT / "docs/sw.js"
     sw.write_text(worker.replace("__VERSION__", version))
 
-    print(f"{out.relative_to(ROOT)}: {out.stat().st_size // 1024} KB, Fassung {version}")
+    parts = len(sorted((HERE / "app").glob("*.js")))
+    print(f"{out.relative_to(ROOT)}: {out.stat().st_size // 1024} KB, Fassung {version}"
+          f" ({parts} Anwendungsteile)")
 
 
 if __name__ == "__main__":
