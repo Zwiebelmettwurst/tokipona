@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="o toki!">
-<script>window.OTOKI_VERSION = 'f79ea2f61f';</script>
+<script>window.OTOKI_VERSION = 'c8c15b079e';</script>
 
 <style>
 /* linja pimeja 1.9 — jan Inkepa, CC0. Siehe prototype/SCHRIFT.md.
@@ -6498,7 +6498,9 @@ const TokiPona = (function (data) {
         solution: task.flawed.correct,
         speak: task.flawed.correct,
         xray: task.flawed.correct,
-        reason: escape(task.flawed.violation.message),
+        // Der Verstoß trägt keinen fertigen Satz in sich, nur einen Schlüssel —
+        // `say` macht daraus die Erklärung in der eingestellten Sprache.
+        reason: escape(say(task.flawed.violation)),
       });
     };
     return screen;

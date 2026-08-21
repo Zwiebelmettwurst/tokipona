@@ -114,6 +114,14 @@ const SHOTS = lib.SHOTS;
 
       const sheet = page.locator('.sheet');
       if (await sheet.count()) {
+        // Kein Platzhalter darf durchrutschen: „undefined“ im Blatt heißt,
+        // dass eine Erklärung ins Leere greift.
+        const text = (await sheet.textContent()).replace(/\s+/g, ' ').trim();
+        for (const loch of ['undefined', 'null', 'NaN', '[object Object]']) {
+          if (text.includes(loch)) {
+            errors.push(`[${scheme}] „${loch}“ im Rückmeldeblatt: ${text.slice(0, 120)}`);
+          }
+        }
         const good = await sheet.locator('.verdict.good').count();
         if (!good) {
           const shown = await sheet.locator('.solution').count()

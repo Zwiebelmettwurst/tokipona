@@ -3308,7 +3308,9 @@
         solution: task.flawed.correct,
         speak: task.flawed.correct,
         xray: task.flawed.correct,
-        reason: escape(task.flawed.violation.message),
+        // Der Verstoß trägt keinen fertigen Satz in sich, nur einen Schlüssel —
+        // `say` macht daraus die Erklärung in der eingestellten Sprache.
+        reason: escape(say(task.flawed.violation)),
       });
     };
     return screen;
