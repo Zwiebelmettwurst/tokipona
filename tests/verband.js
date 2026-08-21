@@ -69,8 +69,8 @@ const check = (c, m) => { if (!c) { errors.push(m); console.log('  ✗ ' + m); }
     srs: { 'v:s01': { reps: 1, interval: 600000, ease: 2.5, due: Date.now() - 1000 } },
   })));
   await page.reload();
-  await page.waitForSelector('.lesson.review');
-  await page.locator('.lesson.review').click();
+  await page.waitForSelector('.lesson.due');
+  await page.locator('.lesson.due').click();
   await page.waitForSelector('.choice');
   const asked = (await page.locator('.question').textContent()).trim();
   const options = await page.locator('.choice').allTextContents();
@@ -91,8 +91,8 @@ const check = (c, m) => { if (!c) { errors.push(m); console.log('  ✗ ' + m); }
     srs: { 'y:soweli': { reps: 1, interval: 600000, ease: 2.5, due: Date.now() - 1000 } },
   })));
   await page.reload();
-  await page.waitForSelector('.lesson.review');
-  await page.locator('.lesson.review').click();
+  await page.waitForSelector('.lesson.due');
+  await page.locator('.lesson.due').click();
   await page.waitForSelector('.bank .tile');
   const chips = await page.locator('.bank .tile').allTextContents();
   console.log('Silben:', chips.join(' '));

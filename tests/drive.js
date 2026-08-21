@@ -156,7 +156,7 @@ const SHOTS = lib.SHOTS;
     });
     await page.reload();
     await page.waitForSelector('.lesson');
-    const reviewCard = page.locator('.lesson.review');
+    const reviewCard = page.locator('.lesson.due');
     if (!(await reviewCard.count())) {
       errors.push(`[${scheme}] keine Wiederholungskarte trotz fälliger Karten`);
     } else {

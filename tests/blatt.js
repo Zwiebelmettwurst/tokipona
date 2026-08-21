@@ -17,8 +17,8 @@ async function build(page, id, words) {
     }));
   }, 's:' + id);
   await page.reload();
-  await page.waitForSelector('.lesson.review');
-  await page.locator('.lesson.review').click();
+  await page.waitForSelector('.lesson.due');
+  await page.locator('.lesson.due').click();
   await page.waitForSelector('.slot');
   for (const word of words) {
     const tile = page.locator(`.bank .tile:not(.used)[data-word="${word}"]`).first();

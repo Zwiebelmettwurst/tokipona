@@ -53,7 +53,7 @@ const check = (c, m) => { if (!c) { errors.push(m); console.log('  ✗ ' + m); }
       srs: { [k]: { reps: 1, interval: 600000, ease: 2.5, due: Date.now() - 1000 } },
     })), key);
     await page.reload();
-    await page.locator('.lesson.review').click();
+    await page.locator('.lesson.due').click();
     await page.waitForSelector('.typed');
     await page.locator('.typed').fill(payload);
     await page.locator('.actions .primary').click();

@@ -452,6 +452,25 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 
 .lesson.review .badge { background: var(--gold-soft); color: var(--gold); font-size: 1rem; }
 .lesson.review { border-color: var(--gold); }
+.lesson.weak .badge { background: var(--wrong-soft); color: var(--wrong); font-size: 1rem; }
+.lesson.weak { border-color: var(--wrong); }
+
+/* Tagebuch: schreiben oben, Gelesenes darunter. */
+.diarytext {
+  min-height: 5.5rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+.diarywrite .actions { margin-top: 0.6rem; padding: 0.6rem 0 0; }
+.diarywrite .lookup { margin-top: 0.6rem; }
+.diarynudge .question.tp { margin: 0.4rem 0 0.5rem; font-size: 1.0625rem; }
+.diaryentry .question.tp {
+  margin: 0.4rem 0 0.6rem;
+  font-size: 0.9375rem;
+  white-space: pre-wrap;
+}
+.diaryentry .xraywrap { margin-bottom: 0.6rem; }
+.diarypast .card { margin-top: 0.7rem; }
 
 /* Zeigergeräte bekommen eine Hover-Rückmeldung. Auf Tippgeräten bliebe sie
    nach der Berührung kleben und sähe aus wie eine getroffene Auswahl. */

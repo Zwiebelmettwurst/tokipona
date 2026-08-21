@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="o toki!">
-<script>window.OTOKI_VERSION = 'c03c88d374';</script>
+<script>window.OTOKI_VERSION = '4aca297542';</script>
 
 <style>
 /* linja pimeja 1.9 — jan Inkepa, CC0. Siehe prototype/SCHRIFT.md.
@@ -474,6 +474,25 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 
 .lesson.review .badge { background: var(--gold-soft); color: var(--gold); font-size: 1rem; }
 .lesson.review { border-color: var(--gold); }
+.lesson.weak .badge { background: var(--wrong-soft); color: var(--wrong); font-size: 1rem; }
+.lesson.weak { border-color: var(--wrong); }
+
+/* Tagebuch: schreiben oben, Gelesenes darunter. */
+.diarytext {
+  min-height: 5.5rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+.diarywrite .actions { margin-top: 0.6rem; padding: 0.6rem 0 0; }
+.diarywrite .lookup { margin-top: 0.6rem; }
+.diarynudge .question.tp { margin: 0.4rem 0 0.5rem; font-size: 1.0625rem; }
+.diaryentry .question.tp {
+  margin: 0.4rem 0 0.6rem;
+  font-size: 0.9375rem;
+  white-space: pre-wrap;
+}
+.diaryentry .xraywrap { margin-bottom: 0.6rem; }
+.diarypast .card { margin-top: 0.7rem; }
 
 /* Zeigergeräte bekommen eine Hover-Rückmeldung. Auf Tippgeräten bliebe sie
    nach der Berührung kleben und sähe aus wie eine getroffene Auswahl. */
@@ -3165,6 +3184,13 @@ const TokiPona = (function (data) {
 (function (DATA, MUSI, OPEN, LIPU, TP) {
   const KEY = 'o-toki-fortschritt-v1';
   const GOALS = [20, 40, 60, 100];
+  // Wie lang eine Runde ist. Nicht nur abschneiden: eine lange Runde holt
+  // wirklich mehr Sätze aus der Lektion, eine kurze lässt Beiwerk weg.
+  const SIZES = [
+    { id: 'kurz', words: 1, builds: 2, reads: 1, cap: 6 },
+    { id: 'mittel', words: 2, builds: 3, reads: 2, cap: 12 },
+    { id: 'lang', words: 3, builds: 5, reads: 4, cap: 20 },
+  ];
   // Die beiden Sprecherinnen — hier oben, weil der geladene Zustand dagegen
   // geprüft wird.
   const VOICES = [{ id: 'kalaasi' }, { id: 'jlakuse' }, { id: 'ante' }];
@@ -3366,6 +3392,30 @@ const TokiPona = (function (data) {
       musiSting: 'Frechheit', musiLiteral: 'wörtlich',
       musiSection: (name, count) => `${name} · ${count}`,
       musiPeace: 'Und danach: <i>mi musi taso</i> — war nur Spaß.',
+      sizeTitle: 'länge einer runde',
+      sizeHint: 'Wie viele Aufgaben eine Lektion hat. Kurz reicht für die Bahn, '
+        + 'lang für den Abend. Wiederholungen richten sich mit.',
+      sizeShort: 'Kurz · 6', sizeMedium: 'Mittel · 12', sizeLong: 'Lang · 20',
+      weakTitle: 'schwachstellen üben',
+      weakSub: (n) => `${n} ${n === 1 ? 'Sache sitzt' : 'Sachen sitzen'} noch nicht`,
+      weakHint: 'Nur das, was zuletzt gewackelt hat — Wörter und Konzepte, '
+        + 'unabhängig davon, wann sie planmäßig dran wären.',
+      weakDone: 'Schwachstellen durch',
+      weakNote: 'Was hier wieder wackelt, steht beim nächsten Mal erneut da.',
+      diaryTitle: 'o sitelen — tagebuch',
+      diaryHint: 'Ein Satz am Tag, selbst geschrieben. Der Parser liest mit, '
+        + 'bewertet aber nicht — es ist dein Tagebuch.',
+      diaryOpen: 'Heute schreiben', diaryBack: 'Zurück',
+      diaryLead: 'Schreib auf, wie dein Tag war. Kurz reicht.',
+      diaryPrompt: 'Anstoß für heute',
+      diaryPlaceholder: 'tenpo suno ni la mi …',
+      diarySave: 'Eintrag sichern', diarySaved: 'Gesichert.',
+      diaryEmpty: 'Noch kein Eintrag. Der erste ist der schwerste.',
+      diaryCount: (n, days) => `${n} ${n === 1 ? 'Eintrag' : 'Einträge'}`
+        + `${days > 1 ? ` · ${days} Tage am Stück` : ''}`,
+      diaryToday: 'heute', diaryXray: 'Satzbau ansehen',
+      diaryReward: 'Erster Eintrag heute · +15 XP',
+      diaryLines: (ok, all) => `${ok}/${all} Sätze gehen glatt durch`,
       updateReady: 'Neue Fassung ist da.', updateLoad: 'Jetzt laden',
       versionLabel: (v) => `Fassung ${v}`,
       credit: (link) => `Prototyp. Übungssätze aus ${link} (MIT, © 2020 /dev/urandom `
@@ -3565,6 +3615,30 @@ const TokiPona = (function (data) {
       musiSting: 'cheek', musiLiteral: 'literally',
       musiSection: (name, count) => `${name} · ${count}`,
       musiPeace: 'And afterwards: <i>mi musi taso</i> — it was only play.',
+      sizeTitle: 'length of a round',
+      sizeHint: 'How many exercises a lesson holds. Short fits a train ride, '
+        + 'long fits an evening. Reviews follow suit.',
+      sizeShort: 'Short · 6', sizeMedium: 'Medium · 12', sizeLong: 'Long · 20',
+      weakTitle: 'practise weak spots',
+      weakSub: (n) => `${n} ${n === 1 ? 'thing has' : 'things have'} not settled yet`,
+      weakHint: 'Only what wobbled last time — words and concepts, no matter '
+        + 'when they would be due.',
+      weakDone: 'Weak spots done',
+      weakNote: 'Whatever wobbles again will be waiting next time.',
+      diaryTitle: 'o sitelen — diary',
+      diaryHint: 'One sentence a day, written by you. The parser reads along '
+        + 'but does not grade — it is your diary.',
+      diaryOpen: 'Write today', diaryBack: 'Back',
+      diaryLead: 'Write down how your day went. Short is fine.',
+      diaryPrompt: 'A nudge for today',
+      diaryPlaceholder: 'tenpo suno ni la mi …',
+      diarySave: 'Save entry', diarySaved: 'Saved.',
+      diaryEmpty: 'No entry yet. The first one is the hardest.',
+      diaryCount: (n, days) => `${n} ${n === 1 ? 'entry' : 'entries'}`
+        + `${days > 1 ? ` · ${days} days in a row` : ''}`,
+      diaryToday: 'today', diaryXray: 'Show the structure',
+      diaryReward: 'First entry today · +15 XP',
+      diaryLines: (ok, all) => `${ok}/${all} sentences hold up`,
       updateReady: 'A new version is here.', updateLoad: 'Load it now',
       versionLabel: (v) => `Version ${v}`,
       credit: (link) => `Prototype. Exercise sentences from ${link} (MIT, © 2020 /dev/urandom `
@@ -3693,6 +3767,8 @@ const TokiPona = (function (data) {
   const blank = {
     xp: 0, streak: 0, lastDay: null, dayXp: 0, goal: 40, days: {}, read: {},
     done: {}, mastery: {}, seenWords: {}, srs: {},
+    size: 'mittel',
+    diary: {},
     sitelen: false,
     sound: true,
     nameHead: 'jan',
@@ -3752,6 +3828,7 @@ const TokiPona = (function (data) {
   save();
   let session = null;
   let reading = null;
+  let diary = false;
   let tab = 'pfad';
 
   // Was aus dem Speicher oder aus einer Sicherungsdatei kommt, ist erst einmal
@@ -3783,12 +3860,16 @@ const TokiPona = (function (data) {
     state.lang = DATA.languages[raw.lang] ? raw.lang : blank.lang;
     state.nameHead = typeof raw.nameHead === 'string' ? raw.nameHead.slice(0, 16) : blank.nameHead;
     state.voice = VOICES.some((entry) => entry.id === raw.voice) ? raw.voice : blank.voice;
+    state.size = SIZES.some((entry) => entry.id === raw.size) ? raw.size : blank.size;
     state.sitelen = raw.sitelen === true;
     state.sound = raw.sound !== false;
     state.done = plain(raw.done, (value) => (value ? true : undefined));
     state.read = plain(raw.read, (value) => (value ? true : undefined));
     state.seenWords = plain(raw.seenWords, (value) => (value ? true : undefined));
     state.days = plain(raw.days, (value) => number(value, undefined, 1e9));
+    // Tagebucheinträge sind eigener Text — begrenzt, aber sonst unangetastet.
+    state.diary = plain(raw.diary, (value) => (typeof value === 'string' && value.trim()
+      ? value.slice(0, 600) : undefined));
     state.mastery = plain(raw.mastery, (value) => number(value, undefined, 1));
     state.srs = plain(raw.srs, (card) => {
       if (!card || typeof card !== 'object') return undefined;
@@ -4399,13 +4480,35 @@ const TokiPona = (function (data) {
     return out;
   };
 
+  const sizeOf = () => SIZES.find((entry) => entry.id === state.size) || SIZES[1];
+
+  // Zuschneiden, ohne die Runde eintönig zu machen: erst von jeder Sorte eine
+  // Aufgabe sichern, dann in der ursprünglichen Reihenfolge auffüllen.
+  function trimQueue(tasks, limit) {
+    if (tasks.length <= limit) return tasks;
+    const kept = new Set();
+    const seen = new Set();
+    for (const task of tasks) {
+      if (kept.size >= limit) break;
+      if (seen.has(task.type)) continue;
+      seen.add(task.type);
+      kept.add(task);
+    }
+    for (const task of tasks) {
+      if (kept.size >= limit) break;
+      kept.add(task);
+    }
+    return tasks.filter((task) => kept.has(task));
+  }
+
   function buildSession(lesson) {
+    const size = sizeOf();
     const builds = shuffle(lesson.items.filter((i) => i.direction === 'de_tp'));
     const reads = shuffle(lesson.items.filter((i) => i.direction === 'tp_de'));
     const words = shuffle(lesson.words.filter((w) => TP.lexicon[w]));
     const tasks = [];
 
-    words.slice(0, 2).forEach((word) => tasks.push({ type: 'word', word, lesson, concepts: [] }));
+    words.slice(0, size.words).forEach((word) => tasks.push({ type: 'word', word, lesson, concepts: [] }));
     // In jeder zweiten Lektion wird ein Wort nicht abgefragt, sondern gebaut.
     const longWord = words.find((word) => (TP.syllables(word) || []).length >= 2);
     if (longWord && lesson.number % 2 === 1) {
@@ -4416,9 +4519,9 @@ const TokiPona = (function (data) {
     if (style && lesson.number >= 5) {
       tasks.push({ type: 'style', style, lesson, concepts: [] });
     }
-    builds.slice(0, 3).forEach((item) =>
+    builds.slice(0, size.builds).forEach((item) =>
       tasks.push({ type: 'build', item, lesson, concepts: lessonConcepts(lesson) }));
-    reads.slice(0, 2).forEach((item) =>
+    reads.slice(0, size.reads).forEach((item) =>
       tasks.push({ type: 'choose', item, lesson, concepts: lessonConcepts(lesson) }));
 
     const flawed = brokenSentence(lesson);
@@ -4438,7 +4541,7 @@ const TokiPona = (function (data) {
       tasks.push({ type: 'trace', word: traceWord, lesson, concepts: [] });
     }
 
-    const heard = reads[2] || builds[4];
+    const heard = reads[size.reads] || builds[size.builds + 1];
     if (state.sound && speechAvailable() && heard) {
       // Gerade Lektionen diktieren, ungerade lassen wählen.
       const kind = lesson.number % 2 === 0 ? 'dictation' : 'listen';
@@ -4452,13 +4555,14 @@ const TokiPona = (function (data) {
 
     const prompt = shuffle(OPEN.prompts.filter((entry) => entry.stage <= lesson.number))[0];
     if (prompt) tasks.push({ type: 'answer', prompt, lesson, concepts: lessonConcepts(lesson) });
-    else if (builds[3]) {
-      tasks.push({ type: 'free', item: builds[3], lesson, concepts: lessonConcepts(lesson) });
+    else if (builds[size.builds]) {
+      tasks.push({ type: 'free', item: builds[size.builds], lesson, concepts: lessonConcepts(lesson) });
     }
 
     return {
       lesson,
-      queue: tasks.length ? tasks : builds.slice(0, 4).map((item) => ({ type: 'build', item, lesson, concepts: [] })),
+      queue: trimQueue(tasks.length ? tasks
+        : builds.slice(0, 4).map((item) => ({ type: 'build', item, lesson, concepts: [] })), size.cap),
       index: 0,
       correct: 0,
       total: 0,
@@ -4500,7 +4604,8 @@ const TokiPona = (function (data) {
     // Aus jeder Sorte etwas, damit die Runde nicht nur aus Sticheleien besteht.
     const bySort = ['utala', 'utala', 'konter', 'wawa', 'pona'].map((kind) =>
       shuffle(lesson.items.filter((item) => item.kind === kind))[0]).filter(Boolean);
-    const picks = [...new Set(bySort.concat(shuffle(lesson.items)))].slice(0, 6);
+    const picks = [...new Set(bySort.concat(shuffle(lesson.items)))]
+      .slice(0, Math.max(3, sizeOf().cap - 2));
     const tasks = shuffle(picks).map((item, index) => ({
       type: index % 2 ? 'build' : 'choose', item, lesson, concepts: [],
     }));
@@ -4527,10 +4632,81 @@ const TokiPona = (function (data) {
   }
 
   function buildReviewSession() {
-    const tasks = shuffle(dueKeys()).map(taskFromKey).filter(Boolean).slice(0, 12);
+    const tasks = shuffle(dueKeys()).map(taskFromKey).filter(Boolean).slice(0, sizeOf().cap);
     return {
       lesson: null, review: true, queue: tasks, index: 0, correct: 0, total: 0, xp: 0,
       retried: new Set(),
+    };
+  }
+
+  // ------------------------------------------------------- Schwachstellen
+
+  // Wackelig ist, was danebenging — nicht, was noch nie dran war. Eine falsche
+  // Antwort senkt die Leichtigkeit unter den Anfangswert; das ist die einzige
+  // Spur, die ein Fehler hinterlässt. Übersprungene Karten bleiben bei 2,5 und
+  // zählen deshalb nicht mit: Überspringen ist kein Fehler.
+  // Der Fälligkeitstermin spielt hier keine Rolle — darum geht es ja gerade.
+  function weakKeys() {
+    const scored = Object.keys(state.srs).map((key) => {
+      const card = state.srs[key];
+      // Kleiner Wert heißt: sitzt schlecht.
+      const score = (card.reps ? 1 : 0) + (card.ease - 1.4) / 1.4;
+      return { key, score, slipped: card.ease < 2.5 };
+    }).filter((entry) => entry.slipped && entry.score < 1.4);
+    scored.sort((a, b) => a.score - b.score);
+    return scored.map((entry) => entry.key);
+  }
+
+  // Bei Konzepten fehlt diese Spur: ein frisches Konzept steht genauso niedrig
+  // wie ein misslungenes. Also zählt nur, was in einer abgeschlossenen Lektion
+  // vorkam — wer eine Lektion sauber durchspielt, landet über der Hälfte.
+  function weakConcepts() {
+    const covered = new Set(lessons()
+      .filter((lesson) => state.done[lesson.number])
+      .flatMap(lessonConcepts));
+    return Object.keys(state.mastery)
+      .filter((concept) => covered.has(concept) && state.mastery[concept] < 0.5)
+      .sort((a, b) => state.mastery[a] - state.mastery[b]);
+  }
+
+  // Zu einem schwachen Konzept passt jede Lektion, die es überhaupt behandelt —
+  // und aus den freigeschalteten davon kommen die Sätze.
+  function itemsForConcept(concept) {
+    const open = lessons().filter((lesson) => unlocked(lesson.number)
+      && lessonConcepts(lesson).includes(concept));
+    return shuffle(open).flatMap((lesson) => shuffle(lesson.items)
+      .slice(0, 2)
+      .map((item) => ({
+        type: item.direction === 'de_tp' ? 'build' : 'choose',
+        item,
+        lesson,
+        concepts: [concept],
+      })));
+  }
+
+  function weakSession() {
+    const cap = sizeOf().cap;
+    const fromCards = weakKeys().map(taskFromKey).filter(Boolean);
+    const fromConcepts = weakConcepts().flatMap(itemsForConcept);
+    // Abwechselnd auffädeln: sonst stehen erst zehn Wörter und dann zehn Sätze.
+    const queue = [];
+    const seen = new Set();
+    for (let i = 0; i < Math.max(fromCards.length, fromConcepts.length); i += 1) {
+      for (const task of [fromCards[i], fromConcepts[i]]) {
+        if (!task) continue;
+        const id = keyOf(task) || String(queue.length);
+        if (seen.has(id)) continue;
+        seen.add(id);
+        queue.push(task);
+      }
+    }
+    return queue.slice(0, cap);
+  }
+
+  function buildWeakSession() {
+    return {
+      lesson: null, review: true, weak: true, queue: weakSession(),
+      index: 0, correct: 0, total: 0, xp: 0, retried: new Set(),
     };
   }
 
@@ -4614,6 +4790,7 @@ const TokiPona = (function (data) {
     app.innerHTML = '';
     if (session) { renderSession(); clearStrayFocus(); return; }
     if (reading) { app.append(readerScreen(reading)); clearStrayFocus(); return; }
+    if (diary) { app.append(diaryScreen()); clearStrayFocus(); return; }
     app.append(topbar());
     if (tab === 'pfad') app.append(pathScreen());
     else if (tab === 'nimi') app.append(wordScreen());
@@ -4669,7 +4846,7 @@ const TokiPona = (function (data) {
     const due = dueKeys().length;
     if (due) {
       const card = el(`
-        <button class="lesson review" data-state="current">
+        <button class="lesson review due" data-state="current">
           <span class="badge">↻</span>
           <span class="body">
             <b>${escape(t('dueCards', due))}</b>
@@ -4678,6 +4855,22 @@ const TokiPona = (function (data) {
         </button>`);
       card.onclick = () => { session = buildReviewSession(); render(); };
       screen.querySelector('.hello').after(card);
+    }
+
+    // Was wackelt, kommt sonst erst dann wieder, wenn die Wiederholung es
+    // vorsieht. Hier steht es sofort zur Verfügung.
+    const weak = weakSession();
+    if (weak.length >= 4) {
+      const card = el(`
+        <button class="lesson review weak" data-state="current">
+          <span class="badge">△</span>
+          <span class="body">
+            <b>${escape(t('weakTitle'))}</b>
+            <span>${escape(t('weakSub', weak.length))}</span>
+          </span>
+        </button>`);
+      card.onclick = () => { session = buildWeakSession(); render(); };
+      (screen.querySelector('.lesson.review') || screen.querySelector('.hello')).after(card);
     }
 
     const path = screen.querySelector('.path');
@@ -4716,8 +4909,10 @@ const TokiPona = (function (data) {
     }
 
     screen.append(readingCard());
+    screen.append(diaryCard());
     screen.append(weekCard());
     screen.append(goalCard());
+    screen.append(sizeCard());
     screen.append(languageCard());
     screen.append(soundCard());
     screen.append(sitelenCard());
@@ -4759,6 +4954,148 @@ const TokiPona = (function (data) {
       list.append(row);
     });
     return card;
+  }
+
+  // ------------------------------------------------------------ Tagebuch
+
+  // Wie viele Tage am Stück geschrieben wurde, von heute (oder gestern) zurück.
+  function diaryStreak() {
+    const entries = state.diary || {};
+    let days = 0;
+    let cursor = new Date();
+    if (!entries[today()]) cursor = new Date(Date.now() - 86400000);
+    for (;;) {
+      const key = cursor.toISOString().slice(0, 10);
+      if (!entries[key]) return days;
+      days += 1;
+      cursor = new Date(cursor.getTime() - 86400000);
+    }
+  }
+
+  // Ein Anstoß, der sich am Tag festmacht statt zu würfeln: wer zweimal
+  // hinschaut, findet dieselbe Frage vor.
+  function diaryNudge() {
+    const open = OPEN.prompts.filter((entry) => unlocked(entry.stage));
+    if (!open.length) return null;
+    const day = today();
+    let sum = 0;
+    for (let i = 0; i < day.length; i += 1) sum = (sum * 31 + day.charCodeAt(i)) % 100003;
+    return open[sum % open.length];
+  }
+
+  function diaryCard() {
+    const entries = Object.keys(state.diary || {});
+    const streak = diaryStreak();
+    const card = el(`
+      <div class="card">
+        <h2>${escape(t('diaryTitle'))}</h2>
+        <p class="hint">${escape(t('diaryHint'))}</p>
+        <div class="row"><button class="ghost">${escape(t('diaryOpen'))}</button></div>
+        <p class="hint">${escape(entries.length
+          ? t('diaryCount', entries.length, streak) : t('diaryEmpty'))}</p>
+      </div>`);
+    card.querySelector('.ghost').onclick = () => { diary = true; render(); };
+    return card;
+  }
+
+  function diaryScreen() {
+    const day = today();
+    const nudge = diaryNudge();
+    const screen = screenWith(`
+      <div class="exbar">
+        <button aria-label="${escape(t('diaryBack'))}">✕</button>
+        <span class="track"></span>
+        <span class="metric">sitelen</span>
+      </div>
+      <div class="hello">
+        <h1>${escape(t('diaryTitle'))}</h1>
+        <p>${escape(t('diaryLead'))}</p>
+      </div>
+      <div class="card diarywrite">
+        <h2>${escape(t('diaryToday'))} · ${escape(day)}</h2>
+        <textarea class="typed diarytext" rows="4" autocomplete="off" autocapitalize="off"
+                  spellcheck="false" placeholder="${escape(t('diaryPlaceholder'))}"
+                  aria-label="toki pona"></textarea>
+        <p class="live"></p>
+        <div class="actions"><button class="primary">${escape(t('diarySave'))}</button></div>
+      </div>
+      <div class="diarypast"></div>`);
+
+    screen.querySelector('.exbar button').onclick = () => { diary = false; render(); };
+
+    if (nudge) {
+      const box = el(`
+        <div class="card diarynudge">
+          <h2>${escape(t('diaryPrompt'))}</h2>
+          <p class="question tp">${escape(nudge.tp)}</p>
+          <p class="hint">${escape((nudge[state.lang] || nudge.de)[0])}</p>
+        </div>`);
+      const listen = sayButton(nudge.tp, t('listen'));
+      if (listen) box.querySelector('.question').append(listen);
+      screen.querySelector('.hello').after(box);
+    }
+
+    const input = screen.querySelector('.diarytext');
+    const live = screen.querySelector('.live');
+    const button = screen.querySelector('.primary');
+    input.value = (state.diary && state.diary[day]) || '';
+    button.after(lookupHelper(input));
+
+    // Mitlesen, nicht benoten: gezählt wird, wie viele Sätze durchgehen, und
+    // beim ersten Stolperer steht daneben, woran es liegt.
+    const draw = () => {
+      const text = input.value.trim();
+      if (!text) { live.textContent = ''; live.className = 'live'; return; }
+      const parts = TP.splitUtterances(text);
+      const results = parts.map((part) => TP.parse(part));
+      const ok = results.filter((result) => result.isValid).length;
+      const first = results.find((result) => !result.isValid);
+      live.textContent = t('diaryLines', ok, results.length)
+        + (first ? ' · ' + say(first.violations[0]) : '');
+      live.className = 'live ' + (first ? 'bad' : 'good');
+    };
+    input.oninput = draw;
+    draw();
+
+    button.onclick = () => {
+      const text = input.value.trim();
+      const fresh = !(state.diary && state.diary[day]);
+      state.diary = state.diary || {};
+      if (text) state.diary[day] = text.slice(0, 600);
+      else delete state.diary[day];
+      save();
+      // Einmal am Tag gibt es Punkte — fürs Schreiben, nicht fürs Richtigsein.
+      if (text && fresh) { award(15); toast(t('diaryReward')); }
+      else toast(t('diarySaved'));
+      render();
+    };
+
+    const past = screen.querySelector('.diarypast');
+    Object.keys(state.diary || {}).sort().reverse()
+      .filter((key) => key !== day)
+      .forEach((key) => {
+        const text = state.diary[key];
+        const entry = el(`
+          <div class="card diaryentry">
+            <h2>${escape(key)}</h2>
+            <p class="question tp">${escape(text)}</p>
+            <div class="row"><button class="ghost">${escape(t('diaryXray'))}</button></div>
+          </div>`);
+        const toggle = entry.querySelector('.ghost');
+        toggle.onclick = () => {
+          if (entry.querySelector('.xraywrap')) {
+            entry.querySelectorAll('.xraywrap').forEach((box) => box.remove());
+            return;
+          }
+          TP.splitUtterances(text).forEach((part) => {
+            const box = xrayBlock(part, null, null);
+            if (box) toggle.parentElement.before(box);
+          });
+        };
+        past.append(entry);
+      });
+
+    return screen;
   }
 
   // Der Text selbst: Zeile für Zeile, Übersetzung erst auf Tippen.
@@ -4899,6 +5236,24 @@ const TokiPona = (function (data) {
       const button = el(`<button class="ghost" data-picked="${value === goal()}"
         >${escape(t('goalPick', value))}</button>`);
       button.onclick = () => { state.goal = value; save(); render(); };
+      row.append(button);
+    });
+    return card;
+  }
+
+  function sizeCard() {
+    const card = el(`
+      <div class="card">
+        <h2>${escape(t('sizeTitle'))}</h2>
+        <p class="hint">${escape(t('sizeHint'))}</p>
+        <div class="row"></div>
+      </div>`);
+    const row = card.querySelector('.row');
+    const labels = { kurz: t('sizeShort'), mittel: t('sizeMedium'), lang: t('sizeLong') };
+    SIZES.forEach((entry) => {
+      const button = el(`<button class="ghost" data-picked="${entry.id === sizeOf().id}"
+        >${escape(labels[entry.id])}</button>`);
+      button.onclick = () => { state.size = entry.id; save(); render(); };
       row.append(button);
     });
     return card;
@@ -6673,9 +7028,9 @@ const TokiPona = (function (data) {
       <div class="screen done">
         <div class="burst">pona!</div>
         <h2>${escape(quiz ? (quiz.title[state.lang] || quiz.title.de)
-          : (review ? t('reviewDone') : lesson.title))}</h2>
+          : (review ? t(session.weak ? 'weakDone' : 'reviewDone') : lesson.title))}</h2>
         <p>${escape(quiz ? (quiz.about[state.lang] || quiz.about.de)
-          : (review ? t('reviewNote')
+          : (review ? t(session.weak ? 'weakNote' : 'reviewNote')
             : (musi ? t('musiLead') : lesson.note.replace(/<[^>]+>/g, ''))))}</p>
         <div class="tally">
           <div><b>+${session.xp}</b><span>${escape(t('xp'))}</span></div>

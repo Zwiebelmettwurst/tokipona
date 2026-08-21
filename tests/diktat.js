@@ -60,7 +60,7 @@ const FAKE = `
     done: { 1: true }, lang: 'de', sound: true,
     srs: { 's:lsp02_08': { reps: 1, interval: 600000, ease: 2.5, due: Date.now() - 1000 } } })));
   await page.reload();
-  await page.locator('.lesson.review').click();
+  await page.locator('.lesson.due').click();
   await page.waitForSelector('.exbar');
   // Die Wiederholung liefert eine Bauaufgabe; das Diktat kommt aus der Lektion.
   await page.goto(FILE);

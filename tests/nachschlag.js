@@ -23,8 +23,8 @@ const open = (page, key) => page.evaluate((k) => {
   await page.goto(FILE);
   await open(page, 'n:6');
   await page.reload();
-  await page.waitForSelector('.lesson.review');
-  await page.locator('.lesson.review').click();
+  await page.waitForSelector('.lesson.due');
+  await page.locator('.lesson.due').click();
   await page.waitForSelector('.typed');
   const concept = (await page.locator('.question').textContent()).trim();
   check(Boolean(await page.locator('.lookuptoggle').count()), 'kein Nachschlage-Knopf beim Umschreiben');
@@ -53,8 +53,8 @@ const open = (page, key) => page.evaluate((k) => {
   await page.goto(FILE);
   await open(page, 'q:q03');
   await page.reload();
-  await page.waitForSelector('.lesson.review');
-  await page.locator('.lesson.review').click();
+  await page.waitForSelector('.lesson.due');
+  await page.locator('.lesson.due').click();
   await page.waitForSelector('.typed');
   check(Boolean(await page.locator('.lookuptoggle').count()), 'kein Nachschlagen bei der offenen Frage');
 
@@ -65,8 +65,8 @@ const open = (page, key) => page.evaluate((k) => {
     srs: { 's:lsp06_06': { reps: 1, interval: 600000, ease: 2.5, due: Date.now() - 1000 } },
   })));
   await page.reload();
-  await page.waitForSelector('.lesson.review');
-  await page.locator('.lesson.review').click();
+  await page.waitForSelector('.lesson.due');
+  await page.locator('.lesson.due').click();
   await page.waitForSelector('.slot');
   for (const word of ['jan', 'mije', 'li', 'pana', 'moku', 'tawa', 'jan', 'lili']) {
     const tile = page.locator(`.bank .tile:not(.used)[data-word="${word}"]`).first();

@@ -112,7 +112,7 @@ const check = (condition, message) => { if (!condition) { errors.push(message); 
   });
   await page.reload();
   await page.waitForSelector('.lesson');
-  const review = page.locator('.lesson.review');
+  const review = page.locator('.lesson.due');
   check(Boolean(await review.count()), 'keine Wiederholungskarte trotz fälliger musi-Karten');
   if (await review.count()) {
     await review.click();
